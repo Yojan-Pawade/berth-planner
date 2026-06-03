@@ -1,0 +1,48 @@
+.berth-planner {
+    padding: 10px;
+}
+
+.planner-body {
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    white-space: nowrap;
+
+}
+
+.planner-header-row,
+.berth-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.planner-header-row {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #fff;
+}
+
+.planner-title-col,
+.planner-berth-col {
+    width: 250px;
+    flex: 0 0 250px;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: #fff;
+}
+
+.planner-timeline-header-inner,
+.planner-plot-inner {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 20px;
+}
+
+.coulmn {
+    white-space: nowrap;
+    border: 1px solid #666;
+}
