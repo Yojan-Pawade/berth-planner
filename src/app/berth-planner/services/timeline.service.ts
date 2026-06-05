@@ -1,18 +1,9 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 export type ViewMode = 'ONE_DAY' | 'TWO_DAY' | 'ONE_WEEK' | 'ONE_MONTH' | 'CUSTOM';
 export type SlotCount = 4 | 6 | 12 | 24;
 
 export interface TimelineConfig {
-  rangeStartDate: Date | null;
-  rangeEndDate: Date | null;
-  viewMode: ViewMode;
-  selectedDayTimeSlot: SlotCount;
-  containerWidth: number;
-  needsHorizontalScroll: boolean;
-}
-
-export interface TimelineSize {
   totalDays: number;
   totalColumns: number;
   columnWidthPx: number;
@@ -20,110 +11,104 @@ export interface TimelineSize {
   minutesPerSlot: number;
   pxPerMinute: number;
   totalContentWidthPx: number;
+  slotLabels: string[];
+}
+
+export interface SlotMeta {
+  minutesPerSlot: number;
+  labels: string[];
 }
 
 @Injectable({ providedIn: 'root' })
 export class TimeLineService {
-
   readonly todayDate = new Date();
 
-  readonly dayTimeSlots = [
-    { value: 4 as SlotCount, label: '4 Slots' },
-    { value: 6 as SlotCount, label: '6 Slots' },
-    { value: 12 as SlotCount, label: '12 Slots' },
-    { value: 24 as SlotCount, label: '24 Slots' },
-  ];
+  private readonly MIN_COLUMN_WIDTH_12_SLOT = 300;
+  private readonly MIN_COLUMN_WIDTH_24_SLOT = 600;
 
-  private readonly MIN_DAY_WIDTH_SCROLL = 60;
+  readonly slotMetaMap = new Map<SlotCount, SlotMeta>([
+    [4, { minutesPerSlot: 360, labels: ['12a', '6', '12p', '18'] }],
+    [6, { minutesPerSlot: 240, labels: ['12a', '4', '8', '12p', '16', '20'] }],
+    [12, { minutesPerSlot: 120, labels: ['12a', '2', '4', '6', '8', '10', '12p', '14', '16', '18', '20', '22'] }],
+    [24, { minutesPerSlot: 60, labels: ['12a', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12p', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'] }],
+  ]);
 
   private readonly _rangeStartDate = signal<Date | null>(null);
   private readonly _rangeEndDate = signal<Date | null>(null);
   private readonly _viewMode = signal<ViewMode>('ONE_WEEK');
   private readonly _slotCount = signal<SlotCount>(4);
-  private readonly _timelineContainerWidth = signal<number>(0);
+  
+  private readonly _plannerWidthPx = signal<number>(1200);
+  private readonly _plannerHeightPx = signal<number>(0);
 
   readonly rangeStartDate = this._rangeStartDate.asReadonly();
   readonly rangeEndDate = this._rangeEndDate.asReadonly();
   readonly viewMode = this._viewMode.asReadonly();
   readonly slotCount = this._slotCount.asReadonly();
-  readonly timeLineContainerWidth = this._timelineContainerWidth.asReadonly();
-  readonly slotMinMap = new Map<number, number>([
-    [4, 360],
-    [6, 240],
-    [12, 120],
-    [24, 60]
-  ]);
+  
+  readonly plannerWidthPx = this._plannerWidthPx.asReadonly();
+  readonly plannerHeightPx = this._plannerHeightPx.asReadonly();
 
   private readonly MS_PER_MINUTE = 1000 * 60;
-  private readonly MS_PER_HOUR = 1000 * 60 * 60;
   private readonly MS_PER_DAY = 1000 * 60 * 60 * 24;
 
-  readonly config = computed<TimelineConfig>(() => {
-    const rangeStartDate = this._rangeStartDate();
-    const rangeEndDate = this._rangeEndDate();
-    const viewMode = this._viewMode();
-    const selectedDayTimeSlot = this._slotCount();
-    const containerWidth = this._timelineContainerWidth();
-    const needsHorizontalScroll = viewMode === 'ONE_MONTH' || viewMode === 'CUSTOM';
-
-    return {
-      rangeStartDate,
-      rangeEndDate,
-      viewMode,
-      selectedDayTimeSlot,
-      containerWidth,
-      needsHorizontalScroll,
-    };
-  });
-
-
-  setViewMode(mode: ViewMode): void {
+  initTimeline(mode: ViewMode, slots: SlotCount = 4): void {
+    this._slotCount.set(slots);
     this._viewMode.set(mode);
     if (mode !== 'CUSTOM') {
-      this._dateRangeForMode(mode);
+      const { start, end } = this.resolveDateRange(mode, this.todayDate);
+      this._rangeStartDate.set(start);
+      this._rangeEndDate.set(end);
     }
   }
 
-  setSlotCount(slots: SlotCount): void {
-    this._slotCount.set(slots);
-  }
+  navigate(direction: 'NEXT' | 'PREV'): void {
+    const mode = this._viewMode();
+    const current = this._rangeStartDate();
+    if (mode === 'CUSTOM' || !current) return;
 
-  setCustomRange(start: Date, end: Date): void {
-    this._viewMode.set('CUSTOM');
+    const ref = new Date(current);
+    const step = direction === 'NEXT' ? 1 : -1;
+
+    switch (mode) {
+      case 'ONE_DAY': ref.setDate(ref.getDate() + step); break;
+      case 'TWO_DAY': ref.setDate(ref.getDate() + (step * 2)); break;
+      case 'ONE_WEEK': ref.setDate(ref.getDate() + (step * 7)); break;
+      case 'ONE_MONTH': ref.setMonth(ref.getMonth() + step); break;
+    }
+
+    const { start, end } = this.resolveDateRange(mode, ref);
     this._rangeStartDate.set(start);
     this._rangeEndDate.set(end);
   }
 
-  setContainerWidth(px: number): void {
-    this._timelineContainerWidth.set(px);
-  }
-
-
-  generateTimelineSize(): TimelineSize {
-    const containerWidth = this._timelineContainerWidth();
+  generateTimelineConfig(): TimelineConfig {
+    const containerWidth = Math.floor(this._plannerWidthPx() * 80 / 100); 
     const slotCount = this._slotCount();
-    const viewMode = this._viewMode();
     const start = this._rangeStartDate();
     const end = this._rangeEndDate();
 
     const totalDays = this._daysBetween(start, end);
     const totalColumns = totalDays * slotCount;
+    
+    const viewMode = this._viewMode();
+    let columnWidthPx: number;
 
-    const isFitMode = viewMode === 'ONE_DAY'
-      || viewMode === 'TWO_DAY'
-      || viewMode === 'ONE_WEEK';
+    if (viewMode === 'ONE_DAY' || viewMode === 'TWO_DAY') {
+      columnWidthPx = containerWidth / totalDays;
+    } else {
+      columnWidthPx = slotCount === 24 ? this.MIN_COLUMN_WIDTH_24_SLOT
+        : slotCount === 12 ? this.MIN_COLUMN_WIDTH_12_SLOT
+          : (containerWidth / totalDays);
+    }
 
-    const columnWidthPx = isFitMode
-      ? Math.floor(containerWidth / totalDays)
-      : this.MIN_DAY_WIDTH_SCROLL;
+    const slotWidthPx = ((columnWidthPx / slotCount) * 100) / 100;
+    columnWidthPx = slotWidthPx * slotCount;
 
-    const slotWidthPx = columnWidthPx / slotCount;
-
-    const minutesPerSlot = this.slotMinMap.get(slotCount)!;
-
+    const minutesPerSlot = this.slotMetaMap.get(slotCount)!.minutesPerSlot;
     const pxPerMinute = slotWidthPx / minutesPerSlot;
-
     const totalContentWidthPx = totalDays * columnWidthPx;
+    const slotLabels = this.slotMetaMap.get(slotCount)!.labels;
 
     return {
       totalDays,
@@ -133,43 +118,44 @@ export class TimeLineService {
       minutesPerSlot,
       pxPerMinute,
       totalContentWidthPx,
+      slotLabels
     };
   }
 
-  private _dateRangeForMode(mode: ViewMode): void {
-    const start = new Date(this.todayDate);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(start);
+  resolveDateRange(mode: Exclude<ViewMode, 'CUSTOM'>, referenceDate?: Date): { start: Date; end: Date } {
+    const ref = new Date(referenceDate ?? this.todayDate);
+    ref.setHours(0, 0, 0, 0);
+    let start = new Date(ref);
+    let end = new Date(ref);
 
     switch (mode) {
-      case 'ONE_DAY': end.setDate(start.getDate() + 1); break;
-      case 'TWO_DAY': end.setDate(start.getDate() + 2); break;
-      case 'ONE_WEEK': end.setDate(start.getDate() + 7); break;
-      case 'ONE_MONTH': end.setMonth(start.getMonth() + 1); break;
+      case 'ONE_DAY': break;
+      case 'TWO_DAY': end.setDate(ref.getDate() + 1); break;
+      case 'ONE_WEEK': {
+        const day = ref.getDay();
+        const diffToMonday = day === 0 ? -6 : 1 - day;
+        start.setDate(ref.getDate() + diffToMonday);
+        end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        break;
+      }
+      case 'ONE_MONTH': {
+        start = new Date(ref.getFullYear(), ref.getMonth(), 1);
+        end = new Date(ref.getFullYear(), ref.getMonth() + 1, 0);
+        break;
+      }
     }
-
-    end.setDate(end.getDate() - 1);
     end.setHours(23, 59, 59, 999);
-
-    this._rangeStartDate.set(start);
-    this._rangeEndDate.set(end);
+    return { start, end };
   }
 
-  calcBarLayout(
-    itemStart: Date,
-    itemEnd: Date,
-    pxPerMinute: number
-  ): { leftPx: number; widthPx: number } | null {
-    const rangeStartDate = this._rangeStartDate();
-    if (!rangeStartDate || pxPerMinute === 0) return null;
-    const leftMinutes = (itemStart.getTime() - rangeStartDate.getTime()) / this.MS_PER_MINUTE;
-    const widthMinutes = (itemEnd.getTime() - itemStart.getTime()) / this.MS_PER_MINUTE;
-    return {
-      leftPx: Math.round(leftMinutes * pxPerMinute),
-      widthPx: Math.round(widthMinutes * pxPerMinute),
-    };
+  setPlannerWidthPx(width: number): void {
+    this._plannerWidthPx.set(width);
   }
-
+  
+  setPlannerHeightPx(height: number): void {
+    this._plannerHeightPx.set(height);
+  }
 
   private _daysBetween(start: Date | null, end: Date | null): number {
     if (!start || !end) return 0;

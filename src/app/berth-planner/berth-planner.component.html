@@ -2,27 +2,25 @@
     <div class="berth-planner-toolbar"></div>
 
     <div class="planner-body" #plannerBody>
-
         <div class="planner-header-row">
-            <div class="planner-title-col">Berth Planner</div>
-            <div class="planner-timeline-header-inner">
-                <div class="coulmn">10-11-1016</div>
-                <div class="coulmn">10-11-1016</div>
-                <div class="coulmn">10-11-1016</div>
-                <div class="coulmn">10-11-1016</div>
-                <div class="coulmn">10-11-1016</div>
-                <div class="coulmn">10-11-1016</div>
-                <div class="coulmn">10-11-1016</div>
-                <div class="coulmn">10-11-1016</div>
-                <div class="coulmn">10-11-1016</div>
-                <div class="coulmn">10-11-1016</div>
-                <div class="coulmn">10-11-1016</div>
+            <div class="planner-title-col" [style.width.px]="berthNameWidth()">Berth Planner</div>
+            <div class="planner-timeline-header-inner"[style.width.px]="timelineWidth()"  >
+
+                <ng-container *ngFor="let date of timeline">
+                    <div [style.width.px]="timelineConfig.columnWidthPx" class="day-col">
+                        <div class="date">{{date |date:'dd-MMM-YYYY'}} </div>
+                        <div class="time-col">
+                            <div [style.width.px]="timelineConfig.slotWidthPx" *ngFor="let time of timelineConfig.slotLabels ">{{time}}</div>
+                        </div>
+                    </div>
+                </ng-container>
             </div>
         </div>
         <div>
             <div class="berth-row">
-                <div class="planner-berth-col">Berth A</div>
+                <div class="planner-berth-col" [style.width.px]="berthNameWidth()">Berth A</div>
                 <div class="planner-plot-inner">
+                    <!-- <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
@@ -32,14 +30,14 @@
                     <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
-                    <div class="coulmn">10-11-1016</div>
-                    <div class="coulmn">10-11-1016</div>
+                    <div class="coulmn">10-11-1016</div> -->
                 </div>
             </div>
 
             <div class="berth-row">
-                <div class="planner-berth-col">Berth B</div>
+                <div class="planner-berth-col" [style.width.px]="berthNameWidth()">Berth B</div>
                 <div class="planner-plot-inner">
+                    <!-- <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
@@ -49,14 +47,14 @@
                     <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
-                    <div class="coulmn">10-11-1016</div>
-                    <div class="coulmn">10-11-1016</div>
+                    <div class="coulmn">10-11-1016</div> -->
                 </div>
             </div>
 
             <div class="berth-row">
-                <div class="planner-berth-col">Berth C</div>
+                <div class="planner-berth-col" [style.width.px]="berthNameWidth()">Berth C</div>
                 <div class="planner-plot-inner">
+                    <!-- <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
@@ -66,8 +64,7 @@
                     <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
                     <div class="coulmn">10-11-1016</div>
-                    <div class="coulmn">10-11-1016</div>
-                    <div class="coulmn">10-11-1016</div>
+                    <div class="coulmn">10-11-1016</div> -->
                 </div>
             </div>
 

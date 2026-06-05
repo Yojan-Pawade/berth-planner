@@ -1,20 +1,30 @@
 .berth-planner {
     padding: 10px;
+    overflow:hidden;
 }
 
 .planner-body {
     overflow: auto;
     display: flex;
+
     flex-direction: column;
     gap: 5px;
     white-space: nowrap;
 
 }
 
-.planner-header-row,
-.berth-row {
+.planner-header-row{
     display: flex;
     flex-direction: row;
+    width: max-content;
+    min-width: 100%;
+}
+.berth-row{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    width: max-content;
+    min-width: 100%;
 }
 
 .planner-header-row {
@@ -22,24 +32,55 @@
     top: 0;
     z-index: 1;
     background-color: #fff;
+
 }
 
 .planner-title-col,
 .planner-berth-col {
-    width: 250px;
-    flex: 0 0 250px;
     position: sticky;
     left: 0;
     z-index: 1;
     background-color: #fff;
+    border: 1px solid #bcbcbc;
+    flex-shrink: 0;
 }
 
-.planner-timeline-header-inner,
 .planner-plot-inner {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     gap: 20px;
+}
+
+.planner-timeline-header-inner {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    text-align: center;
+    .day-col {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-top: 1px solid #bcbcbc;
+        border-right: 1px solid #bcbcbc;
+        border-bottom:1px solid #bcbcbc ;
+
+        .time-col{
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            border-top:1px solid #bcbcbc ;
+            & > div{
+                font-size: 12px;
+                font-weight: 500;
+                text-align: left;
+                &:not(:last-child){
+                       border-right: 1px solid #bcbcbc;
+                }
+            }
+        }
+    }
 }
 
 .coulmn {
