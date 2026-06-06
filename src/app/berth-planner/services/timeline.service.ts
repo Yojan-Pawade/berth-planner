@@ -1,28 +1,12 @@
 import { Injectable, signal } from '@angular/core';
-
-export type ViewMode = 'ONE_DAY' | 'TWO_DAY' | 'ONE_WEEK' | 'ONE_MONTH' | 'CUSTOM';
-export type SlotCount = 4 | 6 | 12 | 24;
-
-export interface TimelineConfig {
-  totalDays: number;
-  totalColumns: number;
-  columnWidthPx: number;
-  slotWidthPx: number;
-  minutesPerSlot: number;
-  pxPerMinute: number;
-  totalContentWidthPx: number;
-  slotLabels: string[];
-}
-
-export interface SlotMeta {
-  minutesPerSlot: number;
-  labels: string[];
-}
+import { SlotCount, SlotMeta, TimelineConfig, ViewMode } from '../berth-planner.model';
 
 @Injectable({ providedIn: 'root' })
 export class TimeLineService {
   readonly todayDate = new Date();
 
+  private readonly MIN_COLUMN_WIDTH_4_SLOT  = 120;
+  private readonly MIN_COLUMN_WIDTH_6_SLOT  = 180;
   private readonly MIN_COLUMN_WIDTH_12_SLOT = 300;
   private readonly MIN_COLUMN_WIDTH_24_SLOT = 600;
 
@@ -37,6 +21,7 @@ export class TimeLineService {
   private readonly _rangeEndDate = signal<Date | null>(null);
   private readonly _viewMode = signal<ViewMode>('ONE_WEEK');
   private readonly _slotCount = signal<SlotCount>(4);
+  private readonly _bollardSize = signal<number>(25)
   
   private readonly _plannerWidthPx = signal<number>(1200);
   private readonly _plannerHeightPx = signal<number>(0);
@@ -45,6 +30,7 @@ export class TimeLineService {
   readonly rangeEndDate = this._rangeEndDate.asReadonly();
   readonly viewMode = this._viewMode.asReadonly();
   readonly slotCount = this._slotCount.asReadonly();
+  readonly bollardSize = this._bollardSize.asReadonly();
   
   readonly plannerWidthPx = this._plannerWidthPx.asReadonly();
   readonly plannerHeightPx = this._plannerHeightPx.asReadonly();
@@ -83,10 +69,11 @@ export class TimeLineService {
   }
 
   generateTimelineConfig(): TimelineConfig {
-    const containerWidth = Math.floor(this._plannerWidthPx() * 80 / 100); 
+    const containerWidth = this._plannerWidthPx() * 84.5/100
     const slotCount = this._slotCount();
     const start = this._rangeStartDate();
     const end = this._rangeEndDate();
+    const bollardSize = this._bollardSize();
 
     const totalDays = this._daysBetween(start, end);
     const totalColumns = totalDays * slotCount;
@@ -96,10 +83,17 @@ export class TimeLineService {
 
     if (viewMode === 'ONE_DAY' || viewMode === 'TWO_DAY') {
       columnWidthPx = containerWidth / totalDays;
+
+    } else if (viewMode === 'ONE_MONTH' || viewMode === 'CUSTOM') {
+      columnWidthPx = slotCount === 24 ? this.MIN_COLUMN_WIDTH_24_SLOT
+        : slotCount === 12 ? this.MIN_COLUMN_WIDTH_12_SLOT
+          : slotCount === 6 ? this.MIN_COLUMN_WIDTH_6_SLOT
+            : this.MIN_COLUMN_WIDTH_4_SLOT;
+
     } else {
       columnWidthPx = slotCount === 24 ? this.MIN_COLUMN_WIDTH_24_SLOT
         : slotCount === 12 ? this.MIN_COLUMN_WIDTH_12_SLOT
-          : (containerWidth / totalDays);
+          : containerWidth / totalDays;
     }
 
     const slotWidthPx = ((columnWidthPx / slotCount) * 100) / 100;
@@ -118,7 +112,8 @@ export class TimeLineService {
       minutesPerSlot,
       pxPerMinute,
       totalContentWidthPx,
-      slotLabels
+      slotLabels,
+      bollardSize
     };
   }
 
@@ -148,6 +143,26 @@ export class TimeLineService {
     end.setHours(23, 59, 59, 999);
     return { start, end };
   }
+
+  
+  
+calcBarLayout(
+  itemStart: Date,
+  itemEnd: Date,
+  pxPerMinute: number
+): { leftPx: number; widthPx: number } | null {
+  const rangeStartDate = this._rangeStartDate();
+  console.log('date range st',rangeStartDate);
+  if (!rangeStartDate || pxPerMinute === 0) return null;
+
+  const leftMinutes  = (itemStart.getTime() - rangeStartDate.getTime()) / this.MS_PER_MINUTE;
+  const widthMinutes = (itemEnd.getTime()   - itemStart.getTime())      / this.MS_PER_MINUTE;
+
+  return {
+    leftPx:  Math.round(leftMinutes  * pxPerMinute),
+    widthPx: Math.round(widthMinutes * pxPerMinute),
+  };
+}
 
   setPlannerWidthPx(width: number): void {
     this._plannerWidthPx.set(width);
