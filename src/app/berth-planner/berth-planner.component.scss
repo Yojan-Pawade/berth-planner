@@ -79,10 +79,13 @@
 .planner-corner-label {
     @include sticky-left($z: 11);
     @include flex-row(center, center);
-    border: 1px dotted #bcbcbc;
+    background-color: #f5f3ff;
+    border: 1px solid #ddd6fe;
     box-sizing: border-box;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 700;
+    color: #5b21b6;
+    letter-spacing: 0.5px;
 }
 
 .planner-timeline {
@@ -97,27 +100,24 @@
         border-top: 1px dotted #bcbcbc;
         border-bottom: 1px dotted #bcbcbc;
         box-sizing: border-box;
-        color: #5731A3;
+        color: #0058BE;
         flex-shrink: 0;
         position: relative;
         height: max-content;
-
-        &:not(:last-child) {
             &::after {
                 content: '';
                 position: absolute;
                 top: 0;
-                right: -1px;
+                right: 0px;
                 bottom: 0;
                 width: 0;
                 border-right: 1px dotted #bcbcbc;
                 pointer-events: none;
                 z-index: 0;
             }
-        }
 
         &:nth-child(even) {
-            background-color: #EBDCFF;
+            background-color: #F8F2FF;
         }
 
         &:nth-child(odd) {
@@ -137,7 +137,7 @@
         width: 100%;
         border-top: 1px dotted #bcbcbc;
         box-sizing: border-box;
-        color: #4A4452;
+        color: #43474D;
     }
 
     &__slot {
@@ -146,10 +146,6 @@
         text-align: left;
         box-sizing: border-box;
         flex-shrink: 0;
-
-        &:not(:last-child) {
-            border-right: 1px dotted #bcbcbc;
-        }
     }
 }
 
@@ -209,6 +205,8 @@
     &__bollards {
         flex: 1;
         @include flex-col();
+        color:#43474D;
+        font-size: 12px;
     }
 
     &__cell {
@@ -269,11 +267,11 @@
     box-sizing: border-box;
 
     &:nth-child(odd) {
-        background-color: rgba(214, 207, 255, 0.3);
+        background-color: #F1E6FF;
     }
 
     &:nth-child(even) {
-        background-color: rgba(217, 188, 255, 0.5);
+        background-color: #fff;
     }
 
     &:not(:last-child) {

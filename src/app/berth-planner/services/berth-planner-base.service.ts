@@ -11,7 +11,7 @@ export class BerthPlannerbaseService implements OnInit {
   readonly orientation = this._orientation.asReadonly();
 
   private readonly BERTH_NAME_PERCENT = 15;
-  private readonly BERTH_NAME_HEIGHT_PERCENT = 10;
+  private readonly BERTH_NAME_HEIGHT_PERCENT = 12;
   private readonly TIMELINE_PERCENT = 85;
 
   timelineConfig!: TimelineConfig;
@@ -29,7 +29,7 @@ export class BerthPlannerbaseService implements OnInit {
   }
 
   _init() {
-    this.timelineSvc.initTimeline('ONE_WEEK', 6);
+    this.timelineSvc.initTimeline('ONE_MONTH', 6);
     this.updateLayout();
   }
 
