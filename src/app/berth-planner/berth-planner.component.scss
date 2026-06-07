@@ -180,7 +180,7 @@
     box-sizing: border-box;
 
     &:not(:last-child) {
-        border-bottom: 1.5px dotted #bcbcbc;
+        border-bottom: 1px dotted #bcbcbc;
     }
 
     &__info {
@@ -213,13 +213,13 @@
 
     &__cell {
         @include flex-row(center, center);
-        border-left: 1.5px dotted #bcbcbc;
+        border-left: 1px dotted #bcbcbc;
         font-weight: 500;
         box-sizing: border-box;
         flex-shrink: 0;
 
         &:not(:last-child) {
-            border-bottom: 1.5px dotted #bcbcbc;
+            border-bottom: 1px dotted #bcbcbc;
         }
     }
 }
@@ -420,7 +420,7 @@
             border-bottom: none;
 
             &:not(:last-child) {
-                border-right: 1.5px dotted #bcbcbc;
+                border-right: 1px dotted #bcbcbc;
             }
         }
     }

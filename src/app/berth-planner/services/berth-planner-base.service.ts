@@ -29,7 +29,7 @@ export class BerthPlannerbaseService implements OnInit {
   }
 
   _init() {
-    this.timelineSvc.initTimeline('ONE_WEEK', 24);
+    this.timelineSvc.initTimeline('ONE_WEEK', 6);
     this.updateLayout();
   }
 

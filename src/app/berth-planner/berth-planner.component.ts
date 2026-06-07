@@ -23,20 +23,21 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
 
   ngAfterViewInit() {
     if (this.plannerBody?.nativeElement) {
-      this.resizeObserver = new ResizeObserver((entries) => {
-        for (let entry of entries) {
-          const el = entry.target as HTMLElement;
-
-          const bodyWidth = Math.floor(entry.contentRect.width);
-          const bodyHeight = Math.floor(entry.contentRect.height);
-          this.timelineSvc.setPlannerWidthPx(bodyWidth);
-          this.timelineSvc.setPlannerHeightPx(bodyHeight);
-        }
-      });
-
-      this.resizeObserver.observe(this.plannerBody.nativeElement);
+        this.resizeObserver = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                const bodyWidth = entry.contentRect.width;
+                const bodyHeight = entry.contentRect.height;
+                this.timelineSvc.setPlannerWidthPx(bodyWidth);
+                this.timelineSvc.setPlannerHeightPx(bodyHeight);
+            }
+        });
+        this.resizeObserver.observe(this.plannerBody.nativeElement);
+        const el = this.plannerBody.nativeElement;
+        this.timelineSvc.setPlannerWidthPx(el.clientWidth);
+        this.timelineSvc.setPlannerHeightPx(el.clientHeight);
+        this.updateLayout();
     }
-  }
+}
 
 
   onNext() {
