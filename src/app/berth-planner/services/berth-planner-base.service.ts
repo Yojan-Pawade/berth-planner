@@ -25,7 +25,7 @@ export class BerthPlannerbaseService implements OnInit {
   }
 
   _init() {
-    this.timelineSvc.initTimeline('ONE_WEEK', 24);
+    this.timelineSvc.initTimeline('ONE_WEEK', 6);
     this.updateLayout();
   }
 
@@ -95,41 +95,6 @@ export class BerthPlannerbaseService implements OnInit {
       };
     });
     console.log(this.berthPlotingData);
-
-
-    const newApproach = this.rawBerthData.map((item: any) => {
-      // Date handling
-      const plannedStart = new Date(item.planned_start);
-      const plannedEnd = new Date(item.planned_end);
-      const actualStart = item.actual_start ? new Date(item.actual_start) : null;
-      const actualEnd = item.actual_end ? new Date(item.actual_end) : null;
-      const pxPerMinute = this.timelineConfig.pxPerMinute;
-
-      // ploting calculations
-      const startTimestamps = plannedStart;
-      const endTimestamps = (actualEnd !== null && (actualEnd.getTime() > plannedEnd?.getTime())) ? actualEnd : plannedEnd;
-      const berthLayout = this.timelineSvc.calcBarLayout(startTimestamps, endTimestamps, pxPerMinute)!;
-      const plannedLayout = this.timelineSvc.calcBarLayout(plannedStart!, plannedEnd!, pxPerMinute)!;
-      let actualLayout: any | null = null;
-      if (actualStart && actualEnd) {
-        actualLayout = this.timelineSvc.calcBarLayout(actualStart, actualEnd, pxPerMinute)!;
-      }
-
-      // bollards calculation
-      const bollardconfig = this.prepareBollards(item.avail_bollards_st, item.avail_bollards_ed, item.bollards_increment, item.bollards_start, item.bollards_end)
-
-      return {
-        id: item.id,
-        berth_name: item.berth_name,
-        bollard_start: item.bollards_start,
-        bollard_end: item.bollards_end,
-        planned_start: plannedStart,
-        planned_end: plannedEnd,
-        actual_start: actualStart,
-        actual_end: actualEnd,
-        bollard_labels: bollardconfig.labels,
-      };
-    });
   }
 
   private generateTimelineDays(): void {
@@ -161,22 +126,6 @@ export class BerthPlannerbaseService implements OnInit {
       layoutTopMargin,
       layoutHeight
     };
-  }
-
-
-  prepareBollards(st: number, ed: number, inc: number, ac_st: number, ac_ed: number) {
-    const labels: String[] = [];
-    for (let i = st; i <= ed; i += inc) {
-      labels.push(i.toString());
-    }
-    const layoutHeight = (Math.floor((ac_ed - ac_st) / inc + 1)) * this.timelineSvc.bollardSize();
-    const topPx = Math.floor((ac_st - st) / inc) * this.timelineSvc.bollardSize();
-    return {
-      labels,
-      layoutHeight,
-      topPx
-    }
-
   }
 
 }

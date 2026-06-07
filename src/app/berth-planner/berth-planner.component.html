@@ -1,59 +1,63 @@
 <div class="berth-planner" #plannerWrapper>
-    <div class="berth-planner-toolbar">
-        <div class="date-range">
+    
+    <div class="planner-toolbar">
+        <div class="planner-toolbar__nav">
             <button mat-icon-button (click)="onPrev()">
                 <mat-icon>chevron_left</mat-icon>
             </button>
-            <span class="date-range-label">{{dateRangeLabel}}</span>
+            <span class="planner-toolbar__label">{{ dateRangeLabel }}</span>
             <button mat-icon-button (click)="onNext()">
                 <mat-icon>chevron_right</mat-icon>
             </button>
         </div>
     </div>
 
-    <div class="planner-body" #plannerBody>
+    <div class="planner-grid" #plannerBody>
+
         <div class="planner-header-row">
-            <div class="planner-title-col" [style.width.px]="berthNameWidth()">Berth/Bollards</div>
-            <div class="planner-timeline-header-inner">
+            <div class="planner-corner-label" [style.width.px]="berthNameWidth()">Berth / Bollards</div>
+            <div class="planner-timeline">
                 <ng-container *ngFor="let date of timeline">
-                    <div [style.width.px]="timelineConfig.columnWidthPx" class="day-col">
-                        <div class="date">{{date |date:'dd-MMM-YYYY'}} </div>
-                        <div class="time-col">
-                            <div [style.width.px]="timelineConfig.slotWidthPx" *ngFor="let time of timelineConfig.slotLabels ">{{time}}</div>
+                    <div class="planner-timeline__day" [style.width.px]="timelineConfig.columnWidthPx">
+                        <div class="planner-timeline__date">{{ date | date:'dd-MMM-yyyy' }}</div>
+                        <div class="planner-timeline__slots">
+                            <div class="planner-timeline__slot" [style.width.px]="timelineConfig.slotWidthPx"
+                                *ngFor="let time of timelineConfig.slotLabels">{{ time }}</div>
                         </div>
                     </div>
                 </ng-container>
             </div>
         </div>
-        <div>
+
         <ng-container *ngFor="let berth of berthPlotingData">
-            <div class="berth-row" [style.height.px]="berth.total_row_height">
-                <div class="planner-berth-col" [style.width.px]="berthNameWidth()">
-                    <div class="berth_name">
-                        <span class="icon"><mat-icon>anchor</mat-icon></span>
-                        <span>{{berth.berth_name}}</span>
+            <div class="planner-data-row" [style.height.px]="berth.total_row_height">
+
+                <div class="planner-berth-axis" [style.width.px]="berthNameWidth()">
+                    <div class="planner-berth-axis__info">
+                        <span class="planner-berth-axis__avatar"><mat-icon>anchor</mat-icon></span>
+                        <span>{{ berth.berth_name }}</span>
                     </div>
-                    <div class="bollards">
-                        <div *ngFor="let bollar of berth.bollard_labels" [style.height.px]="timelineSvc.bollardSize()">
-                            {{bollar}}
+                    <div class="planner-berth-axis__bollards">
+                        <div class="planner-berth-axis__cell" *ngFor="let bollard of berth.bollard_labels"
+                            [style.height.px]="timelineSvc.bollardSize()">
+                            {{ bollard }}
                         </div>
                     </div>
                 </div>
-        
-                <div class="planner-plot-inner" [style.width.px]="timelineConfig.totalContentWidthPx">
-                    <div *ngFor="let vessel of berth.vessels" class="plot-outer-border" [ngStyle]="{
-                            'position': 'absolute',
-                            'left.px': vessel.left_px,
-                            'top.px': vessel.top_px,
-                            'width.px': vessel.width_px,
-                            'height.px': vessel.height_px
-                         }">
-                            <strong>{{vessel.vessel_name}}</strong>
+
+                <div class="planner-canvas" [style.width.px]="timelineConfig.totalContentWidthPx">
+                    <div *ngFor="let vessel of berth.vessels" class="planner-vessel" [ngStyle]="{
+                         'left.px':   vessel.left_px,
+                         'top.px':    vessel.top_px,
+                         'width.px':  vessel.width_px,
+                         'height.px': vessel.height_px
+                       }">
+                        <span class="planner-vessel__title">{{ vessel.vessel_name }}</span>
                     </div>
                 </div>
-        
+
             </div>
         </ng-container>
-        </div>
+
     </div>
 </div>

@@ -1,106 +1,185 @@
+@mixin flex-row($align: stretch, $justify: flex-start, $gap: 0) {
+    display: flex;
+    flex-direction: row;
+    align-items: $align;
+    justify-content: $justify;
+
+    @if $gap != 0 {
+        gap: $gap;
+    }
+}
+
+@mixin flex-col($align: stretch, $justify: flex-start, $gap: 0) {
+    display: flex;
+    flex-direction: column;
+    align-items: $align;
+    justify-content: $justify;
+
+    @if $gap != 0 {
+        gap: $gap;
+    }
+}
+
+@mixin sticky-left($z: 1) {
+    position: sticky;
+    left: 0;
+    z-index: $z;
+    background-color: #fff;
+}
+
+@mixin sticky-top($z: 1) {
+    position: sticky;
+    top: 0;
+    z-index: $z;
+    background-color: #fff;
+}
+
 .berth-planner {
     padding: 10px;
     box-sizing: border-box;
-    height:100%;
+    height: 100%;
 }
 
-.berth-planner-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 5px 0px;
+.planner-toolbar {
+    @include flex-row(center, flex-end, 10px);
+    padding: 5px 10px;
     border: 1px solid #bcbcbc;
     border-radius: 15px;
     margin-bottom: 10px;
     background-color: #fff;
     z-index: 10;
 
-    .date-range {
-        display: flex;
-        align-items: center;
-        gap: 5px;
+    &__nav {
+        @include flex-row(center, center, 5px);
+    }
+
+    &__label {
+        font-size: 14px;
+        font-weight: 500;
     }
 }
 
-.planner-body {
+.planner-grid {
+    @include flex-col();
     overflow: auto;
-    display: flex;
-    flex-direction: column;
     white-space: nowrap;
     width: 100%;
     height: calc(100% - 60px);
-
-}
-
-.berth-row {
-    display: flex;
-    flex-direction: row;
-    width: max-content;
-    box-sizing: border-box;
-    border-bottom: 1.5px dotted #000;
-    border-right: 1.5px dotted #000;
 }
 
 .planner-header-row {
-    display: flex;
-    flex-direction: row;
+    @include flex-row();
+    @include sticky-top($z: 10);
     width: max-content;
     min-width: 100%;
     box-sizing: border-box;
-    position: sticky;
-    top: 0;
-    background-color: #fff;
-    z-index: 10;
     margin-bottom: 1px;
 }
 
-.planner-title-col {
-    position: sticky;
-    left: 0;
-    background-color: #fff;
-    border: 1px dotted #000;
+.planner-corner-label {
+    @include sticky-left($z: 11);
+    @include flex-row(center, center);
+    border: 1px dotted #bcbcbc;
     box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 500;
-    z-index: 10;
 }
 
-.planner-berth-col {
-    position: sticky;
-    left: 0;
-    z-index: 3;
-    background-color: #fff;
-    border: 1px dotted #000;
+.planner-timeline {
+    @include flex-row();
+    flex-wrap: nowrap;
+    text-align: center;
+    box-sizing: border-box;
+
+    &__day {
+        @include flex-col(center, center);
+        border-top: 1px dotted #bcbcbc;
+        border-right: 1px dotted #bcbcbc;
+        border-bottom: 1px dotted #bcbcbc;
+        box-sizing: border-box;
+        color: #5731A3;
+        flex-shrink: 0;
+
+        &:nth-child(even) {
+            background-color: #EBDCFF;
+        }
+
+        &:nth-child(odd) {
+            background-color: #E9E7F3;
+        }
+    }
+
+    &__date {
+        padding: 2px 4px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    &__slots {
+        @include flex-row();
+        width: 100%;
+        border-top: 1px dotted #bcbcbc;
+        box-sizing: border-box;
+        color: #4A4452;
+    }
+
+    &__slot {
+        font-size: 11px;
+        font-weight: 500;
+        text-align: left;
+        box-sizing: border-box;
+        flex-shrink: 0;
+
+        &:not(:last-child) {
+            border-right: 1px dotted #bcbcbc;
+        }
+    }
+}
+
+.planner-data-row {
+    @include flex-row();
+    width: max-content;
+    box-sizing: border-box;
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-bottom: 1px dotted #bcbcbc;
+        border-right: 1px dotted #bcbcbc;
+        pointer-events: none;
+        z-index: 0;
+    }
+}
+
+.planner-berth-axis {
+    @include sticky-left($z: 3);
+    @include flex-row(stretch);
+    border: 1px dotted #bcbcbc;
     border-top: none;
     border-bottom: none;
     flex-shrink: 0;
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
     box-sizing: border-box;
 
-    .berth_name {
-        flex: 2;
-        font-size: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
+    &:not(:last-child) {
+        border-bottom: 1.5px dotted #bcbcbc;
+    }
 
-        .icon {
-          display: flex;
-        align-items: center;
-        justify-content: center;
-        
+    &__info {
+        flex: 2;
+        @include flex-row(center, center, 10px);
+        font-size: 16px;
+    }
+
+    &__avatar {
+        @include flex-row(center, center);
         width: 36px;
         height: 36px;
         border-radius: 50%;
         background-color: #fee0e0;
         border: 1px solid #DC3545;
+        flex-shrink: 0;
 
         mat-icon {
             width: 20px;
@@ -109,128 +188,48 @@
             color: #DC3545;
         }
     }
+
+    &__bollards {
+        flex: 1;
+        @include flex-col();
     }
 
-    .bollards {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
+    &__cell {
+        @include flex-row(center, center);
+        border-left: 1.5px dotted #bcbcbc;
+        font-weight: 500;
+        box-sizing: border-box;
+        flex-shrink: 0;
 
-        & > div {
-            border-left: 1.5px dotted #000;
-            text-align: center;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box;
-            position: relative; 
-
-            &:not(:last-child) {
-                border-bottom: 1.5px dotted #000;
-            }
-
-            /* FIX 1: HORIZONTAL CELL LINES */
-            // &::after {
-            //     content: '';
-            //     position: absolute;
-            //     bottom: -1px;      
-            //     left: 100%;         
-            //     width: 100000px;    
-            //     height: 0px;
-            //     border-bottom: 1px solid #ccc;
-            //     pointer-events: none; 
-            //     z-index: -1; 
-            // }
+        &:not(:last-child) {
+            border-bottom: 1.5px dotted #bcbcbc;
         }
     }
 }
 
-.planner-plot-inner {
-    display: flex;
-    flex-direction: row;
+.planner-canvas {
+    @include flex-row();
     flex-wrap: nowrap;
     flex-shrink: 0;
     position: relative;
-    z-index: 1;
     box-sizing: border-box;
     overflow: hidden;
 }
 
-.plot-outer-border {
-    border: 1px solid #000;
+.planner-vessel {
+    position: absolute;
+    box-sizing: border-box;
     background-color: #fff;
-    box-sizing: border-box;
     z-index: 2;
-}
+    box-shadow: inset 0 0 0 1px #5731A3;
+    border-radius: 2px;
 
-.planner-timeline-header-inner {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    text-align: center;
-    box-sizing: border-box;
-
-    .day-col {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        border-top: 1px dotted #000;
-        border-right: 1px dotted #000;
-        border-bottom: 1px dotted #000;
-        box-sizing: border-box;
-        background-color: #fff;
-        color:#5731A3;
-
-        &:nth-child(even) {
-            background-color: #EBDCFF;
-        }
-        &:nth-child(odd){
-            background-color: #E9E7F3;
-        }
-
-        .date {
-            padding: 1px;
-        }
-
-        .time-col {
-            display: flex;
-            flex-direction: row;
-            width: 100%;
-            border-top: 1px dotted #000;
-            box-sizing: border-box;
-            color:#4A4452;
-
-            &>div {
-                font-size: 11px;
-                font-weight: 500;
-                text-align: left;
-                box-sizing: border-box;
-                flex-shrink: 0;
-                position: relative;
-
-                &:not(:last-child) {
-                    // border-right: 1px dotted #000;
-                }
-
-                /* FIX 2: VERTICAL TIMELINE LANES */
-                // &::after {
-                //     content: '';
-                //     position: absolute;
-                //     top: 100%;          
-                //     left: -1px;        
-                //     width: 0px; 
-                //     height: 100000px;
-                //     border-left: 1px solid #ccc;
-                //     pointer-events: none; 
-                //     z-index: -1; 
-                // }
-            }
-        }
+    &__title {
+        font-size: 11px;
+        font-weight: 500;
+        padding: 2px 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-}
-.coulmn {
-    white-space: nowrap;
-    border: 1px dotted #000;
 }
