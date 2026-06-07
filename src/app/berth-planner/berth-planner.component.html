@@ -28,8 +28,6 @@
                     [style.height.px]="orientation() === 'vertical' ? timelineConfig.columnHeightPx : null">
 
                     <div class="planner-grid__slot-line" *ngFor="let slot of timelineConfig.slotLabels; let si = index"
-                        [class.planner-grid__slot-line--even]="(i * timelineConfig.slotLabels.length + si) % 2 === 0"
-                        [class.planner-grid__slot-line--odd]="(i * timelineConfig.slotLabels.length + si) % 2 !== 0"
                         [style.width.px]="orientation() === 'horizontal' ? timelineConfig.slotWidthPx : null"
                         [style.height.px]="orientation() === 'vertical' ? timelineConfig.slotHeightPx : null">
                     </div>
