@@ -284,6 +284,10 @@
     height: 100%;
     flex-shrink: 0;
     box-sizing: border-box;
+
+    &:not(:last-child) {
+        border-right: 1px dotted #e0e0e0;
+    }
 }
 
 .planner-vessel {
