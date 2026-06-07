@@ -13,7 +13,7 @@
 
     <div class="planner-body" #plannerBody>
         <div class="planner-header-row">
-            <div class="planner-title-col" [style.width.px]="berthNameWidth()">Berth Planner</div>
+            <div class="planner-title-col" [style.width.px]="berthNameWidth()">Berth/Bollards</div>
             <div class="planner-timeline-header-inner">
                 <ng-container *ngFor="let date of timeline">
                     <div [style.width.px]="timelineConfig.columnWidthPx" class="day-col">
@@ -27,23 +27,31 @@
         </div>
         <div>
         <ng-container *ngFor="let berth of berthPlotingData">
-            <div class="berth-row">
+            <div class="berth-row" [style.height.px]="berth.total_row_height">
                 <div class="planner-berth-col" [style.width.px]="berthNameWidth()">
-                    <span class="berth_name">{{berth.berth_name}}</span>
+                    <div class="berth_name">
+                        <span class="icon"><mat-icon>anchor</mat-icon></span>
+                        <span>{{berth.berth_name}}</span>
+                    </div>
                     <div class="bollards">
-                        <div *ngFor="let bollar of berth.bollard_labels">{{bollar}}</div>
+                        <div *ngFor="let bollar of berth.bollard_labels" [style.height.px]="timelineSvc.bollardSize()">
+                            {{bollar}}
+                        </div>
                     </div>
                 </div>
+        
                 <div class="planner-plot-inner" [style.width.px]="timelineConfig.totalContentWidthPx">
-                    <div class="plot-outer-border" [ngStyle]="{
-                            'position':   'absolute',
-                            'left.px':    berth.planned_left_margin,
-                            'top.px':     berth.layout_top_margin,
-                            'width.px':   berth.layout_width,
-                            'height.px':  berth.layout_height
-                            }">
+                    <div *ngFor="let vessel of berth.vessels" class="plot-outer-border" [ngStyle]="{
+                            'position': 'absolute',
+                            'left.px': vessel.left_px,
+                            'top.px': vessel.top_px,
+                            'width.px': vessel.width_px,
+                            'height.px': vessel.height_px
+                         }">
+                            <strong>{{vessel.vessel_name}}</strong>
                     </div>
                 </div>
+        
             </div>
         </ng-container>
         </div>

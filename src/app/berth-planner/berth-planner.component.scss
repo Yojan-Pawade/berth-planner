@@ -1,5 +1,7 @@
 .berth-planner {
     padding: 10px;
+    box-sizing: border-box;
+    height:100%;
 }
 
 .berth-planner-toolbar {
@@ -11,79 +13,135 @@
     border: 1px solid #bcbcbc;
     border-radius: 15px;
     margin-bottom: 10px;
+    background-color: #fff;
+    z-index: 10;
 
-    .date-range{
+    .date-range {
         display: flex;
         align-items: center;
-        gap:5px;
+        gap: 5px;
     }
 }
 
 .planner-body {
     overflow: auto;
     display: flex;
-
     flex-direction: column;
-    gap: 5px;
     white-space: nowrap;
+    width: 100%;
+    height: calc(100% - 60px);
 
 }
 
-.planner-header-row{
+.berth-row {
     display: flex;
     flex-direction: row;
     width: max-content;
-    min-width: 100%;
-}
-.berth-row{
-    display: flex;
-    flex-direction: row;
-    width: max-content;
-    min-width: 100%;
-    position: relative;
+    box-sizing: border-box;
+    border-bottom: 1.5px dotted #000;
+    border-right: 1.5px dotted #000;
 }
 
 .planner-header-row {
+    display: flex;
+    flex-direction: row;
+    width: max-content;
+    min-width: 100%;
+    box-sizing: border-box;
     position: sticky;
     top: 0;
-    z-index: 1;
     background-color: #fff;
-
+    z-index: 10;
+    margin-bottom: 1px;
 }
 
-.planner-title-col,
+.planner-title-col {
+    position: sticky;
+    left: 0;
+    background-color: #fff;
+    border: 1px dotted #000;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 500;
+    z-index: 10;
+}
+
 .planner-berth-col {
     position: sticky;
     left: 0;
-    z-index: 1;
+    z-index: 3;
     background-color: #fff;
-    border: 1px solid #bcbcbc;
+    border: 1px dotted #000;
+    border-top: none;
+    border-bottom: none;
     flex-shrink: 0;
-}
-
-.planner-berth-col{
     display: flex;
     flex-direction: row;
-    align-items: center;
-    .berth_name{
+    align-items: stretch;
+    box-sizing: border-box;
+
+    .berth_name {
         flex: 2;
         font-size: 20px;
-        padding-left: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+
+        .icon {
+          display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: #fee0e0;
+        border: 1px solid #DC3545;
+
+        mat-icon {
+            width: 20px;
+            height: 20px;
+            font-size: 20px;
+            color: #DC3545;
+        }
+    }
     }
 
-    .bollards{
-        flex:1;
+    .bollards {
+        flex: 1;
         display: flex;
         flex-direction: column;
 
-        & >div{
-            border-left: 1px solid #bcbcbc;
+        & > div {
+            border-left: 1.5px dotted #000;
             text-align: center;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            position: relative; 
 
-            &:not(:last-child){
-                border-bottom: 1px solid #bcbcbc;
+            &:not(:last-child) {
+                border-bottom: 1.5px dotted #000;
             }
+
+            /* FIX 1: HORIZONTAL CELL LINES */
+            // &::after {
+            //     content: '';
+            //     position: absolute;
+            //     bottom: -1px;      
+            //     left: 100%;         
+            //     width: 100000px;    
+            //     height: 0px;
+            //     border-bottom: 1px solid #ccc;
+            //     pointer-events: none; 
+            //     z-index: -1; 
+            // }
         }
     }
 }
@@ -93,13 +151,17 @@
     flex-direction: row;
     flex-wrap: nowrap;
     flex-shrink: 0;
-    gap: 20px;
     position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
-.plot-outer-border{
-    border:1px solid #000;
-
+.plot-outer-border {
+    border: 1px solid #000;
+    background-color: #fff;
+    box-sizing: border-box;
+    z-index: 2;
 }
 
 .planner-timeline-header-inner {
@@ -107,33 +169,68 @@
     flex-direction: row;
     flex-wrap: nowrap;
     text-align: center;
+    box-sizing: border-box;
+
     .day-col {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        border-top: 1px solid #bcbcbc;
-        border-right: 1px solid #bcbcbc;
-        border-bottom:1px solid #bcbcbc ;
+        border-top: 1px dotted #000;
+        border-right: 1px dotted #000;
+        border-bottom: 1px dotted #000;
+        box-sizing: border-box;
+        background-color: #fff;
+        color:#5731A3;
 
-        .time-col{
+        &:nth-child(even) {
+            background-color: #EBDCFF;
+        }
+        &:nth-child(odd){
+            background-color: #E9E7F3;
+        }
+
+        .date {
+            padding: 1px;
+        }
+
+        .time-col {
             display: flex;
             flex-direction: row;
             width: 100%;
-            border-top:1px solid #bcbcbc ;
-            & > div{
-                font-size: 12px;
+            border-top: 1px dotted #000;
+            box-sizing: border-box;
+            color:#4A4452;
+
+            &>div {
+                font-size: 11px;
                 font-weight: 500;
                 text-align: left;
-                &:not(:last-child){
-                       border-right: 1px solid #bcbcbc;
+                box-sizing: border-box;
+                flex-shrink: 0;
+                position: relative;
+
+                &:not(:last-child) {
+                    // border-right: 1px dotted #000;
                 }
+
+                /* FIX 2: VERTICAL TIMELINE LANES */
+                // &::after {
+                //     content: '';
+                //     position: absolute;
+                //     top: 100%;          
+                //     left: -1px;        
+                //     width: 0px; 
+                //     height: 100000px;
+                //     border-left: 1px solid #ccc;
+                //     pointer-events: none; 
+                //     z-index: -1; 
+                // }
             }
         }
     }
 }
-
 .coulmn {
     white-space: nowrap;
-    border: 1px solid #666;
+    border: 1px dotted #000;
 }

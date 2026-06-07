@@ -69,7 +69,7 @@ export class TimeLineService {
   }
 
   generateTimelineConfig(): TimelineConfig {
-    const containerWidth = this._plannerWidthPx() * 84.5/100
+    const containerWidth = this._plannerWidthPx() * 85/100
     const slotCount = this._slotCount();
     const start = this._rangeStartDate();
     const end = this._rangeEndDate();
@@ -152,15 +152,14 @@ calcBarLayout(
   pxPerMinute: number
 ): { leftPx: number; widthPx: number } | null {
   const rangeStartDate = this._rangeStartDate();
-  console.log('date range st',rangeStartDate);
   if (!rangeStartDate || pxPerMinute === 0) return null;
 
   const leftMinutes  = (itemStart.getTime() - rangeStartDate.getTime()) / this.MS_PER_MINUTE;
-  const widthMinutes = (itemEnd.getTime()   - itemStart.getTime())      / this.MS_PER_MINUTE;
+  const widthMinutes = (itemEnd.getTime()   - itemStart.getTime()) / this.MS_PER_MINUTE;
 
   return {
-    leftPx:  Math.round(leftMinutes  * pxPerMinute),
-    widthPx: Math.round(widthMinutes * pxPerMinute),
+    leftPx:  leftMinutes  * pxPerMinute,
+    widthPx: widthMinutes * pxPerMinute,
   };
 }
 
