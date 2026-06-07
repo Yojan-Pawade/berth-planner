@@ -5,13 +5,23 @@ export type SlotCount = 4 | 6 | 12 | 24;
 export interface TimelineConfig {
   totalDays: number;
   totalColumns: number;
+
+  // HORIZONTAL LAYOUT CALC
   columnWidthPx: number;
   slotWidthPx: number;
-  minutesPerSlot: number;
-  pxPerMinute: number;
   totalContentWidthPx: number;
+  pxPerMinute: number;
+
+  // VERTICLE LAYOUT CALC
+  columnHeightPx: number;
+  slotHeightPx: number;
+  totalContentHeightPx: number;
+  pxPerMinuteVertical: number; 
+
+  minutesPerSlot: number;    
+
   slotLabels: string[];
-  bollardSize:number;
+  bollardSize: number;
 }
 
 export interface SlotMeta {

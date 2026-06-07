@@ -15,15 +15,48 @@
         </mat-slide-toggle>
     </div>
 
-    <div class="planner-grid" #plannerBody>
-        <div class="planner-header-row">
-            <div class="planner-corner-label" [style.width.px]="berthNameWidth()">Berth / Bollards</div>
+    <div class="planner-grid" 
+         [ngClass]="{'planner-grid--vertical': orientation() === 'vertical'}" 
+         #plannerBody>
+         
+        <div class="planner-grid__lines">
+            <ng-container *ngFor="let date of timeline; let i = index">
+                <div class="planner-grid__day-band"
+                    [style.left.px]="orientation() === 'horizontal' ? berthNameWidth() + (i * timelineConfig.columnWidthPx) : null"
+                    [style.width.px]="orientation() === 'horizontal' ? timelineConfig.columnWidthPx : null"
+                    [style.top.px]="orientation() === 'vertical' ? berthNameHeight() + (i * timelineConfig.columnHeightPx) : null"
+                    [style.height.px]="orientation() === 'vertical' ? timelineConfig.columnHeightPx : null">
+
+                    <div class="planner-grid__slot-line" *ngFor="let slot of timelineConfig.slotLabels; let si = index"
+                        [class.planner-grid__slot-line--even]="(i * timelineConfig.slotLabels.length + si) % 2 === 0"
+                        [class.planner-grid__slot-line--odd]="(i * timelineConfig.slotLabels.length + si) % 2 !== 0"
+                        [style.width.px]="orientation() === 'horizontal' ? timelineConfig.slotWidthPx : null"
+                        [style.height.px]="orientation() === 'vertical' ? timelineConfig.slotHeightPx : null">
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+
+        <div class="planner-header-row"
+             [ngClass]="{'planner-header-row--vertical': orientation() === 'vertical'}">
+            
+            <div class="planner-corner-label" 
+                 [style.width.px]="berthNameWidth()"
+                 [style.height.px]="orientation() === 'vertical' ? berthNameHeight() : null">
+                {{orientation() === 'horizontal' ? 'Berth / Bollards' : 'Timline'}}
+            </div>
+            
             <div class="planner-timeline">
                 <ng-container *ngFor="let date of timeline">
-                    <div class="planner-timeline__day" [style.width.px]="timelineConfig.columnWidthPx">
+                    <div class="planner-timeline__day" 
+                         [style.width.px]="orientation() === 'horizontal' ? timelineConfig.columnWidthPx : null"
+                         [style.height.px]="orientation() === 'vertical' ? timelineConfig.columnHeightPx : null">
+                        
                         <div class="planner-timeline__date">{{ date | date:'dd-MMM-yyyy' }}</div>
                         <div class="planner-timeline__slots">
-                            <div class="planner-timeline__slot" [style.width.px]="timelineConfig.slotWidthPx"
+                            <div class="planner-timeline__slot" 
+                                 [style.width.px]="orientation() === 'horizontal' ? timelineConfig.slotWidthPx : null"
+                                 [style.height.px]="orientation() === 'vertical' ? timelineConfig.slotHeightPx : null"
                                 *ngFor="let time of timelineConfig.slotLabels">{{ time }}</div>
                         </div>
                     </div>
@@ -32,22 +65,29 @@
         </div>
 
         <ng-container *ngFor="let berth of berthPlotingData">
-            <div class="planner-data-row" [style.height.px]="berth.total_row_height">
+            <div class="planner-data-row" 
+                 [style.height.px]="orientation() === 'horizontal' ? berth.total_row_height : null"
+                 [style.width.px]="orientation() === 'vertical' ? berth.total_bollard_px : null">
 
-                <div class="planner-berth-axis" [style.width.px]="berthNameWidth()">
+                <div class="planner-berth-axis" 
+                     [style.width.px]="orientation() === 'horizontal' ? berthNameWidth() : berth.total_bollard_px"
+                     [style.height.px]="orientation() === 'vertical' ? berthNameHeight() : null">
                     <div class="planner-berth-axis__info">
-                        <span class="planner-berth-axis__avatar"><mat-icon>anchor</mat-icon></span>
+                        <span class="planner-berth-axis__avatar" *ngIf="orientation() === 'horizontal'"><mat-icon>anchor</mat-icon></span>
                         <span>{{ berth.berth_name }}</span>
                     </div>
                     <div class="planner-berth-axis__bollards">
                         <div class="planner-berth-axis__cell" *ngFor="let bollard of berth.bollard_labels"
-                            [style.height.px]="timelineSvc.bollardSize()">
+                            [style.height.px]="orientation() === 'horizontal' ? timelineSvc.bollardSize() : null"
+                            [style.width.px]="orientation() === 'vertical' ? timelineSvc.bollardSize() : null">
                             {{ bollard }}
                         </div>
                     </div>
                 </div>
 
-                <div class="planner-canvas" [style.width.px]="timelineConfig.totalContentWidthPx">
+                <div class="planner-canvas" 
+                     [style.width.px]="orientation() === 'horizontal' ? timelineConfig.totalContentWidthPx : berth.total_bollard_px"
+                     [style.height.px]="orientation() === 'vertical' ? timelineConfig.totalContentHeightPx : berth.total_row_height">
                     <div *ngFor="let vessel of berth.vessels" class="planner-vessel" [ngStyle]="{
                          'left.px':   vessel.left_px,
                          'top.px':    vessel.top_px,

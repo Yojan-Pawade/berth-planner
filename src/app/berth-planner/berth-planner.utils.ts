@@ -161,32 +161,79 @@ export const BERTH_PLANNER_DATA = [
     ]
   },
   {
-    berth_id: 'f3e2d1c0-b9a8-7654-3210-abcdefabcdef',
-    berth_name: 'Berth F',
+  "berth_id": "f3e2d1c0-b9a8-7654-3210-abcdefabcdef",
+  "berth_name": "Berth F",
+  "avail_bollards_st": 1,
+  "avail_bollards_ed": 13,
+  "bollards_increment": 4,
+  "vessels": [
+    {
+      "id": "vessel-june7-002",
+      "vessel_name": "Sea Breeze",
+      "bollards_start": 5,
+      "bollards_end": 13,
+      "planned_start": "2026-06-07T06:00:00.000Z",
+      "planned_end": "2026-06-07T18:00:00.000Z",
+      "actual_start": "2026-06-07T06:05:00.000Z",
+      "actual_end": null
+    },
+  ]
+},
+{
+    berth_id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
+    berth_name: 'Berth A',
     avail_bollards_st: 1,
-    avail_bollards_ed: 13,
-    bollards_increment: 4,
+    avail_bollards_ed: 11,
+    bollards_increment: 2,
     vessels: [
       {
-        id: 'a1b2c3d4-0011-4e5f-a678-9b0c1d2e3f4k',
-        vessel_name: 'Falcon Crest',
-        bollards_start: 5,
-        bollards_end: 13,
-        planned_start: '2026-06-06T12:00:00.000Z',
-        planned_end: '2026-06-06T20:00:00.000Z',
-        actual_start: '2026-06-06T12:30:00.000Z',
-        actual_end: null,
+        id: 'a1b2c3d4-0001-4e5f-a678-9b0c1d2e3f4a',
+        vessel_name: 'Alpha Voyager',
+        bollards_start: 3,
+        bollards_end: 9,
+        planned_start: '2026-06-01T06:00:00.000Z',
+        planned_end: '2026-06-01T14:00:00.000Z',
+        actual_start: '2026-06-02T06:30:00.000Z',
+        actual_end: '2026-06-02T14:15:00.000Z',
       },
       {
-        id: 'a1b2c3d4-0012-4e5f-a678-9b0c1d2e3f4l',
-        vessel_name: 'Dawn Runner',
+        id: '2c5e4d1a-8b9c-4f0e-a123-bc4d5e6f7a8b',
+        vessel_name: 'Oceanic Express',
         bollards_start: 1,
-        bollards_end: 9,
-        planned_start: '2026-06-08T08:00:00.000Z',
-        planned_end: '2026-06-08T16:00:00.000Z',
+        bollards_end: 7,
+        planned_start: '2026-06-04T08:00:00.000Z',
+        planned_end: '2026-06-04T20:00:00.000Z',
         actual_start: null,
-        actual_end: null,
+        actual_end: null
       }
     ]
-  }
+  },{
+    berth_id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
+    berth_name: 'Berth A',
+    avail_bollards_st: 1,
+    avail_bollards_ed: 11,
+    bollards_increment: 2,
+    vessels: [
+      {
+        id: 'a1b2c3d4-0001-4e5f-a678-9b0c1d2e3f4a',
+        vessel_name: 'Alpha Voyager',
+        bollards_start: 3,
+        bollards_end: 9,
+        planned_start: '2026-06-01T06:00:00.000Z',
+        planned_end: '2026-06-01T14:00:00.000Z',
+        actual_start: '2026-06-02T06:30:00.000Z',
+        actual_end: '2026-06-02T14:15:00.000Z',
+      },
+      {
+        id: '2c5e4d1a-8b9c-4f0e-a123-bc4d5e6f7a8b',
+        vessel_name: 'Oceanic Express',
+        bollards_start: 1,
+        bollards_end: 7,
+        planned_start: '2026-06-04T08:00:00.000Z',
+        planned_end: '2026-06-04T20:00:00.000Z',
+        actual_start: null,
+        actual_end: null
+      }
+    ]
+  },
 ];

@@ -69,7 +69,7 @@
 
 .planner-header-row {
     @include flex-row();
-    @include sticky-top($z: 10);
+    @include sticky-top($z: 5);
     width: max-content;
     min-width: 100%;
     box-sizing: border-box;
@@ -90,23 +90,39 @@
     flex-wrap: nowrap;
     text-align: center;
     box-sizing: border-box;
+    height: 100%;
 
     &__day {
         @include flex-col(center, center);
         border-top: 1px dotted #bcbcbc;
-        border-right: 1px dotted #bcbcbc;
         border-bottom: 1px dotted #bcbcbc;
         box-sizing: border-box;
         color: #5731A3;
         flex-shrink: 0;
-
+        position: relative;
+        height: max-content;
+        
+        &:not(:last-child) {
+            &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: -1px;
+                bottom: 0;
+                width: 0;
+                border-right: 1px dotted #bcbcbc;
+                pointer-events: none;
+                z-index: 0;
+            }
+        }
         &:nth-child(even) {
             background-color: #EBDCFF;
         }
 
         &:nth-child(odd) {
-            background-color: #E9E7F3;
+            background-color: #fff;
         }
+                
     }
 
     &__date {
@@ -216,6 +232,63 @@
     overflow: hidden;
 }
 
+.planner-grid {
+    @include flex-col();
+    overflow: auto;
+    white-space: nowrap;
+    width: 100%;
+    height: calc(100% - 60px);
+    position: relative;
+}
+
+.planner-grid__lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+    width: max-content;
+    height: max-content;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.planner-grid__day-band {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    border-right: 1px dotted #bcbcbc;
+}
+
+.planner-grid__slot-line {
+    height: 100%;
+    flex-shrink: 0;
+    box-sizing: border-box;
+
+    &--even {
+        background-color: rgba(217, 188, 255, 0.5);
+    }
+
+    &--odd {
+        background-color: rgba(214, 207, 255, 0.3);
+    }
+}
+
+
+.planner-grid__slot-line {
+    height: 100%;
+    flex-shrink: 0;
+    box-sizing: border-box;
+
+    &:not(:last-child) {
+        border-right: 1px dotted #e0e0e0;
+    }
+}
+
 .planner-vessel {
     position: absolute;
     box-sizing: border-box;
@@ -231,5 +304,119 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+}
+
+
+.planner-grid--vertical {
+    flex-direction: row !important;
+
+.planner-grid__day-band {
+        left: 0 !important;
+        right: 0; 
+        bottom: auto;
+        width: auto !important;
+        flex-direction: column;
+        border-right: none;
+        border-bottom: 1px dotted #bcbcbc;
+    }
+
+    .planner-grid__slot-line {
+        width: 100% !important;
+        height: auto;
+
+        &:not(:last-child) {
+            border-right: none;
+            border-bottom: 1px dotted #e0e0e0;
+        }
+    }
+
+    .planner-header-row--vertical {
+        flex-direction: column;
+        width: auto !important;
+        min-width: unset !important;
+        height: max-content;
+        position: sticky;
+        left: 0;
+        z-index: 10;
+        background-color: #fff;
+    }
+
+    .planner-corner-label {
+        position: sticky;
+        top: 0;
+        left: 0;
+        z-index: 11;
+    }
+
+    .planner-timeline {
+        flex-direction: column; 
+
+        &__day {
+            flex-direction: row;
+            border-top: none;
+            border-left: 1px dotted #bcbcbc;
+            border-bottom: 1px dotted #bcbcbc;
+        }
+
+        &__date {
+            border-right: none;
+            @include flex-row(center, center);
+            padding: 0 4px;
+            flex:2; 
+        }
+
+        &__slots {
+            flex-direction: column;
+            width: auto;
+            height: 100%;
+            border-top: none;
+            flex:1;
+        }
+
+        &__slot {
+            line-height: normal;
+            @include flex-row(center, center);
+            border-left: 1px dotted #bcbcbc; 
+            border-right: none;
+            &:not(:last-child) {
+                border-bottom: 1px dotted #bcbcbc;
+            }
+        }
+    }
+
+    .planner-data-row {
+        flex-direction: column; 
+        width: auto !important;
+        height: max-content !important;
+    }
+
+    .planner-berth-axis {
+        position: sticky;
+        top: 0;
+        left: unset;
+        z-index: 3;
+        flex-direction: column;
+        border-left: none;
+        border-bottom: 1px dotted #bcbcbc;
+
+        &__info {
+            border-bottom: 1px dotted #bcbcbc;
+            border-top: 1px dotted #bcbcbc;
+            padding: 5px 0;
+        }
+
+        &__bollards {
+            flex-direction: row; 
+        }
+
+        &__cell {
+            border-left: none;
+            border-bottom: none;
+
+            &:not(:last-child) {
+                border-right: 1.5px dotted #bcbcbc;
+            }
+        }
     }
 }

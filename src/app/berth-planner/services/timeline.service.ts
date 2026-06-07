@@ -69,7 +69,8 @@ export class TimeLineService {
   }
 
   generateTimelineConfig(): TimelineConfig {
-    const containerWidth = this._plannerWidthPx() * 85/100
+    const containerWidth = this._plannerWidthPx() * 85 / 100;
+    const containerHeight = this._plannerHeightPx()*90 /100;
     const slotCount = this._slotCount();
     const start = this._rangeStartDate();
     const end = this._rangeEndDate();
@@ -77,10 +78,10 @@ export class TimeLineService {
 
     const totalDays = this._daysBetween(start, end);
     const totalColumns = totalDays * slotCount;
-    
-    const viewMode = this._viewMode();
-    let columnWidthPx: number;
 
+    const viewMode = this._viewMode();
+    // Horizontal Calc
+    let columnWidthPx: number;
     if (viewMode === 'ONE_DAY' || viewMode === 'TWO_DAY') {
       columnWidthPx = containerWidth / totalDays;
 
@@ -96,12 +97,29 @@ export class TimeLineService {
           : containerWidth / totalDays;
     }
 
-    const slotWidthPx = ((columnWidthPx / slotCount) * 100) / 100;
-    columnWidthPx = slotWidthPx * slotCount;
-
+    const slotWidthPx = columnWidthPx / slotCount;
     const minutesPerSlot = this.slotMetaMap.get(slotCount)!.minutesPerSlot;
     const pxPerMinute = slotWidthPx / minutesPerSlot;
     const totalContentWidthPx = totalDays * columnWidthPx;
+
+    // Verticla layout Calc
+    let columnHeightPx: number;
+    if (viewMode === 'ONE_DAY' || viewMode === 'TWO_DAY') {
+      columnHeightPx = containerHeight / totalDays;
+    } else if (viewMode === 'ONE_MONTH' || viewMode === 'CUSTOM' || viewMode === 'ONE_WEEK' ) {
+      columnHeightPx = slotCount === 24 ? this.MIN_COLUMN_WIDTH_24_SLOT
+        : slotCount === 12 ? this.MIN_COLUMN_WIDTH_12_SLOT
+          : slotCount === 6 ? this.MIN_COLUMN_WIDTH_6_SLOT
+            : this.MIN_COLUMN_WIDTH_4_SLOT;
+    } else {
+      columnHeightPx = slotCount === 24 ? this.MIN_COLUMN_WIDTH_24_SLOT
+        : slotCount === 12 ? this.MIN_COLUMN_WIDTH_12_SLOT
+          : containerHeight / totalDays;
+    }
+
+    const slotHeightPx = columnHeightPx / slotCount;
+    const totalContentHeightPx = totalDays * columnHeightPx;
+    const pxPerMinuteVertical = slotHeightPx / minutesPerSlot;
     const slotLabels = this.slotMetaMap.get(slotCount)!.labels;
 
     return {
@@ -109,11 +127,15 @@ export class TimeLineService {
       totalColumns,
       columnWidthPx,
       slotWidthPx,
+      totalContentWidthPx,
+      columnHeightPx,
+      slotHeightPx,
+      totalContentHeightPx,
       minutesPerSlot,
       pxPerMinute,
-      totalContentWidthPx,
+      pxPerMinuteVertical,
       slotLabels,
-      bollardSize
+      bollardSize,
     };
   }
 
@@ -144,24 +166,47 @@ export class TimeLineService {
     return { start, end };
   }
 
-  
-  
-calcBarLayout(
-  itemStart: Date,
-  itemEnd: Date,
-  pxPerMinute: number
-): { leftPx: number; widthPx: number } | null {
-  const rangeStartDate = this._rangeStartDate();
-  if (!rangeStartDate || pxPerMinute === 0) return null;
 
-  const leftMinutes  = (itemStart.getTime() - rangeStartDate.getTime()) / this.MS_PER_MINUTE;
-  const widthMinutes = (itemEnd.getTime()   - itemStart.getTime()) / this.MS_PER_MINUTE;
 
-  return {
-    leftPx:  leftMinutes  * pxPerMinute,
-    widthPx: widthMinutes * pxPerMinute,
-  };
-}
+  calcBarLayout(
+    itemStart: Date,
+    itemEnd: Date,
+    pxPerMinute: number
+  ): { leftPx: number; widthPx: number } | null {
+    const rangeStartDate = this._rangeStartDate();
+    if (!rangeStartDate || pxPerMinute === 0) return null;
+
+    const leftMinutes = (itemStart.getTime() - rangeStartDate.getTime()) / this.MS_PER_MINUTE;
+    const widthMinutes = (itemEnd.getTime() - itemStart.getTime()) / this.MS_PER_MINUTE;
+
+    return {
+      leftPx: leftMinutes * pxPerMinute,
+      widthPx: widthMinutes * pxPerMinute,
+    };
+  }
+
+  calcBarLayoutVertical(
+    itemStart: Date,
+    itemEnd: Date,
+    pxPerMinuteVertical: number
+  ): { topPx: number; heightPx: number } | null {
+    const rangeStartDate = this._rangeStartDate();
+    if (!rangeStartDate || pxPerMinuteVertical === 0) return null;
+    const topMinutes = (itemStart.getTime() - rangeStartDate.getTime()) / this.MS_PER_MINUTE;
+    const heightMinutes = (itemEnd.getTime() - itemStart.getTime()) / this.MS_PER_MINUTE;
+    return {
+      topPx: topMinutes * pxPerMinuteVertical,
+      heightPx: heightMinutes * pxPerMinuteVertical,
+    };
+  }
+
+  setBollarSize(size:number){
+    this._bollardSize.set(size);
+  }
+
+  setSlots(slot:SlotCount){
+    this._slotCount.set(slot);
+  }
 
   setPlannerWidthPx(width: number): void {
     this._plannerWidthPx.set(width);
