@@ -1,3 +1,4 @@
+export type PlannerOrientation = 'horizontal' | 'vertical';
 export type ViewMode = 'ONE_DAY' | 'TWO_DAY' | 'ONE_WEEK' | 'ONE_MONTH' | 'CUSTOM';
 export type SlotCount = 4 | 6 | 12 | 24;
 

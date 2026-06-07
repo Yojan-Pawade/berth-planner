@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { BerthPlannerbaseService } from './services/berth-planner-base.service';
 import { TimeLineService } from './services/timeline.service';
 import { fmt, m, y } from './berth-planner.utils';
+import { PlannerOrientation } from './berth-planner.model';
 
 @Component({
   selector: 'app-berth-planner',
@@ -45,6 +46,10 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
   onPrev() {
     this.shiftTimeline('PREV');
     this.initBerthData();
+  }
+
+  setOrientation(o: PlannerOrientation): void {
+    this._orientation.set(o);
   }
 
   get dateRangeLabel(): string {

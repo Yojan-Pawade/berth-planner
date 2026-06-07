@@ -6,10 +6,12 @@ import {BerthPlannerbaseService } from './services/berth-planner-base.service';
 import { TimeLineService } from './services/timeline.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule }   from '@angular/material/icon';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @NgModule({
   declarations: [BerthPlannerComponent],
-  imports: [CommonModule, BerthplannerRouting,  MatButtonModule, MatIconModule],
+  imports: [CommonModule, BerthplannerRouting,  MatButtonModule, MatIconModule , MatButtonToggleModule,MatSlideToggleModule,],
   providers:  [BerthPlannerbaseService , TimeLineService]
 })
 export class BerthPlannerModule {}

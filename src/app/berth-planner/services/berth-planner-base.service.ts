@@ -1,12 +1,15 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable, OnInit, signal } from '@angular/core';
 import { TimeLineService } from './timeline.service';
-import { TimelineConfig } from '../berth-planner.model';
+import { PlannerOrientation, TimelineConfig } from '../berth-planner.model';
 import { BERTH_PLANNER_DATA} from '../berth-planner.utils';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BerthPlannerbaseService implements OnInit {
+  _orientation = signal<PlannerOrientation>('horizontal');
+  readonly orientation = this._orientation.asReadonly();
+
   private readonly BERTH_NAME_PERCENT = 15;
   private readonly TIMELINE_PERCENT = 85;
 
@@ -25,7 +28,7 @@ export class BerthPlannerbaseService implements OnInit {
   }
 
   _init() {
-    this.timelineSvc.initTimeline('ONE_WEEK', 6);
+    this.timelineSvc.initTimeline('ONE_DAY', 4);
     this.updateLayout();
   }
 

@@ -1,5 +1,4 @@
 <div class="berth-planner" #plannerWrapper>
-    
     <div class="planner-toolbar">
         <div class="planner-toolbar__nav">
             <button mat-icon-button (click)="onPrev()">
@@ -10,10 +9,13 @@
                 <mat-icon>chevron_right</mat-icon>
             </button>
         </div>
+        <mat-slide-toggle [checked]="orientation() === 'vertical'"
+            (change)="setOrientation($event.checked ? 'vertical' : 'horizontal')">
+            {{ orientation() === 'vertical' ? 'Vertical Layout' : 'Horizontal Layout' }}
+        </mat-slide-toggle>
     </div>
 
     <div class="planner-grid" #plannerBody>
-
         <div class="planner-header-row">
             <div class="planner-corner-label" [style.width.px]="berthNameWidth()">Berth / Bollards</div>
             <div class="planner-timeline">
