@@ -113,14 +113,13 @@ export class BerthPlannerbaseService implements OnInit {
 
       const totalBerthHeight = berthBollardLabels.length * this.timelineSvc.bollardSize();
       const totalBollards = berthBollardLabels.length;
+      const total_row_height = totalBollards * this.timelineSvc.bollardSize();
       return {
         id: berthItem.berth_id,
         berth_name: berthItem.berth_name,
         bollard_labels: berthBollardLabels,
         vessels: processedVessels,
-        total_row_height: !isVertical
-          ? totalBollards * this.timelineSvc.bollardSize()
-          : totalBollards * this.timelineSvc.bollardSize(),
+        total_row_height,
         total_bollard_px: totalBollards * this.timelineSvc.bollardSize()
       };
     });

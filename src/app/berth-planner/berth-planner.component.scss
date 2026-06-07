@@ -4,7 +4,7 @@
     align-items: $align;
     justify-content: $justify;
 
-    @if $gap != 0 {
+    @if $gap !=0 {
         gap: $gap;
     }
 }
@@ -15,7 +15,7 @@
     align-items: $align;
     justify-content: $justify;
 
-    @if $gap != 0 {
+    @if $gap !=0 {
         gap: $gap;
     }
 }
@@ -101,7 +101,7 @@
         flex-shrink: 0;
         position: relative;
         height: max-content;
-        
+
         &:not(:last-child) {
             &::after {
                 content: '';
@@ -115,6 +115,7 @@
                 z-index: 0;
             }
         }
+
         &:nth-child(even) {
             background-color: #EBDCFF;
         }
@@ -122,7 +123,7 @@
         &:nth-child(odd) {
             background-color: #fff;
         }
-                
+
     }
 
     &__date {
@@ -245,10 +246,6 @@
     position: absolute;
     top: 0;
     left: 0;
-    min-width: 100%;
-    min-height: 100%;
-    width: max-content;
-    height: max-content;
     pointer-events: none;
     z-index: 0;
 }
@@ -269,14 +266,19 @@
     flex-shrink: 0;
     box-sizing: border-box;
 
-    &--even {
+    &:nth-child(odd) {
+        background-color: rgba(214, 207, 255, 0.3);
+    }
+
+    &:nth-child(even) {
         background-color: rgba(217, 188, 255, 0.5);
     }
 
-    &--odd {
-        background-color: rgba(214, 207, 255, 0.3);
+    &:not(:last-child) {
+        border-right: 1px dotted #e0e0e0;
     }
 }
+
 
 
 .planner-grid__slot-line {
@@ -311,9 +313,10 @@
 .planner-grid--vertical {
     flex-direction: row !important;
 
-.planner-grid__day-band {
+    .planner-grid__day-band {
         left: 0 !important;
-        right: 0; 
+        right: 0;
+        top: auto;
         bottom: auto;
         width: auto !important;
         flex-direction: column;
@@ -350,7 +353,7 @@
     }
 
     .planner-timeline {
-        flex-direction: column; 
+        flex-direction: column;
 
         &__day {
             flex-direction: row;
@@ -363,7 +366,7 @@
             border-right: none;
             @include flex-row(center, center);
             padding: 0 4px;
-            flex:2; 
+            flex: 2;
         }
 
         &__slots {
@@ -371,13 +374,13 @@
             width: auto;
             height: 100%;
             border-top: none;
-            flex:1;
+            flex: 1;
         }
 
         &__slot {
             line-height: normal;
             @include flex-row(center, center);
-            border-left: 1px dotted #bcbcbc; 
+            border-left: 1px dotted #bcbcbc;
             border-right: none;
             &:not(:last-child) {
                 border-bottom: 1px dotted #bcbcbc;
@@ -386,7 +389,7 @@
     }
 
     .planner-data-row {
-        flex-direction: column; 
+        flex-direction: column;
         width: auto !important;
         height: max-content !important;
     }
@@ -407,7 +410,7 @@
         }
 
         &__bollards {
-            flex-direction: row; 
+            flex-direction: row;
         }
 
         &__cell {

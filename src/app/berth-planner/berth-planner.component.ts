@@ -24,13 +24,13 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
   ngAfterViewInit() {
     if (this.plannerBody?.nativeElement) {
       this.resizeObserver = new ResizeObserver((entries) => {
-        console.log('fires',entries);
         for (let entry of entries) {
+          const el = entry.target as HTMLElement;
+
           const bodyWidth = Math.floor(entry.contentRect.width);
           const bodyHeight = Math.floor(entry.contentRect.height);
           this.timelineSvc.setPlannerWidthPx(bodyWidth);
           this.timelineSvc.setPlannerHeightPx(bodyHeight);
-          this.updateLayout();
         }
       });
 
@@ -51,10 +51,10 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
 
   setOrientation(o: PlannerOrientation): void {
     this._orientation.set(o);
-    if(o == 'vertical'){
-     this.timelineSvc.setBollarSize(35); 
-    }else{
-     this.timelineSvc.setBollarSize(25); 
+    if (o == 'vertical') {
+      this.timelineSvc.setBollarSize(35);
+    } else {
+      this.timelineSvc.setBollarSize(25);
     }
     this.updateLayout();
     this.initBerthData();
