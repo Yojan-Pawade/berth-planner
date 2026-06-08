@@ -22,22 +22,31 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
     super.ngOnInit();
     this.initBerthData();
   }
-
+  
   ngAfterViewInit() {
     if (this.plannerBody?.nativeElement) {
+      const el = this.plannerBody.nativeElement;
+
       this.resizeObserver = new ResizeObserver((entries) => {
         for (let entry of entries) {
           const bodyWidth = entry.contentRect.width;
           const bodyHeight = entry.contentRect.height;
-          this.timelineSvc.setPlannerWidthPx(bodyWidth);
-          this.timelineSvc.setPlannerHeightPx(bodyHeight);
+
+          if (bodyWidth > 0 && bodyHeight > 0) {
+            this.timelineSvc.setPlannerWidthPx(bodyWidth);
+            this.timelineSvc.setPlannerHeightPx(bodyHeight);
+            this.updateLayout();
+          }
         }
       });
-      this.resizeObserver.observe(this.plannerBody.nativeElement);
-      const el = this.plannerBody.nativeElement;
-      this.timelineSvc.setPlannerWidthPx(el.clientWidth);
-      this.timelineSvc.setPlannerHeightPx(el.clientHeight);
-      this.updateLayout();
+
+      this.resizeObserver.observe(el);
+
+      if (el.clientWidth > 0) {
+        this.timelineSvc.setPlannerWidthPx(el.clientWidth);
+        this.timelineSvc.setPlannerHeightPx(el.clientHeight);
+        this.updateLayout();
+      }
     }
   }
 
@@ -99,7 +108,7 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
       }
     }
     return {
-      width: totalBerthHeight+ this.berthNameWidth() +'px',
+      width: totalBerthHeight + this.berthNameWidth() + 'px',
     }
   }
 

@@ -32,7 +32,7 @@
             </p>
         </div>
     </div>
-    <div class="planner-grid"  *ngIf="berthPlotingData.length !== 0" [ngClass]="{'planner-grid--vertical': orientation() === 'vertical'}" #plannerBody>
+    <div class="planner-grid"  *ngIf="berthPlotingData.length > 0" [ngClass]="{'planner-grid--vertical': orientation() === 'vertical'}" #plannerBody>
 
         <div class="planner-grid__lines" [ngStyle]="getGridHeight">
             <ng-container *ngFor="let date of timeline; let i = index">
