@@ -21,7 +21,7 @@
 
     <div class="planner-grid" [ngClass]="{'planner-grid--vertical': orientation() === 'vertical'}" #plannerBody>
 
-        <div class="planner-grid__lines">
+        <div class="planner-grid__lines" [ngStyle]="getGridHeight">
             <ng-container *ngFor="let date of timeline; let i = index">
                 <div class="planner-grid__day-band"
                     [style.left.px]="orientation() === 'horizontal' ? berthNameWidth() + (i * timelineConfig.columnWidthPx) : null"

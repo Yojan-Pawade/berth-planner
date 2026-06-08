@@ -49,7 +49,6 @@ export class BerthPlannerbaseService implements OnInit {
     this.startDateRange = this.timelineSvc.rangeStartDate();
     this.endDateRange = this.timelineSvc.rangeEndDate();
     this.timelineConfig = this.timelineSvc.generateTimelineConfig();
-    console.log('timelineConfig', this.timelineConfig);
     this.generateTimelineDays();
   }
 

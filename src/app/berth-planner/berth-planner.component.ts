@@ -53,7 +53,6 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
     this.pendingSlotCount = 4;
   }
 
-
   onNext() {
     this.shiftTimeline('NEXT');
     this.initBerthData();
@@ -89,6 +88,18 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
       case 'ONE_MONTH': return `${m(start)}-${y(start)}`;
       case 'CUSTOM': return `${fmt(start)} – ${fmt(end)}`;
       default: return '';
+    }
+  }
+
+  get getGridHeight() {
+    const totalBerthHeight = this.berthPlotingData.reduce((prev, curr) => prev + curr.total_row_height, 0);
+    if (this.orientation() === 'horizontal') {
+      return {
+        height: totalBerthHeight + 55 + 'px',
+      }
+    }
+    return {
+      width: totalBerthHeight+ this.berthNameWidth() +'px',
     }
   }
 

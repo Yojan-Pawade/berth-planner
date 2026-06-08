@@ -84,7 +84,7 @@ export class TimeLineService {
 
   generateTimelineConfig(): TimelineConfig {
     const containerWidth = this._plannerWidthPx() * 85 / 100;
-    const containerHeight = this._plannerHeightPx() * 90 /100;
+    const containerHeight = this._plannerHeightPx() * 88 /100;
     const slotCount = this._slotCount();
     const start = this._rangeStartDate();
     const end = this._rangeEndDate();
