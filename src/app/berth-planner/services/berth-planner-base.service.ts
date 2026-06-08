@@ -1,7 +1,7 @@
 import { Injectable, OnInit, signal } from '@angular/core';
 import { TimeLineService } from './timeline.service';
 import { PlannerOrientation, SlotCount, TimelineConfig, ViewMode } from '../berth-planner.model';
-import { BERTH_PLANNER_DATA} from '../berth-planner.utils';
+import { BERTH_PLANNER_DATA } from '../berth-planner.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -10,8 +10,8 @@ export class BerthPlannerbaseService implements OnInit {
   _orientation = signal<PlannerOrientation>('horizontal');
   readonly orientation = this._orientation.asReadonly();
 
-  pendingViewMode:  ViewMode   = 'ONE_DAY';
-  pendingSlotCount: SlotCount  = 4;
+  pendingViewMode: ViewMode = 'ONE_DAY';
+  pendingSlotCount: SlotCount = 4;
 
   private readonly BERTH_NAME_PERCENT = 15;
   private readonly BERTH_NAME_HEIGHT_PERCENT = 12;
@@ -37,7 +37,7 @@ export class BerthPlannerbaseService implements OnInit {
   }
 
   berthNameWidth = () => Math.floor(this.timelineSvc.plannerWidthPx() * this.BERTH_NAME_PERCENT / 100);
-  berthNameHeight = () => Math.floor(this.timelineSvc.plannerHeightPx()* this.BERTH_NAME_HEIGHT_PERCENT / 100); 
+  berthNameHeight = () => Math.floor(this.timelineSvc.plannerHeightPx() * this.BERTH_NAME_HEIGHT_PERCENT / 100);
   timelineWidth = () => Math.floor(this.timelineSvc.plannerWidthPx() * this.TIMELINE_PERCENT / 100);
 
   shiftTimeline(direction: 'NEXT' | 'PREV'): void {
@@ -49,14 +49,25 @@ export class BerthPlannerbaseService implements OnInit {
     this.startDateRange = this.timelineSvc.rangeStartDate();
     this.endDateRange = this.timelineSvc.rangeEndDate();
     this.timelineConfig = this.timelineSvc.generateTimelineConfig();
-    console.log('timelineConfig',this.timelineConfig);
+    console.log('timelineConfig', this.timelineConfig);
     this.generateTimelineDays();
   }
 
   async initBerthData() {
     this.rawBerthData = BERTH_PLANNER_DATA;
     const isVertical = this._orientation() === 'vertical';
-    this.berthPlotingData = this.rawBerthData.map((berthItem: any) => {
+
+    const rangeStart = this.timelineSvc.rangeStartDate();
+    const rangeEnd = this.timelineSvc.rangeEndDate();
+    const filteredBerthData = this.rawBerthData.filter((berthItem: any) => {
+      if (!rangeStart || !rangeEnd) return true;
+      return (berthItem.vessels || []).some((vessel: any) => {
+        const vesselStart = new Date(vessel.planned_start);
+        const vesselEnd = new Date(vessel.planned_end);
+        return vesselStart <= rangeEnd && vesselEnd >= rangeStart;
+      });
+    });
+    this.berthPlotingData = filteredBerthData.map((berthItem: any) => {
       const berthBollardLabels: string[] = [];
       for (let i = berthItem.avail_bollards_st; i <= berthItem.avail_bollards_ed; i += berthItem.bollards_increment) {
         berthBollardLabels.push(`${i}`);
