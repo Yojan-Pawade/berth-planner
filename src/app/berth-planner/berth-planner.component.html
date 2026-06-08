@@ -19,7 +19,20 @@
         </button>
     </div>
 
-    <div class="planner-grid" [ngClass]="{'planner-grid--vertical': orientation() === 'vertical'}" #plannerBody>
+
+    
+    <div class="planner-no-data" *ngIf="berthPlotingData.length === 0">
+        <div class="planner-no-data__card">
+            <div class="planner-no-data__icon-wrapper">
+                <mat-icon class="planner-no-data__icon">anchor</mat-icon>
+            </div>
+            <h3 class="planner-no-data__title">No Planner Data Found</h3>
+            <p class="planner-no-data__description">
+                There are no scheduled berths or vessel plotting logs available for the selected date range. Try adjusting your filters or navigation view window.
+            </p>
+        </div>
+    </div>
+    <div class="planner-grid"  *ngIf="berthPlotingData.length !== 0" [ngClass]="{'planner-grid--vertical': orientation() === 'vertical'}" #plannerBody>
 
         <div class="planner-grid__lines" [ngStyle]="getGridHeight">
             <ng-container *ngFor="let date of timeline; let i = index">
@@ -37,7 +50,7 @@
             </ng-container>
         </div>
 
-        <div class="planner-header-row" [ngClass]="{'planner-header-row--vertical': orientation() === 'vertical'}">
+        <div class="planner-header-row"  [ngClass]="{'planner-header-row--vertical': orientation() === 'vertical'}">
 
             <div class="planner-corner-label" [style.width.px]="berthNameWidth()"
                 [style.height.px]="orientation() === 'vertical' ? berthNameHeight() : null">
