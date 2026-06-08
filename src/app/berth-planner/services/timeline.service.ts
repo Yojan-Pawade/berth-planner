@@ -10,6 +10,20 @@ export class TimeLineService {
   private readonly MIN_COLUMN_WIDTH_12_SLOT = 300;
   private readonly MIN_COLUMN_WIDTH_24_SLOT = 600;
 
+  readonly dayTimeSlots: { value: SlotCount; label: string }[] = [
+    { value: 4, label: '4' },
+    { value: 6, label: '6' },
+    { value: 12, label: '12' },
+    { value: 24, label: '24' },
+  ];
+
+  readonly viewModes = [
+    { value: 'ONE_DAY' as ViewMode, label: '1 Day' },
+    { value: 'TWO_DAY' as ViewMode, label: '2 Days' },
+    { value: 'ONE_WEEK' as ViewMode, label: '1 Week' },
+    { value: 'ONE_MONTH' as ViewMode, label: '1 Month' },
+  ];
+
   readonly slotMetaMap = new Map<SlotCount, SlotMeta>([
     [4, { minutesPerSlot: 360, labels: ['12a', '6', '12p', '18'] }],
     [6, { minutesPerSlot: 240, labels: ['12a', '4', '8', '12p', '16', '20'] }],

@@ -3,6 +3,7 @@ import { BerthPlannerbaseService } from './services/berth-planner-base.service';
 import { TimeLineService } from './services/timeline.service';
 import { fmt, m, y } from './berth-planner.utils';
 import { PlannerOrientation } from './berth-planner.model';
+import { MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
   selector: 'app-berth-planner',
@@ -12,6 +13,7 @@ import { PlannerOrientation } from './berth-planner.model';
 export class BerthPlannerComponent extends BerthPlannerbaseService implements OnInit {
   private resizeObserver!: ResizeObserver;
   @ViewChild('plannerBody', { static: false }) plannerBody!: ElementRef<HTMLDivElement>;
+  @ViewChild(MatMenuTrigger) filterMenuTrigger!: MatMenuTrigger;
   constructor(timelineSvc: TimeLineService) {
     super(timelineSvc);
   }
@@ -23,21 +25,33 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
 
   ngAfterViewInit() {
     if (this.plannerBody?.nativeElement) {
-        this.resizeObserver = new ResizeObserver((entries) => {
-            for (let entry of entries) {
-                const bodyWidth = entry.contentRect.width;
-                const bodyHeight = entry.contentRect.height;
-                this.timelineSvc.setPlannerWidthPx(bodyWidth);
-                this.timelineSvc.setPlannerHeightPx(bodyHeight);
-            }
-        });
-        this.resizeObserver.observe(this.plannerBody.nativeElement);
-        const el = this.plannerBody.nativeElement;
-        this.timelineSvc.setPlannerWidthPx(el.clientWidth);
-        this.timelineSvc.setPlannerHeightPx(el.clientHeight);
-        this.updateLayout();
+      this.resizeObserver = new ResizeObserver((entries) => {
+        for (let entry of entries) {
+          const bodyWidth = entry.contentRect.width;
+          const bodyHeight = entry.contentRect.height;
+          this.timelineSvc.setPlannerWidthPx(bodyWidth);
+          this.timelineSvc.setPlannerHeightPx(bodyHeight);
+        }
+      });
+      this.resizeObserver.observe(this.plannerBody.nativeElement);
+      const el = this.plannerBody.nativeElement;
+      this.timelineSvc.setPlannerWidthPx(el.clientWidth);
+      this.timelineSvc.setPlannerHeightPx(el.clientHeight);
+      this.updateLayout();
     }
-}
+  }
+
+  onApplyFilters(): void {
+    this.timelineSvc.initTimeline(this.pendingViewMode, this.pendingSlotCount);
+    this.updateLayout();
+    this.initBerthData();
+    this.filterMenuTrigger.closeMenu();
+  }
+
+  onResetFilters(): void {
+    this.pendingViewMode = 'ONE_DAY';
+    this.pendingSlotCount = 4;
+  }
 
 
   onNext() {

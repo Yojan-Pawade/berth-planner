@@ -13,12 +13,14 @@
             (change)="setOrientation($event.checked ? 'vertical' : 'horizontal')">
             {{ orientation() === 'vertical' ? 'Vertical Layout' : 'Horizontal Layout' }}
         </mat-slide-toggle>
+
+        <button mat-icon-button [matMenuTriggerFor]="filterMenu">
+            <mat-icon>tune</mat-icon>
+        </button>
     </div>
 
-    <div class="planner-grid" 
-         [ngClass]="{'planner-grid--vertical': orientation() === 'vertical'}" 
-         #plannerBody>
-         
+    <div class="planner-grid" [ngClass]="{'planner-grid--vertical': orientation() === 'vertical'}" #plannerBody>
+
         <div class="planner-grid__lines">
             <ng-container *ngFor="let date of timeline; let i = index">
                 <div class="planner-grid__day-band"
@@ -35,26 +37,24 @@
             </ng-container>
         </div>
 
-        <div class="planner-header-row"
-             [ngClass]="{'planner-header-row--vertical': orientation() === 'vertical'}">
-            
-            <div class="planner-corner-label" 
-                 [style.width.px]="berthNameWidth()"
-                 [style.height.px]="orientation() === 'vertical' ? berthNameHeight() : null">
+        <div class="planner-header-row" [ngClass]="{'planner-header-row--vertical': orientation() === 'vertical'}">
+
+            <div class="planner-corner-label" [style.width.px]="berthNameWidth()"
+                [style.height.px]="orientation() === 'vertical' ? berthNameHeight() : null">
                 {{orientation() === 'horizontal' ? 'Berth / Bollards' : 'Timline'}}
             </div>
-            
+
             <div class="planner-timeline">
                 <ng-container *ngFor="let date of timeline">
-                    <div class="planner-timeline__day" 
-                         [style.width.px]="orientation() === 'horizontal' ? timelineConfig.columnWidthPx : null"
-                         [style.height.px]="orientation() === 'vertical' ? timelineConfig.columnHeightPx : null">
-                        
+                    <div class="planner-timeline__day"
+                        [style.width.px]="orientation() === 'horizontal' ? timelineConfig.columnWidthPx : null"
+                        [style.height.px]="orientation() === 'vertical' ? timelineConfig.columnHeightPx : null">
+
                         <div class="planner-timeline__date">{{ date | date:'dd-MMM-yyyy' }}</div>
                         <div class="planner-timeline__slots">
-                            <div class="planner-timeline__slot" 
-                                 [style.width.px]="orientation() === 'horizontal' ? timelineConfig.slotWidthPx : null"
-                                 [style.height.px]="orientation() === 'vertical' ? timelineConfig.slotHeightPx : null"
+                            <div class="planner-timeline__slot"
+                                [style.width.px]="orientation() === 'horizontal' ? timelineConfig.slotWidthPx : null"
+                                [style.height.px]="orientation() === 'vertical' ? timelineConfig.slotHeightPx : null"
                                 *ngFor="let time of timelineConfig.slotLabels">{{ time }}</div>
                         </div>
                     </div>
@@ -63,15 +63,16 @@
         </div>
 
         <ng-container *ngFor="let berth of berthPlotingData">
-            <div class="planner-data-row" 
-                 [style.height.px]="orientation() === 'horizontal' ? berth.total_row_height : null"
-                 [style.width.px]="orientation() === 'vertical' ? berth.total_bollard_px : null">
+            <div class="planner-data-row"
+                [style.height.px]="orientation() === 'horizontal' ? berth.total_row_height : null"
+                [style.width.px]="orientation() === 'vertical' ? berth.total_bollard_px : null">
 
-                <div class="planner-berth-axis" 
-                     [style.width.px]="orientation() === 'horizontal' ? berthNameWidth() : berth.total_bollard_px"
-                     [style.height.px]="orientation() === 'vertical' ? berthNameHeight() : null">
+                <div class="planner-berth-axis"
+                    [style.width.px]="orientation() === 'horizontal' ? berthNameWidth() : berth.total_bollard_px"
+                    [style.height.px]="orientation() === 'vertical' ? berthNameHeight() : null">
                     <div class="planner-berth-axis__info">
-                        <span class="planner-berth-axis__avatar" *ngIf="orientation() === 'horizontal'"><mat-icon>anchor</mat-icon></span>
+                        <span class="planner-berth-axis__avatar"
+                            *ngIf="orientation() === 'horizontal'"><mat-icon>anchor</mat-icon></span>
                         <span>{{ berth.berth_name }}</span>
                     </div>
                     <div class="planner-berth-axis__bollards">
@@ -83,9 +84,9 @@
                     </div>
                 </div>
 
-                <div class="planner-canvas" 
-                     [style.width.px]="orientation() === 'horizontal' ? timelineConfig.totalContentWidthPx : berth.total_bollard_px"
-                     [style.height.px]="orientation() === 'vertical' ? timelineConfig.totalContentHeightPx : berth.total_row_height">
+                <div class="planner-canvas"
+                    [style.width.px]="orientation() === 'horizontal' ? timelineConfig.totalContentWidthPx : berth.total_bollard_px"
+                    [style.height.px]="orientation() === 'vertical' ? timelineConfig.totalContentHeightPx : berth.total_row_height">
                     <div *ngFor="let vessel of berth.vessels" class="planner-vessel" [ngStyle]="{
                          'left.px':   vessel.left_px,
                          'top.px':    vessel.top_px,
@@ -101,3 +102,42 @@
 
     </div>
 </div>
+<mat-menu #filterMenu="matMenu" class="planner-filter-menu">
+    <div class="planner-filter-menu__content" (click)="$event.stopPropagation()">
+
+        <div class="planner-filter-menu__header">
+            <span>Filters</span>
+            <button mat-icon-button (click)="filterMenuTrigger.closeMenu()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+
+        <div class="planner-filter-menu__section">
+            <span class="planner-filter-menu__label">View Mode</span>
+            <div class="planner-filter-options">
+                <div class="planner-filter-option" *ngFor="let mode of timelineSvc.viewModes"
+                    [class.planner-filter-option--active]="pendingViewMode === mode.value"
+                    (click)="pendingViewMode = mode.value">
+                    {{ mode.label }}
+                </div>
+            </div>
+        </div>
+
+        <div class="planner-filter-menu__section">
+            <span class="planner-filter-menu__label">Time Slots</span>
+            <div class="planner-filter-options">
+                <div class="planner-filter-option" *ngFor="let slot of timelineSvc.dayTimeSlots"
+                    [class.planner-filter-option--active]="pendingSlotCount === slot.value"
+                    (click)="pendingSlotCount = slot.value">
+                    {{ slot.label }}
+                </div>
+            </div>
+        </div>
+
+        <div class="planner-filter-menu__footer">
+            <button mat-button (click)="onResetFilters()">Reset</button>
+            <button mat-flat-button color="primary" (click)="onApplyFilters()">Apply</button>
+        </div>
+
+    </div>
+</mat-menu>
