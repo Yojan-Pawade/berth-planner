@@ -1,20 +1,39 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { BerthPlannerbaseService } from './services/berth-planner-base.service';
 import { TimeLineService } from './services/timeline.service';
 import { fmt, m, y } from './berth-planner.utils';
 import { PlannerOrientation } from './berth-planner.model';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-berth-planner',
   templateUrl: './berth-planner.component.html',
-  styleUrl: './berth-planner.component.scss'
+  styleUrl: './berth-planner.component.scss',
+   animations: [
+    trigger('dialogSlide', [
+      transition(':enter', [
+        style({ transform: 'translateX(100%)', opacity: 1 }),
+        animate('500ms ease-out', style({ transform: 'translateX(0%)', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('500ms ease-in', style({ transform: 'translateX(0%)', opacity: 0 }))
+      ])
+    ]),
+  ],
 })
 export class BerthPlannerComponent extends BerthPlannerbaseService implements OnInit {
+
   private resizeObserver!: ResizeObserver;
   @ViewChild('plannerBody', { static: false }) plannerBody!: ElementRef<HTMLDivElement>;
   @ViewChild(MatMenuTrigger) filterMenuTrigger!: MatMenuTrigger;
-  constructor(timelineSvc: TimeLineService) {
+  @ViewChild('toolTip') toolTip! :TemplateRef<any>; 
+
+  constructor(
+    timelineSvc: TimeLineService,
+    protected dialog: MatDialog,
+  ) {
     super(timelineSvc);
   }
 
@@ -109,9 +128,35 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
     }
     return {
       width: totalBerthHeight + this.berthNameWidth() + 'px',
-    }
+    } 
   }
 
+  showTooltip(event:Event , data:any , vesselData:any){
+    event.stopPropagation();
+    this.tootipData = {
+      berth_name: data.berth_name,
+      vessel_name: vesselData.vessel_name,
+      status: vesselData.status.lookup_value,
+      planned_start: new Date(vesselData.planned_start),
+      planned_end: new Date(vesselData.planned_end),
+      actual_start: vesselData.actual_start ? new Date(vesselData.actual_start) : null,
+      actual_end: vesselData.actual_end ? new Date(vesselData.planned_start) : null,
+
+    }
+    this.dialog.open(this.toolTip ,{
+      position :{ top:'0px' , right:'0px' },
+      panelClass : 'tooltip-container',
+    }).afterClosed().subscribe((it)=>{
+      this.tootipData = null;
+    })
+
+    console.log('data',data , 'vessel',vesselData);
+  }
+
+  closeTooltip(event:Event){
+    event.stopPropagation();
+    this.dialog.closeAll();
+  }
 
   ngOnDestroy(): void {
     if (this.resizeObserver) {

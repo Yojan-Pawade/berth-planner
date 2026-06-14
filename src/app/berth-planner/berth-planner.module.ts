@@ -10,10 +10,11 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatMenuModule }   from '@angular/material/menu';
 import { FormsModule }     from '@angular/forms';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [BerthPlannerComponent],
-  imports: [CommonModule, BerthplannerRouting, MatButtonModule, MatIconModule, MatButtonToggleModule, MatMenuModule, MatSlideToggleModule, FormsModule],
+  imports: [CommonModule, BerthplannerRouting, MatButtonModule, MatIconModule, MatButtonToggleModule, MatMenuModule, MatSlideToggleModule, FormsModule,MatDialogModule],
   providers: [BerthPlannerbaseService, TimeLineService]
 })
 export class BerthPlannerModule {}

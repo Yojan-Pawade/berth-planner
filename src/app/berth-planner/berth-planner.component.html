@@ -100,13 +100,15 @@
                 <div class="planner-canvas"
                     [style.width.px]="orientation() === 'horizontal' ? timelineConfig.totalContentWidthPx : berth.total_bollard_px"
                     [style.height.px]="orientation() === 'vertical' ? timelineConfig.totalContentHeightPx : berth.total_row_height">
-                    <div *ngFor="let vessel of berth.vessels" class="planner-vessel" [ngStyle]="{
+                    <div *ngFor="let vessel of berth.vessels" class="planner-vessel" (click)="showTooltip($event ,berth , vessel)" [ngStyle]="{
                          'left.px':   vessel.left_px,
                          'top.px':    vessel.top_px,
                          'width.px':  vessel.width_px,
                          'height.px': vessel.height_px
                        }">
-                        <span class="planner-vessel__title">{{ vessel.vessel_name }}</span>
+                       <div class="vessel-content" [ngClass]="vessel.status.lookup_code">
+                           <span class="planner-vessel__title">{{ vessel.vessel_name }}</span>
+                       </div>
                     </div>
                 </div>
 
@@ -154,3 +156,41 @@
 
     </div>
 </mat-menu>
+
+<ng-template #toolTip>
+  <div class="tooltip-content" [@dialogSlide]>
+    <mat-dialog-content>
+    <div class="close-icon"><mat-icon class="icon" (click)="closeTooltip($event)">close</mat-icon></div>
+    <div class="data-section">
+        <div class="metadata-field">
+            <span class="field-label">Berth Name</span>
+            <span class="field-value">{{tootipData.berth_name}}</span>
+        </div>
+        <div class="metadata-field">
+            <span class="field-label">Vessel Name</span>
+            <span class="field-value">{{tootipData.vessel_name}}</span>
+        </div>
+        <div class="metadata-field">
+            <span class="field-label">status</span>
+            <span class="field-value">{{tootipData.status}}</span>
+        </div>
+        <div class="metadata-field full-span">
+            <span class="field-label">Planned Start</span>
+            <span class="field-value">{{tootipData.planned_start | date: 'dd-MMM-yyyy hh:mm a'}}</span>
+        </div>
+        <div class="metadata-field full-span">
+            <span class="field-label">Planned End</span>
+            <span class="field-value">{{tootipData.planned_end | date: 'dd-MMM-yyyy hh:mm a' }}</span>
+        </div>
+        <div class="metadata-field full-span" *ngIf="tootipData?.actual_start">
+            <span class="field-label">Planned End</span>
+            <span class="field-value">{{tootipData.actual_start | date: 'dd-MMM-yyyy hh:mm a'}}</span>
+        </div>
+        <div class="metadata-field full-span" *ngIf="tootipData?.actual_end">
+            <span class="field-label">Planned End</span>
+            <span class="field-value">{{tootipData.actual_end | date: 'dd-MMM-yyyy hh:mm a'}}</span>
+        </div>
+    </div>
+    </mat-dialog-content>
+</div>
+</ng-template>

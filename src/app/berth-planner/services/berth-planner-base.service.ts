@@ -10,13 +10,15 @@ export class BerthPlannerbaseService implements OnInit {
   _orientation = signal<PlannerOrientation>('horizontal');
   readonly orientation = this._orientation.asReadonly();
 
-  pendingViewMode: ViewMode = 'ONE_DAY';
+  pendingViewMode: ViewMode = 'ONE_MONTH';
   pendingSlotCount: SlotCount = 4;
 
+  
   private readonly BERTH_NAME_PERCENT = 15;
   private readonly BERTH_NAME_HEIGHT_PERCENT = 12;
   private readonly TIMELINE_PERCENT = 85;
-
+  
+  tootipData :any = null
   timelineConfig!: TimelineConfig;
   timeline: Date[] = [];
   rawBerthData: any[] = [];
@@ -111,6 +113,7 @@ export class BerthPlannerbaseService implements OnInit {
         return {
           id: vesselItem.id,
           vessel_name: vesselItem.vessel_name,
+          status:vesselItem.status,
           bollards_start: vesselItem.bollards_start,
           bollards_end: vesselItem.bollards_end,
           left_px,
