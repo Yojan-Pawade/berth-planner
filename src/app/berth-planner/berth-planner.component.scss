@@ -1,3 +1,5 @@
+@import './beth-planner-style.utils.scss';
+
 @mixin flex-row($align: stretch, $justify: flex-start, $gap: 0) {
     display: flex;
     flex-direction: row;
@@ -24,21 +26,15 @@
     position: sticky;
     left: 0;
     z-index: $z;
-    background-color: #fff;
+    background-color: $planner-bg-surface;
 }
 
 @mixin sticky-top($z: 1) {
     position: sticky;
     top: 0;
     z-index: $z;
-    background-color: #fff;
+    background-color: $planner-bg-surface;
 }
-
-$resource-color-1: blue;
-$resource-color-2: blue;
-$resource-color-3: blue;
-$resource-color-4: blue;
-
 
 .berth-planner {
     padding: 10px;
@@ -49,11 +45,11 @@ $resource-color-4: blue;
 .planner-toolbar {
     @include flex-row(center, flex-end, 10px);
     padding: 5px 10px;
-    border: 1px solid #bcbcbc;
+    border: $planner-border-solid;
     border-radius: 15px;
     margin-bottom: 10px;
-    background-color: #fff;
-    z-index: 10;
+    background-color: $planner-bg-surface;
+    z-index: $planner-z-header;
 
     &__nav {
         @include flex-row(center, center, 5px);
@@ -71,6 +67,7 @@ $resource-color-4: blue;
     white-space: nowrap;
     width: 100%;
     height: calc(100% - 60px);
+    position: relative;
 }
 
 .planner-header-row {
@@ -83,14 +80,14 @@ $resource-color-4: blue;
 }
 
 .planner-corner-label {
-    @include sticky-left($z: 11);
+    @include sticky-left($z: $planner-z-corner);
     @include flex-row(center, center);
-    background-color: #f5f3ff;
-    border: 1px solid #ddd6fe;
+    background-color: $planner-bg-corner;
+    border: 1px solid $planner-border-corner;
     box-sizing: border-box;
     font-size: 13px;
     font-weight: 700;
-    color: #5b21b6;
+    color: $planner-text-corner;
     letter-spacing: 0.5px;
 }
 
@@ -103,33 +100,33 @@ $resource-color-4: blue;
 
     &__day {
         @include flex-col(center, center);
-        border-top: 1px dotted #bcbcbc;
-        border-bottom: 1px dotted #bcbcbc;
+        border-top: $planner-border-thin;
+        border-bottom: $planner-border-thin;
         box-sizing: border-box;
-        color: #0058BE;
+        color: $planner-text-timeline;
         flex-shrink: 0;
         position: relative;
         height: max-content;
-            &::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                right: 0px;
-                bottom: 0;
-                width: 0;
-                border-right: 1px dotted #bcbcbc;
-                pointer-events: none;
-                z-index: 0;
-            }
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0px;
+            bottom: 0;
+            width: 0;
+            border-right: $planner-border-thin;
+            pointer-events: none;
+            z-index: $planner-z-grid;
+        }
 
         &:nth-child(even) {
-            background-color: #F8F2FF;
+            background-color: $planner-bg-day-even;
         }
 
         &:nth-child(odd) {
-            background-color: #fff;
+            background-color: $planner-bg-day-odd;
         }
-
     }
 
     &__date {
@@ -141,9 +138,9 @@ $resource-color-4: blue;
     &__slots {
         @include flex-row();
         width: 100%;
-        border-top: 1px dotted #bcbcbc;
+        border-top: $planner-border-thin;
         box-sizing: border-box;
-        color: #43474D;
+        color: $planner-text-slot;
     }
 
     &__slot {
@@ -165,24 +162,23 @@ $resource-color-4: blue;
         content: '';
         position: absolute;
         inset: 0;
-        border-bottom: 1px dotted #bcbcbc;
-        // border-right: 1px dotted #bcbcbc;
+        border-bottom: $planner-border-thin;
         pointer-events: none;
-        z-index: 0;
+        z-index: $planner-z-grid;
     }
 }
 
 .planner-berth-axis {
-    @include sticky-left($z: 3);
+    @include sticky-left($z: $planner-z-axis);
     @include flex-row(stretch);
-    border: 1px dotted #bcbcbc;
+    border: $planner-border-thin;
     border-top: none;
     border-bottom: none;
     flex-shrink: 0;
     box-sizing: border-box;
 
     &:not(:last-child) {
-        border-bottom: 1px dotted #bcbcbc;
+        border-bottom: $planner-border-thin;
     }
 
     &__info {
@@ -196,34 +192,34 @@ $resource-color-4: blue;
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background-color: #fee0e0;
-        border: 1px solid #DC3545;
+        background-color: $planner-avatar-bg;
+        border: 1px solid $planner-avatar-border;
         flex-shrink: 0;
 
         mat-icon {
             width: 20px;
             height: 20px;
             font-size: 20px;
-            color: #DC3545;
+            color: $planner-avatar-icon;
         }
     }
 
     &__bollards {
         flex: 1;
         @include flex-col();
-        color:#43474D;
+        color: $planner-text-slot;
         font-size: 12px;
     }
 
     &__cell {
         @include flex-row(center, center);
-        border-left: 1px dotted #bcbcbc;
+        border-left: $planner-border-thin;
         font-weight: 500;
         box-sizing: border-box;
         flex-shrink: 0;
 
         &:not(:last-child) {
-            border-bottom: 1px dotted #bcbcbc;
+            border-bottom: $planner-border-thin;
         }
     }
 }
@@ -237,24 +233,15 @@ $resource-color-4: blue;
     overflow: hidden;
 }
 
-.planner-grid {
-    @include flex-col();
-    overflow: auto;
-    white-space: nowrap;
-    width: 100%;
-    height: calc(100% - 60px);
-    position: relative;
-}
-
 .planner-grid__lines {
     position: absolute;
     top: 0;
     left: 0;
     pointer-events: none;
-    z-index: 0;
+    z-index: $planner-z-grid;
     height: 100%;
     width: 100%;
-    border: 1px dotted #bcbcbc;
+    border: $planner-border-thin;
     box-sizing: border-box;
 }
 
@@ -274,40 +261,31 @@ $resource-color-4: blue;
     box-sizing: border-box;
 
     &:nth-child(odd) {
-        background-color: #F1E6FF;
+        background-color: $planner-bg-slot-odd;
     }
 
     &:nth-child(even) {
-        background-color: #fff;
+        background-color: $planner-bg-slot-even;
     }
-
-    &:last-child{
-        border-right: 1px dotted #bcbcbc;
-    }
-}
-
-
-
-.planner-grid__slot-line {
-    height: 100%;
-    flex-shrink: 0;
-    box-sizing: border-box;
 
     &:not(:last-child) {
-        border-right: 1px dotted #e0e0e0;
+        border-right: $planner-border-light;
+    }
+
+    &:last-child {
+        border-right: $planner-border-thin;
     }
 }
 
 .planner-vessel {
-    position: absolute; // needed for ::before positioning
+    position: absolute;
     box-sizing: border-box;
-    background-color: #fff;
-    z-index: 2;
-    border: 1px solid #000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.05);
-    border-radius: 10px;
+    background-color: $planner-vessel-bg;
+    z-index: $planner-z-vessel;
+    border: 1px solid $planner-vessel-border;
+    box-shadow: $planner-vessel-shadow;
+    border-radius: $planner-vessel-radius;
     cursor: pointer;
-
 
     .vessel-content {
         display: flex;
@@ -320,45 +298,30 @@ $resource-color-4: blue;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            color: #fff;
+            color: $planner-vessel-title;
             text-align: center;
             z-index: 1;
             position: relative;
         }
-         &::before {
-        content: ''; 
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 20px;
-        width: 100%;
-        border-top-right-radius: 9px;
-        border-top-left-radius: 9px;
-        z-index: 0;
-    }
 
-    &.OPERATION_COMPLETE::before {
-        background-color: rgb(11, 149, 57);
-    }
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 100%;
+            border-top-right-radius: 9px;
+            border-top-left-radius: 9px;
+            z-index: 0;
+        }
 
-    &.IN_PROGRESS::before {
-        background-color: #dca830;
-    }
-
-    &.PLANNED::before {
-        background-color: #a3c3da;
-    }
-
-    &.CANCELLED::before {
-        background-color: #e4092a;
-    }
-
-    &.ARRIVED::before{
-        background-color: #62db62;
-    }
-    &.REQUESTED::before{
-        background-color: rgb(209, 209, 55);
-    }
+        &.OPERATION_COMPLETE::before { background-color: $status-complete-bg; }
+        &.IN_PROGRESS::before        { background-color: $status-in-progress-bg; }
+        &.PLANNED::before            { background-color: $status-planned-bg; }
+        &.CANCELLED::before          { background-color: $status-cancelled-bg; }
+        &.ARRIVED::before            { background-color: $status-arrived-bg; }
+        &.REQUESTED::before          { background-color: $status-requested-bg; }
     }
 }
 
@@ -373,7 +336,7 @@ $resource-color-4: blue;
         width: auto !important;
         flex-direction: column;
         border-right: none;
-        border-bottom: 1px dotted #bcbcbc;
+        border-bottom: $planner-border-thin;
     }
 
     .planner-grid__slot-line {
@@ -381,7 +344,7 @@ $resource-color-4: blue;
         height: auto;
 
         &:last-child {
-            border-bottom: 1px dotted #bcbcbc;
+            border-bottom: $planner-border-thin;
         }
     }
 
@@ -392,15 +355,15 @@ $resource-color-4: blue;
         height: max-content;
         position: sticky;
         left: 0;
-        z-index: 10;
-        background-color: #fff;
+        z-index: $planner-z-header;
+        background-color: $planner-bg-surface;
     }
 
     .planner-corner-label {
         position: sticky;
         top: 0;
         left: 0;
-        z-index: 11;
+        z-index: $planner-z-corner;
     }
 
     .planner-timeline {
@@ -409,8 +372,8 @@ $resource-color-4: blue;
         &__day {
             flex-direction: row;
             border-top: none;
-            border-left: 1px dotted #bcbcbc;
-            border-bottom: 1px dotted #bcbcbc;
+            border-left: $planner-border-thin;
+            border-bottom: $planner-border-thin;
         }
 
         &__date {
@@ -426,18 +389,20 @@ $resource-color-4: blue;
             height: 100%;
             border-top: none;
             flex: 1;
-              &:not(:last-child){
-                border-bottom: 1px dotted #bcbcbc;
+
+            &:not(:last-child) {
+                border-bottom: $planner-border-thin;
             }
         }
 
         &__slot {
             line-height: normal;
             @include flex-row(center, center);
-            border-left: 1px dotted #bcbcbc;
+            border-left: $planner-border-thin;
             border-right: none;
-            &:not(:last-child){
-                border-bottom: 1px dotted #bcbcbc;
+
+            &:not(:last-child) {
+                border-bottom: $planner-border-thin;
             }
         }
     }
@@ -452,14 +417,14 @@ $resource-color-4: blue;
         position: sticky;
         top: 0;
         left: unset;
-        z-index: 3;
+        z-index: $planner-z-axis;
         flex-direction: column;
         border-left: none;
-        border-bottom: 1px dotted #bcbcbc;
+        border-bottom: $planner-border-thin;
 
         &__info {
-            border-bottom: 1px dotted #bcbcbc;
-            border-top: 1px dotted #bcbcbc;
+            border-bottom: $planner-border-thin;
+            border-top: $planner-border-thin;
             padding: 5px 0;
         }
 
@@ -472,85 +437,84 @@ $resource-color-4: blue;
             border-bottom: none;
 
             &:not(:last-child) {
-                border-right: 1px dotted #bcbcbc;
+                border-right: $planner-border-thin;
             }
         }
     }
 }
 
-
 .planner-filter-menu__content {
-  padding: 16px;
-  min-width: 280px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+    padding: 16px;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .planner-filter-menu__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    border-bottom: 1px solid $planner-menu-border;
+    font-size: 14px;
+    font-weight: 600;
+    color: $planner-menu-title;
 }
 
 .planner-filter-menu__section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .planner-filter-menu__label {
-  font-size: 12px;
-  font-weight: 500;
-  color: #666;
+    font-size: 12px;
+    font-weight: 500;
+    color: $planner-menu-label;
 }
 
 .planner-filter-menu__footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid $planner-menu-border;
 }
 
 .planner-filter-options {
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
-  flex-wrap: wrap;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .planner-filter-option {
-  padding: 6px 14px;
-  border-radius: 6px;
-  border: 1px solid #bcbcbc;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  user-select: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
-  color: #444;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid $planner-filter-default-border;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    color: $planner-filter-default-text;
 
-  &:hover {
-    border-color: #5731A3;
-    color: #5731A3;
-  }
+    &:hover {
+        border-color: $planner-filter-active-border;
+        color: $planner-filter-active-border;
+    }
 
-  &--active {
-    border-color: #5731A3;
-    color: #5731A3;
-    box-shadow: 0 0 0 2px rgba(87, 49, 163, 0.2);
-    background-color: #F3EEFF;
-  }
+    &--active {
+        border-color: $planner-filter-active-border;
+        color: $planner-filter-active-border;
+        box-shadow: 0 0 0 2px $planner-filter-active-shadow;
+        background-color: $planner-filter-active-bg;
+    }
 }
 
-::ng-deep .mat-mdc-menu-panel{
-    background-color: #fff !important;
+::ng-deep .mat-mdc-menu-panel {
+    background-color: $planner-bg-surface !important;
     max-width: 350px !important;
 }
 
@@ -571,11 +535,11 @@ $resource-color-4: blue;
         justify-content: center;
         max-width: 420px;
         text-align: center;
-        background-color: #ffffff;
-        border: 1px solid #e2e8f0;
+        background-color: $planner-bg-surface;
+        border: 1px solid $planner-nodata-border;
         border-radius: 12px;
         padding: 40px 32px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        box-shadow: $planner-nodata-shadow;
     }
 
     &__icon-wrapper {
@@ -584,8 +548,8 @@ $resource-color-4: blue;
         justify-content: center;
         width: 80px;
         height: 80px;
-        background-color: #f8fafc;
-        border: 1px dashed #cbd5e1;
+        background-color: $planner-nodata-icon-bg;
+        border: 1px dashed $planner-nodata-icon-border;
         border-radius: 50%;
         margin-bottom: 20px;
     }
@@ -594,13 +558,13 @@ $resource-color-4: blue;
         font-size: 36px;
         width: 36px;
         height: 36px;
-        color: #64748b;
+        color: $planner-nodata-icon;
     }
 
     &__title {
         font-size: 18px;
         font-weight: 600;
-        color: #1e293b;
+        color: $planner-nodata-title;
         margin: 0 0 8px 0;
         letter-spacing: -0.01em;
     }
@@ -608,72 +572,73 @@ $resource-color-4: blue;
     &__description {
         font-size: 14px;
         line-height: 1.5;
-        color: #64748b;
+        color: $planner-nodata-desc;
         margin: 0;
     }
 }
 
 ::ng-deep .tooltip-container {
-  height: 100%;
-  min-width: 350px !important;
-  transition: all 0.1s ease-in-out;
+    height: 100%;
+    min-width: 350px !important;
+    transition: all 0.1s ease-in-out;
 
-  .mat-mdc-dialog-container {
-    transform: none !important;
-    animation: none !important;
-    transition: none !important;
-    overflow: hidden;
-    .mat-mdc-dialog-surface{
-      border-radius: 0;
-      border-top-left-radius: 14px;
-      border-bottom-left-radius: 14px;
-      padding: 10px 0px;
-    } 
-  }
+    .mat-mdc-dialog-container {
+        transform: none !important;
+        animation: none !important;
+        transition: none !important;
+        overflow: hidden;
 
-  .mat-mdc-dialog-content {
-    max-height: 100% !important;
-    padding: 10px 15px !important;
-    overflow: hidden !important;
-  }
-
-   .tooltip-content {
-    .close-icon{
-      text-align: end;
-      .icon{
-        background-color: #B1B1B1;
-        color:#fff;
-        border-radius: 100%;
-        cursor: pointer;
-      }
+        .mat-mdc-dialog-surface {
+            border-radius: 0;
+            border-top-left-radius: 14px;
+            border-bottom-left-radius: 14px;
+            padding: 10px 0px;
+        }
     }
 
-    .data-section{
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px 5px;
+    .mat-mdc-dialog-content {
+        max-height: 100% !important;
+        padding: 10px 15px !important;
+        overflow: hidden !important;
+    }
 
-        .metadata-field{
-            display: flex;
-            flex-direction: column;
+    .tooltip-content {
+        .close-icon {
+            text-align: end;
 
-            & .full-span{
-                column-span: 2;
+            .icon {
+                background-color: $tooltip-close-bg;
+                color: $planner-bg-surface;
+                border-radius: 100%;
+                cursor: pointer;
             }
+        }
 
-            .field-label{
-                font-size: 11px;
-                font-weight: 600;
-                color:#919191
-            }
+        .data-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 5px;
 
-            .field-value{
-                font-size: 12px;
-                font-weight: 500;
-                color:#000;
+            .metadata-field {
+                display: flex;
+                flex-direction: column;
+
+                & .full-span {
+                    column-span: 2;
+                }
+
+                .field-label {
+                    font-size: 11px;
+                    font-weight: 600;
+                    color: $tooltip-label-color;
+                }
+
+                .field-value {
+                    font-size: 12px;
+                    font-weight: 500;
+                    color: $tooltip-value-color;
+                }
             }
         }
     }
-  }
-
 }

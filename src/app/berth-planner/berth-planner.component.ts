@@ -26,6 +26,8 @@ import { MatDialog } from '@angular/material/dialog';
 export class BerthPlannerComponent extends BerthPlannerbaseService implements OnInit {
 
   private resizeObserver!: ResizeObserver;
+  private resizeTimeout?: number;
+
   @ViewChild('plannerBody', { static: false }) plannerBody!: ElementRef<HTMLDivElement>;
   @ViewChild(MatMenuTrigger) filterMenuTrigger!: MatMenuTrigger;
   @ViewChild('toolTip') toolTip! :TemplateRef<any>; 
@@ -54,7 +56,12 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
           if (bodyWidth > 0 && bodyHeight > 0) {
             this.timelineSvc.setPlannerWidthPx(bodyWidth);
             this.timelineSvc.setPlannerHeightPx(bodyHeight);
-            this.updateLayout();
+            clearTimeout(this.resizeTimeout);
+            this.resizeTimeout = window.setTimeout(() => {
+              console.log('triggered change layout');
+               this.timelineConfig = this.timelineSvc.generateTimelineConfig();
+              this.initBerthData();
+            }, 100);
           }
         }
       });

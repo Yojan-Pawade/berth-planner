@@ -1,0 +1,42 @@
+$planner-border-color:   #bcbcbc;
+$planner-border-thin:    1px dotted $planner-border-color;
+$planner-border-medium:  1.5px dotted $planner-border-color;
+
+$planner-bg-surface:      #fff;
+$planner-bg-day-even:     #EBDCFF;
+$planner-bg-day-odd:      #E9E7F3;
+
+$planner-text-default:    #333;
+$planner-text-muted:      #666;
+$planner-text-timeline:   #5731A3;
+$planner-text-slot:       #4A4452;
+
+$planner-vessel-border:   #5731A3;
+$planner-vessel-bg:       #fff;
+
+$planner-status-planned-bg:      #E6F1FB;
+$planner-status-planned-text:    #0C447C;
+$planner-status-inprogress-bg:   #FAEEDA;
+$planner-status-inprogress-text: #633806;
+$planner-status-completed-bg:    #E1F5EE;
+$planner-status-completed-text:  #085041;
+$planner-status-delayed-bg:      #FAECE7;
+$planner-status-delayed-text:    #712B13;
+
+$planner-avatar-bg:       #fee0e0;
+$planner-avatar-border:   #DC3545;
+$planner-avatar-icon:     #DC3545;
+
+$planner-filter-active-border: #5731A3;
+$planner-filter-active-bg:     #F3EEFF;
+$planner-filter-active-shadow: rgba(87, 49, 163, 0.2);
+
+$planner-z-corner:   11;
+$planner-z-header:   10;
+$planner-z-axis:     3;
+$planner-z-vessel:   2;
+$planner-z-grid:     1;
+
+$planner-bollard-size-horizontal: 25px;
+$planner-bollard-size-vertical:   35px;
+$planner-grid-header-offset:      55px;
