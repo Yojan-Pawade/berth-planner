@@ -1,41 +1,5 @@
 @import './beth-planner-style.utils.scss';
 
-@mixin flex-row($align: stretch, $justify: flex-start, $gap: 0) {
-    display: flex;
-    flex-direction: row;
-    align-items: $align;
-    justify-content: $justify;
-
-    @if $gap !=0 {
-        gap: $gap;
-    }
-}
-
-@mixin flex-col($align: stretch, $justify: flex-start, $gap: 0) {
-    display: flex;
-    flex-direction: column;
-    align-items: $align;
-    justify-content: $justify;
-
-    @if $gap !=0 {
-        gap: $gap;
-    }
-}
-
-@mixin sticky-left($z: 1) {
-    position: sticky;
-    left: 0;
-    z-index: $z;
-    background-color: $planner-bg-surface;
-}
-
-@mixin sticky-top($z: 1) {
-    position: sticky;
-    top: 0;
-    z-index: $z;
-    background-color: $planner-bg-surface;
-}
-
 .berth-planner {
     padding: 10px;
     box-sizing: border-box;
@@ -45,11 +9,11 @@
 .planner-toolbar {
     @include flex-row(center, flex-end, 10px);
     padding: 5px 10px;
-    border: $planner-border-solid;
+    border: 1px solid $planner-border-color;
     border-radius: 15px;
     margin-bottom: 10px;
     background-color: $planner-bg-surface;
-    z-index: $planner-z-header;
+    z-index: $z-index-header;
 
     &__nav {
         @include flex-row(center, center, 5px);
@@ -80,14 +44,14 @@
 }
 
 .planner-corner-label {
-    @include sticky-left($z: $planner-z-corner);
+    @include sticky-left($z: $z-index-corner);
     @include flex-row(center, center);
-    background-color: $planner-bg-corner;
-    border: 1px solid $planner-border-corner;
+    background-color: #f5f3ff;
+    border: 1px solid #ddd6fe;
     box-sizing: border-box;
     font-size: 13px;
     font-weight: 700;
-    color: $planner-text-corner;
+    color: $planner-purple-dark;
     letter-spacing: 0.5px;
 }
 
@@ -117,15 +81,15 @@
             width: 0;
             border-right: $planner-border-thin;
             pointer-events: none;
-            z-index: $planner-z-grid;
+            z-index: $z-index-grid;
         }
 
         &:nth-child(even) {
-            background-color: $planner-bg-day-even;
+            background-color: $planner-timeline-bg-even;
         }
 
         &:nth-child(odd) {
-            background-color: $planner-bg-day-odd;
+            background-color: $planner-timeline-bg-odd;
         }
     }
 
@@ -164,12 +128,12 @@
         inset: 0;
         border-bottom: $planner-border-thin;
         pointer-events: none;
-        z-index: $planner-z-grid;
+        z-index: $z-index-grid;
     }
 }
 
 .planner-berth-axis {
-    @include sticky-left($z: $planner-z-axis);
+    @include sticky-left($z: $z-index-axis);
     @include flex-row(stretch);
     border: $planner-border-thin;
     border-top: none;
@@ -192,15 +156,15 @@
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background-color: $planner-avatar-bg;
-        border: 1px solid $planner-avatar-border;
+        background-color: #fee0e0;
+        border: 1px solid #DC3545;
         flex-shrink: 0;
 
         mat-icon {
             width: 20px;
             height: 20px;
             font-size: 20px;
-            color: $planner-avatar-icon;
+            color: #DC3545;
         }
     }
 
@@ -238,7 +202,7 @@
     top: 0;
     left: 0;
     pointer-events: none;
-    z-index: $planner-z-grid;
+    z-index: $z-index-grid;
     height: 100%;
     width: 100%;
     border: $planner-border-thin;
@@ -261,69 +225,72 @@
     box-sizing: border-box;
 
     &:nth-child(odd) {
-        background-color: $planner-bg-slot-odd;
+        background-color: $planner-grid-band-bg;
     }
 
     &:nth-child(even) {
-        background-color: $planner-bg-slot-even;
-    }
-
-    &:not(:last-child) {
-        border-right: $planner-border-light;
+        background-color: $planner-timeline-bg-odd;
     }
 
     &:last-child {
         border-right: $planner-border-thin;
+    }
+
+    &:not(:last-child) {
+        border-right: 1px solid #e0e0e0;
     }
 }
 
 .planner-vessel {
     position: absolute;
     box-sizing: border-box;
-    background-color: $planner-vessel-bg;
-    z-index: $planner-z-vessel;
-    border: 1px solid $planner-vessel-border;
-    box-shadow: $planner-vessel-shadow;
-    border-radius: $planner-vessel-radius;
+    background-color: $planner-bg-surface;
+    z-index: $z-index-vessel;
+    border: 1px solid #000000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
     cursor: pointer;
+    overflow: hidden;
 
     .vessel-content {
         display: flex;
         flex-direction: column;
-
-        .planner-vessel__title {
-            font-size: 11px;
-            font-weight: 500;
-            padding: 0px 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: $planner-vessel-title;
-            text-align: center;
-            z-index: 1;
-            position: relative;
-        }
+        position: relative;
+        height: 100%;
+        width: 100%;
 
         &::before {
-            content: '';
+            content: ''; 
             position: absolute;
             top: 0;
             left: 0;
             height: 20px;
             width: 100%;
-            border-top-right-radius: 9px;
-            border-top-left-radius: 9px;
             z-index: 0;
         }
 
         &.OPERATION_COMPLETE::before { background-color: $status-complete-bg; }
-        &.IN_PROGRESS::before        { background-color: $status-in-progress-bg; }
+        &.IN_PROGRESS::before        { background-color: $status-inprogress-bg; }
         &.PLANNED::before            { background-color: $status-planned-bg; }
         &.CANCELLED::before          { background-color: $status-cancelled-bg; }
         &.ARRIVED::before            { background-color: $status-arrived-bg; }
         &.REQUESTED::before          { background-color: $status-requested-bg; }
+
+        .planner-vessel__title {
+            font-size: 11px;
+            font-weight: 500;
+            line-height: 20px;
+            padding: 0px 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #ffffff;
+            text-align: center;
+            z-index: 1;
+        }
     }
 }
+
 
 .planner-grid--vertical {
     flex-direction: row !important;
@@ -355,7 +322,7 @@
         height: max-content;
         position: sticky;
         left: 0;
-        z-index: $planner-z-header;
+        z-index: $z-index-header;
         background-color: $planner-bg-surface;
     }
 
@@ -363,7 +330,7 @@
         position: sticky;
         top: 0;
         left: 0;
-        z-index: $planner-z-corner;
+        z-index: $z-index-corner;
     }
 
     .planner-timeline {
@@ -390,7 +357,7 @@
             border-top: none;
             flex: 1;
 
-            &:not(:last-child) {
+            &:not(:last-child){
                 border-bottom: $planner-border-thin;
             }
         }
@@ -401,7 +368,7 @@
             border-left: $planner-border-thin;
             border-right: none;
 
-            &:not(:last-child) {
+            &:not(:last-child){
                 border-bottom: $planner-border-thin;
             }
         }
@@ -417,7 +384,7 @@
         position: sticky;
         top: 0;
         left: unset;
-        z-index: $planner-z-axis;
+        z-index: $z-index-axis;
         flex-direction: column;
         border-left: none;
         border-bottom: $planner-border-thin;
@@ -443,6 +410,7 @@
     }
 }
 
+
 .planner-filter-menu__content {
     padding: 16px;
     min-width: 280px;
@@ -456,10 +424,10 @@
     align-items: center;
     justify-content: space-between;
     padding-bottom: 8px;
-    border-bottom: 1px solid $planner-menu-border;
+    border-bottom: $planner-border-solid-light;
     font-size: 14px;
     font-weight: 600;
-    color: $planner-menu-title;
+    color: $planner-text-default;
 }
 
 .planner-filter-menu__section {
@@ -471,7 +439,7 @@
 .planner-filter-menu__label {
     font-size: 12px;
     font-weight: 500;
-    color: $planner-menu-label;
+    color: $planner-text-muted;
 }
 
 .planner-filter-menu__footer {
@@ -479,7 +447,7 @@
     justify-content: flex-end;
     gap: 8px;
     padding-top: 8px;
-    border-top: 1px solid $planner-menu-border;
+    border-top: $planner-border-solid-light;
 }
 
 .planner-filter-options {
@@ -492,24 +460,24 @@
 .planner-filter-option {
     padding: 6px 14px;
     border-radius: 6px;
-    border: 1px solid $planner-filter-default-border;
+    border: 1px solid $planner-border-color;
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     user-select: none;
     transition: border-color 0.15s, box-shadow 0.15s;
-    color: $planner-filter-default-text;
+    color: #444444;
 
     &:hover {
-        border-color: $planner-filter-active-border;
-        color: $planner-filter-active-border;
+        border-color: $planner-purple-primary;
+        color: $planner-purple-primary;
     }
 
     &--active {
-        border-color: $planner-filter-active-border;
-        color: $planner-filter-active-border;
-        box-shadow: 0 0 0 2px $planner-filter-active-shadow;
-        background-color: $planner-filter-active-bg;
+        border-color: $planner-purple-primary;
+        color: $planner-purple-primary;
+        box-shadow: 0 0 0 2px rgba(87, 49, 163, 0.2);
+        background-color: $planner-purple-light;
     }
 }
 
@@ -517,6 +485,7 @@
     background-color: $planner-bg-surface !important;
     max-width: 350px !important;
 }
+
 
 .planner-no-data {
     display: flex;
@@ -536,10 +505,10 @@
         max-width: 420px;
         text-align: center;
         background-color: $planner-bg-surface;
-        border: 1px solid $planner-nodata-border;
+        border: 1px solid #e2e8f0;
         border-radius: 12px;
         padding: 40px 32px;
-        box-shadow: $planner-nodata-shadow;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     }
 
     &__icon-wrapper {
@@ -548,8 +517,8 @@
         justify-content: center;
         width: 80px;
         height: 80px;
-        background-color: $planner-nodata-icon-bg;
-        border: 1px dashed $planner-nodata-icon-border;
+        background-color: #f8fafc;
+        border: 1px dashed #cbd5e1;
         border-radius: 50%;
         margin-bottom: 20px;
     }
@@ -558,13 +527,13 @@
         font-size: 36px;
         width: 36px;
         height: 36px;
-        color: $planner-nodata-icon;
+        color: #64748b;
     }
 
     &__title {
         font-size: 18px;
         font-weight: 600;
-        color: $planner-nodata-title;
+        color: #1e293b;
         margin: 0 0 8px 0;
         letter-spacing: -0.01em;
     }
@@ -572,10 +541,11 @@
     &__description {
         font-size: 14px;
         line-height: 1.5;
-        color: $planner-nodata-desc;
+        color: #64748b;
         margin: 0;
     }
 }
+
 
 ::ng-deep .tooltip-container {
     height: 100%;
@@ -593,7 +563,7 @@
             border-top-left-radius: 14px;
             border-bottom-left-radius: 14px;
             padding: 10px 0px;
-        }
+        }  
     }
 
     .mat-mdc-dialog-content {
@@ -607,8 +577,8 @@
             text-align: end;
 
             .icon {
-                background-color: $tooltip-close-bg;
-                color: $planner-bg-surface;
+                background-color: #b1b1b1;
+                color: #ffffff;
                 border-radius: 100%;
                 cursor: pointer;
             }
@@ -630,13 +600,13 @@
                 .field-label {
                     font-size: 11px;
                     font-weight: 600;
-                    color: $tooltip-label-color;
+                    color: #919191;
                 }
 
                 .field-value {
                     font-size: 12px;
                     font-weight: 500;
-                    color: $tooltip-value-color;
+                    color: #000000;
                 }
             }
         }

@@ -3,6 +3,7 @@ import { SlotCount, SlotMeta, TimelineConfig, ViewMode } from '../berth-planner.
 
 @Injectable({ providedIn: 'root' })
 export class TimeLineService {
+  
   readonly todayDate = new Date();
 
   private readonly MIN_COLUMN_WIDTH_4_SLOT  = 120;
