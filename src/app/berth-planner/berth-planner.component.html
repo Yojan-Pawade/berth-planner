@@ -63,7 +63,8 @@
                         [style.width.px]="orientation() === 'horizontal' ? timelineConfig.columnWidthPx : null"
                         [style.height.px]="orientation() === 'vertical' ? timelineConfig.columnHeightPx : null">
 
-                        <div class="planner-timeline__date">{{ date | date:'dd-MMM-yyyy' }}</div>
+                        <div class="planner-timeline__date">
+                            <mat-icon class="calendar-icon">calendar_today</mat-icon>{{ date | date:'dd-MMM-yyyy' }}</div>
                         <div class="planner-timeline__slots">
                             <div class="planner-timeline__slot"
                                 [style.width.px]="orientation() === 'horizontal' ? timelineConfig.slotWidthPx : null"
@@ -99,7 +100,7 @@
                 <div class="planner-canvas"
                     [style.width.px]="orientation() === 'horizontal' ? timelineConfig.totalContentWidthPx : berth.total_bollard_px"
                     [style.height.px]="orientation() === 'vertical' ? timelineConfig.totalContentHeightPx : berth.total_row_height">
-                    <div *ngFor="let vessel of berth.vessels" class="planner-vessel" [ngClass]="vessel.status.lookup_code" (click)="showTooltip($event ,berth , vessel)" [ngStyle]="{
+                    <div *ngFor="let vessel of berth.vessels" class="planner-vessel" [ngClass]="vessel.status.lookup_code"  [ngStyle]="{
                          'left.px':   vessel.left_px,
                          'top.px':    vessel.top_px,
                          'width.px':  vessel.width_px,
