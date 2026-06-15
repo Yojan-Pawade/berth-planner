@@ -167,7 +167,7 @@ export class BerthPlannerbaseService implements OnInit {
     vesselWidth: number,
     vesselHeight: number
   ) {
-    const TITLE_SIZE = 15;
+    const TITLE_SIZE = 10;
     const RESOURCE_BAR_SIZE = 8;
     const BAR_GAP = 5;
     const EDGE_MARGIN = 8;

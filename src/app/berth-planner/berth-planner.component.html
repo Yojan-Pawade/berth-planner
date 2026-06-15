@@ -109,6 +109,7 @@
                         <div class="planner-vessel__title" 
                       [style.width.px]="Math.min(80, vessel.width_px * 0.45)" [matTooltip]="vessel.vessel_name">{{ vessel.vessel_name }}</div>
                         <div *ngFor="let res of vessel.resources"
+                           [matTooltip]="res.resource_name"
                             class="planner-vessel__resource"
                             [ngStyle]="{
                                 'left.px':   res.left_px,
