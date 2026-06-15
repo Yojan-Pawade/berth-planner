@@ -142,9 +142,10 @@ export class BerthPlannerbaseService implements OnInit {
         };
       });
 
+      console.log('final berth data', this.berthPlotingData);
+
       const totalBollards = berthBollardLabels.length;
       const total_row_height = totalBollards * this.timelineSvc.bollardSize();
-
       return {
         id: berthItem.berth_id,
         berth_name: berthItem.berth_name,
@@ -167,7 +168,7 @@ export class BerthPlannerbaseService implements OnInit {
     vesselWidth: number,
     vesselHeight: number
   ) {
-    const TITLE_SIZE = 10;
+    const TITLE_SIZE = 18;
     const RESOURCE_BAR_SIZE = 8;
     const BAR_GAP = 5;
     const EDGE_MARGIN = 8;
@@ -181,12 +182,14 @@ export class BerthPlannerbaseService implements OnInit {
       availableSpace = vesselHeight - TITLE_SIZE - EDGE_MARGIN;
     }
 
-    const maxBarsFit = Math.max(0, Math.floor((availableSpace + BAR_GAP) / slotSize));
+    const maxBarsFit = Math.max(0, Math.floor((availableSpace) / slotSize));
+    console.log('max BAR FIRTS',maxBarsFit ,availableSpace, data , Math.floor((availableSpace) / slotSize));
 
     const totalResources = data.length;
     const visibleCount = Math.min(totalResources, maxBarsFit);
     const hiddenCount = totalResources - visibleCount;
     const visibleResources = data.slice(0, visibleCount);
+    // console.log('visible bars',visibleResources);
 
     const processedResources = visibleResources.map((resourceItem: any, index: number) => {
       const resStart = new Date(resourceItem.planned_start);

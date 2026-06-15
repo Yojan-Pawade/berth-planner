@@ -84,8 +84,7 @@
                     [style.width.px]="orientation() === 'horizontal' ? berthNameWidth() : berth.total_bollard_px"
                     [style.height.px]="orientation() === 'vertical' ? berthNameHeight() : null">
                     <div class="planner-berth-axis__info">
-                        <span class="planner-berth-axis__avatar"
-                            *ngIf="orientation() === 'horizontal'"><mat-icon>anchor</mat-icon></span>
+                        <span class="planner-berth-axis__avatar"><mat-icon>anchor</mat-icon></span>
                         <span>{{ berth.berth_name }}</span>
                     </div>
                     <div class="planner-berth-axis__bollards">
@@ -106,8 +105,24 @@
                          'width.px':  vessel.width_px,
                          'height.px': vessel.height_px
                        }">
-                        <div class="planner-vessel__title" 
-                      [style.width.px]="Math.min(80, vessel.width_px * 0.45)" [matTooltip]="vessel.vessel_name">{{ vessel.vessel_name }}</div>
+                        <!-- <div class="planner-vessel__title" 
+                      [style.width.px]="Math.min(80, vessel.width_px * 0.45)" [matTooltip]="vessel.vessel_name">{{ vessel.vessel_name }}</div> -->
+                        <div class="planner-vessel__actions" [class.is-vertical]="orientation() === 'vertical'">
+                            <div class="action-circle info-badge" 
+                            [matTooltip]="vessel.vessel_name"
+                            (click)="showTooltip($event ,berth , vessel)"
+                            >i</div>
+                            
+                            <div class="action-circle count-badge" 
+                                *ngIf="vessel.hiddenCount > 0" 
+                                [matTooltip]="'+' + vessel.hiddenCount + ' more resources hidden due to container size'">
+                                +{{vessel.hiddenCount}}
+                            </div>
+                            
+                            <div class="action-circle filter-badge" *ngIf="vessel.hiddenCount > 0" [matTooltip]="'Filter resources based on the resource type'">
+                                <mat-icon>tune</mat-icon>
+                            </div>
+                        </div>
                         <div *ngFor="let res of vessel.resources"
                            [matTooltip]="res.resource_name"
                             class="planner-vessel__resource"
