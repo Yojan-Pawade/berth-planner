@@ -32,16 +32,19 @@ $status-requested-bg:          #d1d137;
 // Structural Z-Indices
 $z-index-corner:               11;
 $z-index-header:               10;
-$z-index-axis:                 3;
+$z-index-axis:                 4;
 $z-index-vessel:               2;
 $z-index-grid:                 0;
 
 // Resource Placeholders
-$resource-color-1:             #0000ff;
-$resource-color-2:             #0000ff;
-$resource-color-3:             #0000ff;
-$resource-color-4:             #0000ff;
-
+$resource-colors: (
+  #8B5CF6,
+  #EC4899,
+  #10B981,
+  #FBBF24,
+  #6366F1,
+  #F16365,
+);
 
 @mixin flex-row($align: stretch, $justify: flex-start, $gap: 0) {
     display: flex;

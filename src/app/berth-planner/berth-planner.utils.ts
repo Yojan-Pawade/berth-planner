@@ -25,7 +25,7 @@ export const BERTH_PLANNER_DATA = [
         actual_end: '2026-06-02T06:45:00.000Z',
         resources: [
           { id: 'a1-v1-r1', resource_name: 'Crane 1', planned_start: '2026-06-01T06:00:00.000Z', planned_end: '2026-06-02T06:45:00.000Z' },
-          { id: 'a1-v1-r2', resource_name: 'Tugboat A', planned_start: '2026-06-01T06:15:00.000Z', planned_end: '2026-06-02T07:00:00.000Z' }
+          { id: 'a1-v1-r2', resource_name: 'Tugboat A', planned_start: '2026-06-01T06:15:00.000Z', planned_end: '2026-06-02T06:00:00.000Z' }
         ]
       },
       {

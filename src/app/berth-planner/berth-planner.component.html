@@ -100,15 +100,22 @@
                 <div class="planner-canvas"
                     [style.width.px]="orientation() === 'horizontal' ? timelineConfig.totalContentWidthPx : berth.total_bollard_px"
                     [style.height.px]="orientation() === 'vertical' ? timelineConfig.totalContentHeightPx : berth.total_row_height">
-                    <div *ngFor="let vessel of berth.vessels" class="planner-vessel" (click)="showTooltip($event ,berth , vessel)" [ngStyle]="{
+                    <div *ngFor="let vessel of berth.vessels" class="planner-vessel" [ngClass]="vessel.status.lookup_code" (click)="showTooltip($event ,berth , vessel)" [ngStyle]="{
                          'left.px':   vessel.left_px,
                          'top.px':    vessel.top_px,
                          'width.px':  vessel.width_px,
                          'height.px': vessel.height_px
                        }">
-                       <div class="vessel-content" [ngClass]="vessel.status.lookup_code">
-                           <span class="planner-vessel__title">{{ vessel.vessel_name }}</span>
-                       </div>
+                        <span class="planner-vessel__title">{{ vessel.vessel_name }}</span>
+                        <div *ngFor="let res of vessel.resources"
+                            class="planner-vessel__resource"
+                            [ngStyle]="{
+                                'left.px':   res.left_px,
+                                'top.px':    res.top_px,
+                                'width.px':  res.width_px,
+                                'height.px': res.height_px
+                            }">
+                        </div>
                     </div>
                 </div>
 

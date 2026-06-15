@@ -240,7 +240,6 @@
         border-right: 1px solid #e0e0e0;
     }
 }
-
 .planner-vessel {
     position: absolute;
     box-sizing: border-box;
@@ -252,21 +251,14 @@
     cursor: pointer;
     overflow: hidden;
 
-    .vessel-content {
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        height: 100%;
-        width: 100%;
-
-        &::before {
+     &::before {
             content: ''; 
             position: absolute;
             top: 0;
             left: 0;
-            height: 20px;
             width: 100%;
-            z-index: 0;
+            height: 4px;
+            z-index: 1;
         }
 
         &.OPERATION_COMPLETE::before { background-color: $status-complete-bg; }
@@ -276,7 +268,27 @@
         &.ARRIVED::before            { background-color: $status-arrived-bg; }
         &.REQUESTED::before          { background-color: $status-requested-bg; }
 
+
+        &__resource {
+                position: absolute;
+                border-radius: 15px;
+                box-sizing: border-box;
+                opacity: 0.7;
+                z-index: 2;
+
+                @for $i from 1 through length($resource-colors) {
+                    &:nth-of-type(#{$i}) {
+                        background-color: nth($resource-colors, $i);
+                    }
+                }
+
+                &:hover{
+                    opacity: 1;
+                }
+            }
+
         .planner-vessel__title {
+            position: absolute;
             font-size: 11px;
             font-weight: 500;
             line-height: 20px;
@@ -284,13 +296,11 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            color: #ffffff;
+            color: $planner-text-default;
             text-align: center;
-            z-index: 1;
+            z-index: 3;
         }
-    }
 }
-
 
 .planner-grid--vertical {
     flex-direction: row !important;

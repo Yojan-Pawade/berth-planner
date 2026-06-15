@@ -6,6 +6,7 @@ export class TimeLineService {
   
   readonly todayDate = new Date();
 
+
   private readonly MIN_COLUMN_WIDTH_4_SLOT  = 120;
   private readonly MIN_COLUMN_WIDTH_6_SLOT  = 180;
   private readonly MIN_COLUMN_WIDTH_12_SLOT = 300;
