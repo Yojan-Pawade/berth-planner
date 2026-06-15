@@ -25,7 +25,15 @@ export const BERTH_PLANNER_DATA = [
         actual_end: '2026-06-02T06:45:00.000Z',
         resources: [
           { id: 'a1-v1-r1', resource_name: 'Crane 1', planned_start: '2026-06-01T06:00:00.000Z', planned_end: '2026-06-02T06:45:00.000Z' },
-          { id: 'a1-v1-r2', resource_name: 'Tugboat A', planned_start: '2026-06-01T06:15:00.000Z', planned_end: '2026-06-02T06:00:00.000Z' }
+          { id: 'a1-v1-r2', resource_name: 'Tugboat A', planned_start: '2026-06-01T06:15:00.000Z', planned_end: '2026-06-02T06:00:00.000Z' },
+          { id: 'a1-v1-r3', resource_name: 'Crane 3', planned_start: '2026-06-02T00:00:00.000Z', planned_end: '2026-06-02T06:40:00.000Z' },
+          { id: 'a1-v1-r4', resource_name: 'Crane 4', planned_start: '2026-06-01T00:00:00.000Z', planned_end: '2026-06-02T06:40:00.000Z' },
+          { id: 'a1-v1-r5', resource_name: 'Pilot B', planned_start: '2026-06-01T06:00:00.000Z', planned_end: '2026-06-01T12:00:00.000Z' },
+          { id: 'a1-v1-r6', resource_name: 'Forklift 2', planned_start: '2026-06-01T12:00:00.000Z', planned_end: '2026-06-01T18:00:00.000Z' },
+          { id: 'a1-v1-r7', resource_name: 'Tugboat B', planned_start: '2026-06-01T18:00:00.000Z', planned_end: '2026-06-02T00:00:00.000Z' },
+          { id: 'a1-v1-r8', resource_name: 'Crane 5', planned_start: '2026-06-02T00:00:00.000Z', planned_end: '2026-06-02T06:45:00.000Z' },
+          { id: 'a1-v1-r9', resource_name: 'Pilot C', planned_start: '2026-06-01T06:30:00.000Z', planned_end: '2026-06-01T08:00:00.000Z' },
+          { id: 'a1-v1-r10', resource_name: 'Forklift 3', planned_start: '2026-06-01T20:00:00.000Z', planned_end: '2026-06-02T06:45:00.000Z' }
         ]
       },
       {

@@ -9,6 +9,7 @@ import { BERTH_PLANNER_DATA } from '../berth-planner.utils';
 export class BerthPlannerbaseService implements OnInit {
   _orientation = signal<PlannerOrientation>('horizontal');
   readonly orientation = this._orientation.asReadonly();
+  readonly Math = Math;
 
   pendingViewMode: ViewMode = 'ONE_MONTH';
   pendingSlotCount: SlotCount = 4;
