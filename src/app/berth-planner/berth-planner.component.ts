@@ -27,6 +27,8 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
 
   private resizeObserver!: ResizeObserver;
   private resizeTimeout?: number;
+  lastWidth:any;
+  lastHeight :any;
 
   @ViewChild('plannerBody', { static: false }) plannerBody!: ElementRef<HTMLDivElement>;
   @ViewChild(MatMenuTrigger) filterMenuTrigger!: MatMenuTrigger;
@@ -53,7 +55,9 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
           const bodyWidth = entry.contentRect.width;
           const bodyHeight = entry.contentRect.height;
 
-          if (bodyWidth > 0 && bodyHeight > 0) {
+         if (bodyWidth > 0 && bodyHeight > 0 && (bodyWidth !== this.lastWidth || bodyHeight !== this.lastHeight)) {
+            this.lastWidth = bodyWidth;
+            this.lastHeight = bodyHeight;
             this.timelineSvc.setPlannerWidthPx(bodyWidth);
             this.timelineSvc.setPlannerHeightPx(bodyHeight);
             clearTimeout(this.resizeTimeout);
@@ -61,7 +65,7 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
               console.log('triggered change layout');
                this.timelineConfig = this.timelineSvc.generateTimelineConfig();
               this.initBerthData();
-            }, 100);
+            }, 300);
           }
         }
       });
