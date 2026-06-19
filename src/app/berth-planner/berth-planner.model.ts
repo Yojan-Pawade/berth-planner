@@ -19,9 +19,13 @@ export interface TimelineConfig {
   pxPerMinuteVertical: number; 
 
   minutesPerSlot: number;    
-
   slotLabels: string[];
+  
+  // BOLLARD CONFIGS
   bollardSize: number;
+  bollardStep: number;
+  minBollard: number;
+  maxBollard: number; 
 }
 
 export interface SlotMeta {

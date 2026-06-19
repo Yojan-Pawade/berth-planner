@@ -1,22 +1,27 @@
 <div class="berth-planner" #plannerWrapper>
     <div class="planner-toolbar">
-        <div class="planner-toolbar__nav">
-            <button mat-icon-button (click)="onPrev()">
-                <mat-icon>chevron_left</mat-icon>
-            </button>
-            <span class="planner-toolbar__label">{{ dateRangeLabel }}</span>
-            <button mat-icon-button (click)="onNext()">
-                <mat-icon>chevron_right</mat-icon>
+        <div class="title">
+            Berth Planner
+        </div>
+        <div class="toolbar-actions">
+            <div class="planner-toolbar__nav">
+                <button mat-icon-button (click)="onPrev()">
+                    <mat-icon>chevron_left</mat-icon>
+                </button>
+                <span class="planner-toolbar__label">{{ dateRangeLabel }}</span>
+                <button mat-icon-button (click)="onNext()">
+                    <mat-icon>chevron_right</mat-icon>
+                </button>
+            </div>
+            <mat-slide-toggle [checked]="orientation() === 'vertical'"
+                (change)="setOrientation($event.checked ? 'vertical' : 'horizontal')">
+                {{ orientation() === 'vertical' ? 'Vertical Layout' : 'Horizontal Layout' }}
+            </mat-slide-toggle>
+    
+            <button mat-icon-button [matMenuTriggerFor]="filterMenu">
+                <mat-icon>tune</mat-icon>
             </button>
         </div>
-        <mat-slide-toggle [checked]="orientation() === 'vertical'"
-            (change)="setOrientation($event.checked ? 'vertical' : 'horizontal')">
-            {{ orientation() === 'vertical' ? 'Vertical Layout' : 'Horizontal Layout' }}
-        </mat-slide-toggle>
-
-        <button mat-icon-button [matMenuTriggerFor]="filterMenu">
-            <mat-icon>tune</mat-icon>
-        </button>
     </div>
 
 
@@ -87,11 +92,31 @@
                     <div class="planner-berth-axis__info">
                         <span class="planner-berth-axis__avatar"><mat-icon>anchor</mat-icon></span>
                         <span>{{ berth.berth_name }}</span>
+                        <div class="zoom-controls">
+                            <button
+                                mat-icon-button
+                                class="action-btn btn-zoom-in"
+                                (click)="berthZoomIn(berth.id)"
+                                [matTooltip]="'Zoom In berth ' + berth.berth_name"
+                            >
+                                <mat-icon>add</mat-icon>
+                            </button>
+
+                            <button
+                                mat-icon-button
+                                class="action-btn btn-zoom-out"
+                                (click)="berthZoomOut(berth.id)"
+                                [matTooltip]="'Zoom Out berth ' + berth.berth_name"
+                            >
+                                <mat-icon>remove</mat-icon>
+                            </button>
+                        </div>  
                     </div>
                     <div class="planner-berth-axis__bollards">
-                        <div class="planner-berth-axis__cell" *ngFor="let bollard of berth.bollard_labels"
-                            [style.height.px]="orientation() === 'horizontal' ? timelineSvc.bollardSize() : null"
-                            [style.width.px]="orientation() === 'vertical' ? timelineSvc.bollardSize() : null">
+                        <div class="planner-berth-axis__cell" *ngFor="let bollard of berth.bollard_labels" [ngStyle]="{
+                            'height.px': orientation() === 'horizontal' ? berth.bollard_size : 'auto',
+                            'width.px': orientation() === 'vertical' ? berth.bollard_size : 'auto'
+                          }">
                             {{ bollard }}
                         </div>
                     </div>
@@ -106,8 +131,6 @@
                          'width.px':  vessel.width_px,
                          'height.px': vessel.height_px
                        }">
-                        <!-- <div class="planner-vessel__title" 
-                      [style.width.px]="Math.min(80, vessel.width_px * 0.45)" [matTooltip]="vessel.vessel_name">{{ vessel.vessel_name }}</div> -->
                         <div class="planner-vessel__actions" [class.is-vertical]="orientation() === 'vertical'">
                             <div class="action-circle info-badge" 
                             [matTooltip]="vessel.vessel_name"
@@ -120,9 +143,9 @@
                                 +{{vessel.hiddenCount}}
                             </div>
                             
-                            <div class="action-circle filter-badge" *ngIf="vessel.hiddenCount > 0" [matTooltip]="'Filter resources based on the resource type'">
+                            <!-- <div class="action-circle filter-badge" *ngIf="vessel.hiddenCount > 0" [matTooltip]="'Filter resources based on the resource type'">
                                 <mat-icon>tune</mat-icon>
-                            </div>
+                            </div> -->
                         </div>
                         <div *ngFor="let res of vessel.resources"
                            [matTooltip]="res.resource_name"

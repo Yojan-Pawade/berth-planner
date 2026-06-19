@@ -1,8 +1,22 @@
+// Date extracting common functions
 export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 export const d = (date: Date) => String(date.getDate()).padStart(2, '0');
 export const m = (date: Date) => MONTHS[date.getMonth()];
 export const y = (date: Date) => date.getFullYear();
 export const fmt = (date: Date) => `${d(date)}-${m(date)}-${y(date)}`;
+
+// Resource bar configs
+export const TITLE_SIZE = 18;
+export const RESOURCE_BAR_SIZE = 8;
+export const BAR_GAP = 5;
+export const EDGE_MARGIN = 8;
+export const SLOT_SIZE = RESOURCE_BAR_SIZE + BAR_GAP;
+
+// bollards config
+export const BOLLARD_STEP_SIZE = 5;
+export const BOLLARD_MIN_SIZE = 25;
+export const BOLLARD_MAX_SIZE = 100;
+export const DEFAUTL_BOLLARD_SIZE = 25;
 
 export const BERTH_PLANNER_DATA = [
   {
@@ -33,7 +47,9 @@ export const BERTH_PLANNER_DATA = [
           { id: 'a1-v1-r7', resource_name: 'Tugboat B', planned_start: '2026-06-01T18:00:00.000Z', planned_end: '2026-06-02T00:00:00.000Z' },
           { id: 'a1-v1-r8', resource_name: 'Crane 5', planned_start: '2026-06-02T00:00:00.000Z', planned_end: '2026-06-02T06:45:00.000Z' },
           { id: 'a1-v1-r9', resource_name: 'Pilot C', planned_start: '2026-06-01T06:30:00.000Z', planned_end: '2026-06-01T08:00:00.000Z' },
-          { id: 'a1-v1-r10', resource_name: 'Forklift 3', planned_start: '2026-06-01T20:00:00.000Z', planned_end: '2026-06-02T06:45:00.000Z' }
+          { id: 'a1-v1-r10', resource_name: 'Forklift 3', planned_start: '2026-06-01T20:00:00.000Z', planned_end: '2026-06-02T06:45:00.000Z' },
+          { id: 'a1-v1-r11', resource_name: 'Forklift 4', planned_start: '2026-06-01T12:15:00.000Z', planned_end: '2026-06-01T21:40:00.000Z' }
+
         ]
       },
       {
@@ -124,7 +140,7 @@ export const BERTH_PLANNER_DATA = [
           { id: 'a1-v6-r1', resource_name: 'Crane 2', planned_start: '2026-06-24T06:00:00.000Z', planned_end: '2026-06-25T06:00:00.000Z' },
           { id: 'a1-v6-r2', resource_name: 'Pilot A', planned_start: '2026-06-24T06:15:00.000Z', planned_end: '2026-06-25T06:15:00.000Z' }
         ]
-      }
+     }
     ]
   },
   {

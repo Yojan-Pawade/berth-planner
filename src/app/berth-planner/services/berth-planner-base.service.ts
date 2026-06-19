@@ -1,7 +1,7 @@
 import { Injectable, OnInit, signal } from '@angular/core';
 import { TimeLineService } from './timeline.service';
 import { PlannerOrientation, SlotCount, TimelineConfig, ViewMode } from '../berth-planner.model';
-import { BERTH_PLANNER_DATA } from '../berth-planner.utils';
+import { BERTH_PLANNER_DATA, BOLLARD_MAX_SIZE, BOLLARD_MIN_SIZE, BOLLARD_STEP_SIZE, EDGE_MARGIN, RESOURCE_BAR_SIZE, SLOT_SIZE, TITLE_SIZE } from '../berth-planner.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -74,7 +74,7 @@ export class BerthPlannerbaseService implements OnInit {
       });
     });
 
-    this.berthPlotingData = filteredBerthData.map((berthItem: any) => {
+   /* this.berthPlotingData = filteredBerthData.map((berthItem: any) => {
       const berthBollardLabels: string[] = [];
       for (let i = berthItem.avail_bollards_st; i <= berthItem.avail_bollards_ed; i += berthItem.bollards_increment) {
         berthBollardLabels.push(`${i}`);
@@ -93,24 +93,11 @@ export class BerthPlannerbaseService implements OnInit {
           berthItem.avail_bollards_st,
           berthItem.bollards_increment,
           vesselItem.bollards_start,
-          vesselItem.bollards_end
+          vesselItem.bollards_end,
+          this.timelineConfig.bollardSize
         );
 
-        let left_px: number, width_px: number, top_px: number, height_px: number;
-
-        if (!isVertical) {
-          const timeLayout = this.timelineSvc.calcBarLayout(startTimestamp, endTimestamp, pxPerMinuteHorizontal)!;
-          left_px = timeLayout.leftPx;
-          width_px = timeLayout.widthPx;
-          top_px = bollardLayout.offsetPx;
-          height_px = bollardLayout.sizePx;
-        } else {
-          const timeLayout = this.timelineSvc.calcBarLayoutVertical(startTimestamp, endTimestamp, pxPerMinuteVertical)!;
-          top_px = timeLayout.topPx;
-          height_px = timeLayout.heightPx;
-          left_px = bollardLayout.offsetPx;
-          width_px = bollardLayout.sizePx;
-        }
+        const { left_px , width_px, top_px, height_px} = this.timelayoutCalc(startTimestamp, endTimestamp, bollardLayout, pxPerMinuteHorizontal, pxPerMinuteVertical ) ;
 
         const { resources: processedResources, hiddenCount } = this.InitResources(
           vesselItem.resources,
@@ -145,20 +132,25 @@ export class BerthPlannerbaseService implements OnInit {
       console.log('final berth data', this.berthPlotingData);
 
       const totalBollards = berthBollardLabels.length;
-      const total_row_height = totalBollards * this.timelineSvc.bollardSize();
+      const total_row_height = totalBollards * this.timelineConfig.bollardSize
       return {
         id: berthItem.berth_id,
         berth_name: berthItem.berth_name,
         bollard_labels: berthBollardLabels,
+        bollard_size : this.timelineConfig.bollardSize,
         vessels: processedVessels,
         total_row_height,
         total_bollard_px: total_row_height,
       };
-    });
+    });*/
+    this.berthPlotingData = filteredBerthData.map((berthItem: any) =>
+        this.processSingleBerth(berthItem, this.timelineConfig.bollardSize, isVertical, pxPerMinuteHorizontal, pxPerMinuteVertical)
+    );
+    console.log('final berth data', this.berthPlotingData);
   }
 
 
-  private InitResources(
+  /*private InitResources(
     data: any[],
     pxPerMinuteHorizontal: number,
     pxPerMinuteVertical: number,
@@ -168,13 +160,6 @@ export class BerthPlannerbaseService implements OnInit {
     vesselWidth: number,
     vesselHeight: number
   ) {
-    const TITLE_SIZE = 18;
-    const RESOURCE_BAR_SIZE = 8;
-    const BAR_GAP = 5;
-    const EDGE_MARGIN = 8;
-
-    const slotSize = RESOURCE_BAR_SIZE + BAR_GAP;
-
     let availableSpace: number;
     if (isVertical) {
       availableSpace = vesselWidth - TITLE_SIZE - EDGE_MARGIN;
@@ -182,29 +167,26 @@ export class BerthPlannerbaseService implements OnInit {
       availableSpace = vesselHeight - TITLE_SIZE - EDGE_MARGIN;
     }
 
-    const maxBarsFit = Math.max(0, Math.floor((availableSpace) / slotSize));
-    console.log('max BAR FIRTS',maxBarsFit ,availableSpace, data , Math.floor((availableSpace) / slotSize));
+    const maxBarsFit = Math.max(0, Math.floor((availableSpace) / SLOT_SIZE));
+    // console.log('max BAR FIRTS',maxBarsFit ,availableSpace, data , Math.floor((availableSpace) / SLOT_SIZE));
 
     const totalResources = data.length;
     const visibleCount = Math.min(totalResources, maxBarsFit);
     const hiddenCount = totalResources - visibleCount;
     const visibleResources = data.slice(0, visibleCount);
-    // console.log('visible bars',visibleResources);
 
     const processedResources = visibleResources.map((resourceItem: any, index: number) => {
       const resStart = new Date(resourceItem.planned_start);
       const resEnd = new Date(resourceItem.planned_end);
-
       let res_left_px: number, res_width_px: number, res_top_px: number, res_height_px: number;
-
       if (!isVertical) {
         const resTimeLayout = this.timelineSvc.calcBarLayout(resStart, resEnd, pxPerMinuteHorizontal)!;
         res_left_px = resTimeLayout.leftPx - vesselLeft;
         res_width_px = resTimeLayout.widthPx;
         res_left_px = Math.max(0, res_left_px);
-        res_width_px = Math.min(res_width_px, (vesselWidth - 2) - res_left_px);
+        res_width_px = Math.min(res_width_px, (vesselWidth - 1.5) - res_left_px);
         res_height_px = RESOURCE_BAR_SIZE;
-        res_top_px = vesselHeight - EDGE_MARGIN - res_height_px - (index * slotSize);
+        res_top_px = vesselHeight - EDGE_MARGIN - res_height_px - (index * SLOT_SIZE);
       } else {
         const resTimeLayout = this.timelineSvc.calcBarLayoutVertical(resStart, resEnd, pxPerMinuteVertical)!;
         res_top_px = resTimeLayout.topPx - vesselTop;
@@ -214,7 +196,7 @@ export class BerthPlannerbaseService implements OnInit {
         res_height_px = Math.min(res_height_px, (vesselHeight - 2) - res_top_px);
 
         res_width_px = RESOURCE_BAR_SIZE;
-        res_left_px = vesselWidth - EDGE_MARGIN - res_width_px - (index * slotSize);
+        res_left_px = vesselWidth - EDGE_MARGIN - res_width_px - (index * SLOT_SIZE);
       }
 
       return {
@@ -230,6 +212,262 @@ export class BerthPlannerbaseService implements OnInit {
     });
 
     return { resources: processedResources, hiddenCount };
+  } */
+
+
+  private timelayoutCalc(startTimestamp: Date, endTimestamp: Date, bollardLayout: any, pxPerMinuteHorizontal: number = 0, pxPerMinuteVertical: number = 0) {
+    let left_px: number, width_px: number, top_px: number, height_px: number
+    const isVertical = this._orientation() === 'vertical';
+    if (isVertical) {
+      const timeLayout = this.timelineSvc.calcBarLayoutVertical(startTimestamp, endTimestamp, pxPerMinuteVertical)!;
+      top_px = timeLayout.topPx;
+      height_px = timeLayout.heightPx;
+      left_px = bollardLayout.offsetPx;
+      width_px = bollardLayout.sizePx;
+
+    } else {
+      const timeLayout = this.timelineSvc.calcBarLayout(startTimestamp, endTimestamp, pxPerMinuteHorizontal)!;
+      left_px = timeLayout.leftPx;
+      width_px = timeLayout.widthPx;
+      top_px = bollardLayout.offsetPx;
+      height_px = bollardLayout.sizePx;
+    }
+    return {left_px, width_px, top_px, height_px};
+  }
+
+  private InitResources(
+    data: any[],
+    pxPerMinuteHorizontal: number,
+    pxPerMinuteVertical: number,
+    isVertical: boolean,
+    vesselLeft: number,
+    vesselTop: number,
+    vesselWidth: number,
+    vesselHeight: number
+  ) {
+    let availableSpace: number;
+    if (isVertical) {
+      availableSpace = vesselWidth - TITLE_SIZE - EDGE_MARGIN;
+    } else {
+      availableSpace = vesselHeight - TITLE_SIZE - EDGE_MARGIN;
+    }
+
+    const maxRowsFit = Math.max(0, Math.floor(availableSpace / SLOT_SIZE));
+
+    const sortedData = [...data].sort(
+      (a, b) => new Date(a.planned_start).getTime() - new Date(b.planned_start).getTime()
+    );
+
+    const rowLastEndPx: number[] = [];
+    const processedResources: any[] = [];
+    let hiddenCount = 0;
+
+    for (const resourceItem of sortedData) {
+      const resStart = new Date(resourceItem.planned_start);
+      const resEnd = new Date(resourceItem.planned_end);
+
+      let res_left_px: number, res_width_px: number, res_top_px: number, res_height_px: number;
+      let startPx: number, endPx: number;
+
+      if (!isVertical) {
+        const resTimeLayout = this.timelineSvc.calcBarLayout(resStart, resEnd, pxPerMinuteHorizontal)!;
+        res_left_px = resTimeLayout.leftPx - vesselLeft;
+        res_width_px = resTimeLayout.widthPx;
+        res_left_px = Math.max(0, res_left_px);
+        res_width_px = Math.min(res_width_px, (vesselWidth - 2) - res_left_px);
+        res_height_px = RESOURCE_BAR_SIZE;
+
+        startPx = res_left_px;
+        endPx = res_left_px + res_width_px;
+      } else {
+        const resTimeLayout = this.timelineSvc.calcBarLayoutVertical(resStart, resEnd, pxPerMinuteVertical)!;
+        res_top_px = resTimeLayout.topPx - vesselTop;
+        res_height_px = resTimeLayout.heightPx;
+        res_top_px = Math.max(0, res_top_px);
+        res_height_px = Math.min(res_height_px, (vesselHeight - 2) - res_top_px);
+        res_width_px = RESOURCE_BAR_SIZE;
+
+        startPx = res_top_px;
+        endPx = res_top_px + res_height_px;
+      }
+
+      let targetRow = -1;
+      console.log('rowLastEndPx', rowLastEndPx);
+      for (let row = 0; row < rowLastEndPx.length; row++) {
+        if (startPx > rowLastEndPx[row]) {
+          targetRow = row;
+          break;
+        }
+      }
+      if (targetRow === -1) {
+        if (rowLastEndPx.length < maxRowsFit) {
+          targetRow = rowLastEndPx.length;
+          rowLastEndPx.push(0);
+        } else {
+          hiddenCount++;
+          continue;
+        }
+      }
+      rowLastEndPx[targetRow] = endPx;
+
+      if (!isVertical) {
+        res_top_px = vesselHeight - EDGE_MARGIN - RESOURCE_BAR_SIZE - (targetRow * SLOT_SIZE);
+      } else {
+        res_left_px = vesselWidth - EDGE_MARGIN - RESOURCE_BAR_SIZE - (targetRow * SLOT_SIZE);
+      }
+
+      processedResources.push({
+        id: resourceItem.id,
+        resource_name: resourceItem.resource_name,
+        left_px: res_left_px!,
+        width_px: res_width_px,
+        top_px: res_top_px!,
+        height_px: res_height_px,
+        resStart,
+        resEnd
+      });
+    }
+
+    return { resources: processedResources, hiddenCount };
+  }
+
+  private processSingleBerth(
+    berthItem: any,
+    bollardSize: number,
+    isVertical: boolean,
+    pxPerMinuteHorizontal: number,
+    pxPerMinuteVertical: number
+  ) {
+    const berthBollardLabels: string[] = [];
+    for (let i = berthItem.avail_bollards_st; i <= berthItem.avail_bollards_ed; i += berthItem.bollards_increment) {
+      berthBollardLabels.push(`${i}`);
+    }
+
+    const processedVessels = (berthItem.vessels || []).map((vesselItem: any) => {
+      const plannedStart = new Date(vesselItem.planned_start);
+      const plannedEnd = new Date(vesselItem.planned_end);
+      const actualEnd = vesselItem.actual_end ? new Date(vesselItem.actual_end) : null;
+
+      const startTimestamp = plannedStart;
+      const endTimestamp = (actualEnd !== null && actualEnd.getTime() > plannedEnd.getTime())
+        ? actualEnd : plannedEnd;
+
+      const bollardLayout = this.calculateVesselVerticalLayout(
+        berthItem.avail_bollards_st,
+        berthItem.bollards_increment,
+        vesselItem.bollards_start,
+        vesselItem.bollards_end,
+        bollardSize
+      );
+
+      const { left_px, width_px, top_px, height_px } = this.timelayoutCalc(
+        startTimestamp, endTimestamp, bollardLayout, pxPerMinuteHorizontal, pxPerMinuteVertical
+      );
+
+      const { resources: processedResources, hiddenCount } = this.InitResources(
+        vesselItem.resources,
+        pxPerMinuteHorizontal,
+        pxPerMinuteVertical,
+        isVertical,
+        left_px,
+        top_px,
+        width_px,
+        height_px,
+      );
+
+      return {
+        id: vesselItem.id,
+        vessel_name: vesselItem.vessel_name,
+        status: vesselItem.status,
+        bollards_start: vesselItem.bollards_start,
+        bollards_end: vesselItem.bollards_end,
+        left_px,
+        width_px,
+        top_px,
+        height_px,
+        planned_start: plannedStart,
+        planned_end: plannedEnd,
+        actual_start: vesselItem.actual_start,
+        actual_end: actualEnd,
+        resources: processedResources,
+        hiddenCount
+      };
+    });
+
+    const totalBollards = berthBollardLabels.length;
+    const total_row_height = totalBollards * bollardSize;
+
+    return {
+      id: berthItem.berth_id,
+      berth_name: berthItem.berth_name,
+      bollard_labels: berthBollardLabels,
+      bollard_size: bollardSize,
+      vessels: processedVessels,
+      total_row_height,
+      total_bollard_px: total_row_height,
+    };
+  }
+
+  berthZoomIn(berthID: any) {
+    const ind = this.berthPlotingData.findIndex((it: any) => it.id === berthID);
+    if (ind === -1) return;
+
+    const currentBerth = this.berthPlotingData[ind];
+    if (currentBerth.bollard_size >= BOLLARD_MAX_SIZE) return;
+
+    const newBollardSize = currentBerth.bollard_size + BOLLARD_STEP_SIZE;
+
+    const rawBerthItem = this.rawBerthData.find((it: any) => it.berth_id === berthID);
+    if (!rawBerthItem) return;
+
+    const isVertical = this._orientation() === 'vertical';
+    const pxPerMinuteHorizontal = this.timelineConfig.pxPerMinute;
+    const pxPerMinuteVertical = this.timelineConfig.pxPerMinuteVertical;
+
+    const updatedBerth = this.processSingleBerth(
+      rawBerthItem,
+      newBollardSize,
+      isVertical,
+      pxPerMinuteHorizontal,
+      pxPerMinuteVertical
+    );
+
+    this.berthPlotingData = [
+      ...this.berthPlotingData.slice(0, ind),
+      updatedBerth,
+      ...this.berthPlotingData.slice(ind + 1)
+    ];
+  }
+
+  berthZoomOut(berthID: any) {
+    const ind = this.berthPlotingData.findIndex((it: any) => it.id === berthID);
+    if (ind === -1) return;
+
+    const currentBerth = this.berthPlotingData[ind];
+    if (currentBerth.bollard_size <= BOLLARD_MIN_SIZE) return;
+
+    const newBollardSize = currentBerth.bollard_size - BOLLARD_STEP_SIZE;
+
+    const rawBerthItem = this.rawBerthData.find((it: any) => it.berth_id === berthID);
+    if (!rawBerthItem) return;
+
+    const isVertical = this._orientation() === 'vertical';
+    const pxPerMinuteHorizontal = this.timelineConfig.pxPerMinute;
+    const pxPerMinuteVertical = this.timelineConfig.pxPerMinuteVertical;
+
+    const updatedBerth = this.processSingleBerth(
+      rawBerthItem,
+      newBollardSize,
+      isVertical,
+      pxPerMinuteHorizontal,
+      pxPerMinuteVertical
+    );
+
+    this.berthPlotingData = [
+      ...this.berthPlotingData.slice(0, ind),
+      updatedBerth,
+      ...this.berthPlotingData.slice(ind + 1)
+    ];
   }
 
   private generateTimelineDays(): void {
@@ -251,9 +489,10 @@ export class BerthPlannerbaseService implements OnInit {
     availStart: number,
     increment: number,
     vesselStart: number,
-    vesselEnd: number
+    vesselEnd: number,
+    bollardsSize : number
   ) {
-    const singleBollardRowHeightPx = this.timelineSvc.bollardSize();
+    const singleBollardRowHeightPx = bollardsSize;
     const offsetPx = Math.floor((vesselStart - availStart) / increment) * singleBollardRowHeightPx;
     const sizePx = (Math.floor((vesselEnd - vesselStart) / increment) + 1) * singleBollardRowHeightPx;
 

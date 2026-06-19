@@ -104,11 +104,6 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
 
   setOrientation(o: PlannerOrientation): void {
     this._orientation.set(o);
-    if (o == 'vertical') {
-      this.timelineSvc.setBollarSize(35);
-    } else {
-      this.timelineSvc.setBollarSize(25);
-    }
     this.updateLayout();
     this.initBerthData();
   }

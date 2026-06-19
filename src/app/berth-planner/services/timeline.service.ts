@@ -1,11 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import { SlotCount, SlotMeta, TimelineConfig, ViewMode } from '../berth-planner.model';
+import { BOLLARD_MAX_SIZE, BOLLARD_MIN_SIZE, BOLLARD_STEP_SIZE, DEFAUTL_BOLLARD_SIZE } from '../berth-planner.utils';
 
 @Injectable({ providedIn: 'root' })
 export class TimeLineService {
   
   readonly todayDate = new Date();
-
 
   private readonly MIN_COLUMN_WIDTH_4_SLOT  = 120;
   private readonly MIN_COLUMN_WIDTH_6_SLOT  = 180;
@@ -37,7 +37,6 @@ export class TimeLineService {
   private readonly _rangeEndDate = signal<Date | null>(null);
   private readonly _viewMode = signal<ViewMode>('ONE_WEEK');
   private readonly _slotCount = signal<SlotCount>(4);
-  private readonly _bollardSize = signal<number>(25)
   
   private readonly _plannerWidthPx = signal<number>(1200);
   private readonly _plannerHeightPx = signal<number>(0);
@@ -46,7 +45,6 @@ export class TimeLineService {
   readonly rangeEndDate = this._rangeEndDate.asReadonly();
   readonly viewMode = this._viewMode.asReadonly();
   readonly slotCount = this._slotCount.asReadonly();
-  readonly bollardSize = this._bollardSize.asReadonly();
   
   readonly plannerWidthPx = this._plannerWidthPx.asReadonly();
   readonly plannerHeightPx = this._plannerHeightPx.asReadonly();
@@ -90,7 +88,6 @@ export class TimeLineService {
     const slotCount = this._slotCount();
     const start = this._rangeStartDate();
     const end = this._rangeEndDate();
-    const bollardSize = this._bollardSize();
 
     const totalDays = this._daysBetween(start, end);
     const totalColumns = totalDays * slotCount;
@@ -151,7 +148,10 @@ export class TimeLineService {
       pxPerMinute,
       pxPerMinuteVertical,
       slotLabels,
-      bollardSize,
+      bollardSize: DEFAUTL_BOLLARD_SIZE,
+      bollardStep : BOLLARD_STEP_SIZE,
+      minBollard : BOLLARD_MIN_SIZE,
+      maxBollard : BOLLARD_MAX_SIZE
     };
   }
 
@@ -214,10 +214,6 @@ export class TimeLineService {
       topPx: topMinutes * pxPerMinuteVertical,
       heightPx: heightMinutes * pxPerMinuteVertical,
     };
-  }
-
-  setBollarSize(size:number){
-    this._bollardSize.set(size);
   }
 
   setSlots(slot:SlotCount){
