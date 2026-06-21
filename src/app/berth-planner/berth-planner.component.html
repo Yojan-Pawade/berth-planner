@@ -146,11 +146,11 @@
                             </div>
                             
                             <div class="action-circle filter-badge" 
-                                *ngIf="vessel.hiddenCount > 0 || vessel.resources?.length > 0" 
-                                (click)="onMenuOpened(vessel.id)"
+                                *ngIf="vessel.allResourceTypes?.length > 0" 
+                                (click)="onMenuOpened(vessel.id , berth.id)"
                                 [matTooltip]="'Filter resources based on the resource type'"
                                 [matMenuTriggerFor]="resourceTypeMenu"
-                                [matMenuTriggerData]="{ resourcesList: vessel.allResourceTypes, vesselId: vessel.id }">
+                                [matMenuTriggerData]="{ resourcesList: vessel.allResourceTypes, vesselId: vessel.id , berthId: berth.id }">
                              <mat-icon>tune</mat-icon>
                             </div>
                         </div>
@@ -234,8 +234,8 @@
 </mat-menu>
 
 
-<mat-menu #resourceTypeMenu="matMenu" class="resource-type-filter-menu" (menuClosed)="onMenuClosed()">
-  <ng-template matMenuContent let-resources="resourcesList" let-vesselId="vesselId">
+<mat-menu #resourceTypeMenu="matMenu" class="resource-type-filter-menu" (closed)="onMenuClosed()">
+  <ng-template matMenuContent let-resources="resourcesList" let-vesselId="vesselId" let-berthId="berthId">
     <div class="header">Resource Type Filter</div>
     <div class="resource-filter-container" (click)="$event.stopPropagation()">
       <div *ngFor="let resType of resources" class="resource-item">

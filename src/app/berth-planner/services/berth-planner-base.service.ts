@@ -31,7 +31,9 @@ export class BerthPlannerbaseService implements OnInit {
   timelineConfig!: TimelineConfig;
   timeline: Date[] = [];
   rawBerthData: any[] = [];
-  BerthMap: Map<string, any> = new Map();
+  berthMap: Map<string, any> = new Map();
+  resourceMap : Map<string , any> = new Map();
+  vesselMap : Map<string , any> = new Map();
   resourceTypefilterMap: Map<string, Set<string>> = new Map();
   berthPlotingData: any[] = []
   startDateRange!: Date | null;
@@ -274,7 +276,7 @@ export class BerthPlannerbaseService implements OnInit {
         res_left_px = vesselWidth - EDGE_MARGIN - RESOURCE_BAR_SIZE - (targetRow * SLOT_SIZE);
       }
 
-      processedResources.push({
+      let resourceObj = {
         id: resourceItem.id,
         resource_name: resourceItem.resource_name,
         left_px: res_left_px!,
@@ -283,7 +285,11 @@ export class BerthPlannerbaseService implements OnInit {
         height_px: res_height_px,
         resStart,
         resEnd
-      });
+      }
+
+      this.resourceMap.set(resourceObj.id , resourceObj);
+
+      processedResources.push(resourceObj);
     }
 
     return { resources: processedResources, hiddenCount };
@@ -359,7 +365,7 @@ export class BerthPlannerbaseService implements OnInit {
         height_px,
       );
 
-      return {
+      let vesselObj = {
         id: vesselItem.id,
         vessel_name: vesselItem.vessel_name,
         status: vesselItem.status,
@@ -377,12 +383,14 @@ export class BerthPlannerbaseService implements OnInit {
         allResourceTypes,
         hiddenCount
       };
+      this.vesselMap.set(vesselObj.id , vesselObj);
+      return vesselObj;
     });
 
     const totalBollards = berthBollardLabels.length;
     const total_row_height = totalBollards * bollardSize;
 
-    return {
+    let berthObj = {
       id: berthItem.berth_id,
       berth_name: berthItem.berth_name,
       bollard_labels: berthBollardLabels,
@@ -391,6 +399,8 @@ export class BerthPlannerbaseService implements OnInit {
       total_row_height,
       total_bollard_px: total_row_height,
     };
+    this.berthMap.set(berthObj.id , berthObj);
+    return berthObj;
   }
 
 
@@ -456,6 +466,68 @@ export class BerthPlannerbaseService implements OnInit {
       ...this.berthPlotingData.slice(ind + 1)
     ];
   }
+
+  applyResourceType(vesselId: string, berthId: string) {
+    const berthIndex = this.berthPlotingData.findIndex((it: any) => it.id === berthId);
+    if (berthIndex === -1) return;
+
+    const berthObj = this.berthPlotingData[berthIndex];
+    const vesselIndex = berthObj.vessels.findIndex((it: any) => it.id === vesselId);
+    if (vesselIndex === -1) return;
+
+    const vesselObj = berthObj.vessels[vesselIndex];
+
+    const rawBerthItem = this.rawBerthData.find((it: any) => it.berth_id === berthId);
+    if (!rawBerthItem) return;
+
+    const rawVesselItem = rawBerthItem.vessels.find((it: any) => it.id === vesselId);
+    if (!rawVesselItem) return;
+    // console.log('raw vessels', rawVesselItem);
+
+    const allowedResTypes = this.resourceTypefilterMap.get(vesselId)!;
+    // console.log('resource toyes',allowedResTypes);
+    const filteredResources = rawVesselItem.resources.filter((resource: any) => {
+        return allowedResTypes.has(resource.resource_type.id);
+    });
+    // console.log('filtered resources', filteredResources);
+
+    const { resources: processedResources, hiddenCount } = this.InitResources(
+        filteredResources,
+        this.timelineConfig.pxPerMinute,
+        this.timelineConfig.pxPerMinuteVertical,
+        this.orientation() === 'vertical',
+        vesselObj.left_px,
+        vesselObj.top_px,
+        vesselObj.width_px,
+        vesselObj.height_px,
+    );
+
+    const updatedVessel = {
+        ...vesselObj,
+        resources: processedResources,
+        hiddenCount
+    };
+
+    const updatedVessels = [
+        ...berthObj.vessels.slice(0, vesselIndex),
+        updatedVessel,
+        ...berthObj.vessels.slice(vesselIndex + 1)
+    ];
+
+    const updatedBerth = {
+        ...berthObj,
+        vessels: updatedVessels
+    };
+
+    this.berthPlotingData = [
+        ...this.berthPlotingData.slice(0, berthIndex),
+        updatedBerth,
+        ...this.berthPlotingData.slice(berthIndex + 1)
+    ];
+
+    this.vesselMap.set(updatedVessel.id, updatedVessel);
+    this.berthMap.set(updatedBerth.id, updatedBerth);
+}
 
   private generateTimelineDays(): void {
     if (!this.startDateRange || !this.endDateRange) {

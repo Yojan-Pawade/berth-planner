@@ -30,6 +30,7 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
   lastWidth:any;
   lastHeight :any;
   activeMenuVesselId :string | null =null;
+  activeBerthId :string | null = null;
 
   @ViewChild('plannerBody', { static: false }) plannerBody!: ElementRef<HTMLDivElement>;
   @ViewChild(MatMenuTrigger) filterMenuTrigger!: MatMenuTrigger;
@@ -81,7 +82,7 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
     }
   }
 
-    toggleStatusFilter(code: string): void {
+  toggleStatusFilter(code: string): void {
     const idx = this.pendingStatusFilter.indexOf(code);
     if (idx === -1) {
       this.pendingStatusFilter.push(code);
@@ -89,7 +90,6 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
       this.pendingStatusFilter.splice(idx, 1);
     }
   }
-
 
   onApplyFilters(): void {
     this.timelineSvc.initTimeline(this.pendingViewMode, this.pendingSlotCount);
@@ -193,12 +193,15 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
     }
   }
 
-  onMenuOpened(vesselId: string){
+  onMenuOpened(vesselId: string , berthId:string){
     this.activeMenuVesselId = vesselId;
+    this.activeBerthId = berthId;
   }
 
   onMenuClosed(): void {
-    this.activeMenuVesselId = null;
+    this.applyResourceType(this.activeMenuVesselId! , this.activeBerthId!);
+    this.activeBerthId = null;
+    this.activeMenuVesselId= null;
   }
   
   data(resources :any[]){
