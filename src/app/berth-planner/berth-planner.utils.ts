@@ -18,6 +18,17 @@ export const BOLLARD_MIN_SIZE = 25;
 export const BOLLARD_MAX_SIZE = 100;
 export const DEFAUTL_BOLLARD_SIZE = 25;
 
+export const VESSEL_STATUS = [
+  { lookup_code: 'OPERATION_COMPLETE', lookup_value: 'Operation Complete' },
+  { lookup_code: 'IN_PROGRESS', lookup_value: 'In Progress' },
+  { lookup_code: 'ARRIVED', lookup_value: 'Arrived' },
+  { lookup_code: 'PLANNED', lookup_value: 'Planned' },
+  { lookup_code: 'REQUESTED', lookup_value: 'Requested' },
+  { lookup_code: 'CANCELLED', lookup_value: 'Cancelled' },
+  { lookup_code: 'INVOICED', lookup_value: 'Invoiced' },
+  { lookup_code: 'DEPARTED', lookup_value: 'Departed' }
+]
+
 export const BERTH_PLANNER_DATA = [
   {
     berth_id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',

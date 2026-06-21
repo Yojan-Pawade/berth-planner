@@ -1,15 +1,20 @@
 import { Injectable, OnInit, signal } from '@angular/core';
 import { TimeLineService } from './timeline.service';
 import { PlannerOrientation, SlotCount, TimelineConfig, ViewMode } from '../berth-planner.model';
-import { BERTH_PLANNER_DATA, BOLLARD_MAX_SIZE, BOLLARD_MIN_SIZE, BOLLARD_STEP_SIZE, EDGE_MARGIN, RESOURCE_BAR_SIZE, SLOT_SIZE, TITLE_SIZE } from '../berth-planner.utils';
+import { BERTH_PLANNER_DATA, BOLLARD_MAX_SIZE, BOLLARD_MIN_SIZE, BOLLARD_STEP_SIZE, EDGE_MARGIN, RESOURCE_BAR_SIZE, SLOT_SIZE, TITLE_SIZE, VESSEL_STATUS } from '../berth-planner.utils';
+import { single } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BerthPlannerbaseService implements OnInit {
   _orientation = signal<PlannerOrientation>('horizontal');
+  _VesselStatusFilter = single<string[]>();
   readonly orientation = this._orientation.asReadonly();
   readonly Math = Math;
+  vesselStatusList : any[] =[];
+  pendingStatusFilter: string[] = [];
+  activeStatusFilter: string[] = [];
 
   pendingViewMode: ViewMode = 'ONE_MONTH';
   pendingSlotCount: SlotCount = 4;
@@ -32,12 +37,17 @@ export class BerthPlannerbaseService implements OnInit {
 
   ngOnInit(): void {
     this._init();
+    this.vesselStatusList = VESSEL_STATUS;
   }
 
   _init() {
     this.timelineSvc.initTimeline(this.pendingViewMode, this.pendingSlotCount);
     this.updateLayout();
   }
+
+  isStatusSelected(code: string): boolean {
+  return this.pendingStatusFilter.includes(code);
+}
 
   berthNameWidth = () => Math.floor(this.timelineSvc.plannerWidthPx() * this.BERTH_NAME_PERCENT / 100);
   berthNameHeight = () => Math.floor(this.timelineSvc.plannerHeightPx() * this.BERTH_NAME_HEIGHT_PERCENT / 100);
@@ -64,89 +74,31 @@ export class BerthPlannerbaseService implements OnInit {
 
     const rangeStart = this.timelineSvc.rangeStartDate();
     const rangeEnd = this.timelineSvc.rangeEndDate();
-
-    const filteredBerthData = this.rawBerthData.filter((berthItem: any) => {
-      if (!rangeStart || !rangeEnd) return true;
-      return (berthItem.vessels || []).some((vessel: any) => {
-        const vesselStart = new Date(vessel.planned_start);
-        const vesselEnd = new Date(vessel.planned_end);
-        return vesselStart <= rangeEnd && vesselEnd >= rangeStart;
-      });
-    });
-
-   /* this.berthPlotingData = filteredBerthData.map((berthItem: any) => {
-      const berthBollardLabels: string[] = [];
-      for (let i = berthItem.avail_bollards_st; i <= berthItem.avail_bollards_ed; i += berthItem.bollards_increment) {
-        berthBollardLabels.push(`${i}`);
-      }
-
-      const processedVessels = (berthItem.vessels || []).map((vesselItem: any) => {
-        const plannedStart = new Date(vesselItem.planned_start);
-        const plannedEnd = new Date(vesselItem.planned_end);
-        const actualEnd = vesselItem.actual_end ? new Date(vesselItem.actual_end) : null;
-
-        const startTimestamp = plannedStart;
-        const endTimestamp = (actualEnd !== null && actualEnd.getTime() > plannedEnd.getTime())
-          ? actualEnd : plannedEnd;
-
-        const bollardLayout = this.calculateVesselVerticalLayout(
-          berthItem.avail_bollards_st,
-          berthItem.bollards_increment,
-          vesselItem.bollards_start,
-          vesselItem.bollards_end,
-          this.timelineConfig.bollardSize
-        );
-
-        const { left_px , width_px, top_px, height_px} = this.timelayoutCalc(startTimestamp, endTimestamp, bollardLayout, pxPerMinuteHorizontal, pxPerMinuteVertical ) ;
-
-        const { resources: processedResources, hiddenCount } = this.InitResources(
-          vesselItem.resources,
-          pxPerMinuteHorizontal,
-          pxPerMinuteVertical,
-          isVertical,
-          left_px,
-          top_px,
-          width_px,
-          height_px,
-        );
+    console.log('status', this.activeStatusFilter);
+    const filteredBerthData = this.rawBerthData
+      .map((berth: any) => {
+        const vessels = (berth.vessels || []).filter((vessel: any) => {
+          if (!rangeStart || !rangeEnd) {
+            return (this.activeStatusFilter.length === 0 || this.activeStatusFilter.includes(vessel.status?.lookup_code));
+          }
+          const vesselStart = new Date(vessel.planned_start);
+          const vesselEnd = new Date(vessel.planned_end);
+          const inRange = (vesselStart <= rangeEnd && vesselEnd >= rangeStart);
+          const statusMatch = (this.activeStatusFilter.length === 0 || this.activeStatusFilter.includes(vessel.status?.lookup_code));
+          return inRange && statusMatch;
+        });
 
         return {
-          id: vesselItem.id,
-          vessel_name: vesselItem.vessel_name,
-          status: vesselItem.status,
-          bollards_start: vesselItem.bollards_start,
-          bollards_end: vesselItem.bollards_end,
-          left_px,
-          width_px,
-          top_px,
-          height_px,
-          planned_start: plannedStart,
-          planned_end: plannedEnd,
-          actual_start: vesselItem.actual_start,
-          actual_end: actualEnd,
-          resources: processedResources,
-          hiddenCount
+          ...berth,
+          vessels,
         };
-      });
+      })
+      .filter((berth: any) => berth.vessels.length > 0);
 
-      console.log('final berth data', this.berthPlotingData);
-
-      const totalBollards = berthBollardLabels.length;
-      const total_row_height = totalBollards * this.timelineConfig.bollardSize
-      return {
-        id: berthItem.berth_id,
-        berth_name: berthItem.berth_name,
-        bollard_labels: berthBollardLabels,
-        bollard_size : this.timelineConfig.bollardSize,
-        vessels: processedVessels,
-        total_row_height,
-        total_bollard_px: total_row_height,
-      };
-    });*/
     this.berthPlotingData = filteredBerthData.map((berthItem: any) =>
         this.processSingleBerth(berthItem, this.timelineConfig.bollardSize, isVertical, pxPerMinuteHorizontal, pxPerMinuteVertical)
     );
-    console.log('final berth data', this.berthPlotingData);
+    // console.log('final berth data', this.berthPlotingData);
   }
 
 
@@ -292,7 +244,7 @@ export class BerthPlannerbaseService implements OnInit {
       }
 
       let targetRow = -1;
-      console.log('rowLastEndPx', rowLastEndPx);
+      // console.log('rowLastEndPx', rowLastEndPx);
       for (let row = 0; row < rowLastEndPx.length; row++) {
         if (startPx > rowLastEndPx[row]) {
           targetRow = row;

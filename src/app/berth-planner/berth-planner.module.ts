@@ -12,9 +12,10 @@ import { MatMenuModule }   from '@angular/material/menu';
 import { FormsModule }     from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 @NgModule({
   declarations: [BerthPlannerComponent],
-  imports: [CommonModule, BerthplannerRouting, MatButtonModule, MatIconModule, MatButtonToggleModule, MatMenuModule, MatSlideToggleModule, FormsModule,MatDialogModule , MatTooltipModule],
+  imports: [CommonModule, BerthplannerRouting, MatButtonModule, MatIconModule, MatButtonToggleModule, MatMenuModule, MatSlideToggleModule, FormsModule,MatDialogModule , MatTooltipModule, MatCheckboxModule],
   providers: [BerthPlannerbaseService, TimeLineService]
 })
 export class BerthPlannerModule {}

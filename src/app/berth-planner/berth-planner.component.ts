@@ -4,7 +4,7 @@ import { TimeLineService } from './services/timeline.service';
 import { fmt, m, y } from './berth-planner.utils';
 import { PlannerOrientation } from './berth-planner.model';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { animate, state, style, transition, trigger } from '@angular/animations';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({
@@ -80,8 +80,19 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
     }
   }
 
+    toggleStatusFilter(code: string): void {
+    const idx = this.pendingStatusFilter.indexOf(code);
+    if (idx === -1) {
+      this.pendingStatusFilter.push(code);
+    } else {
+      this.pendingStatusFilter.splice(idx, 1);
+    }
+  }
+
+
   onApplyFilters(): void {
     this.timelineSvc.initTimeline(this.pendingViewMode, this.pendingSlotCount);
+    this.activeStatusFilter = [...this.pendingStatusFilter];
     this.updateLayout();
     this.initBerthData();
     this.filterMenuTrigger.closeMenu();
@@ -90,6 +101,7 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
   onResetFilters(): void {
     this.pendingViewMode = 'ONE_DAY';
     this.pendingSlotCount = 4;
+    this.pendingStatusFilter = [];
   }
 
   onNext() {

@@ -42,7 +42,7 @@
         <div class="planner-grid__lines" [ngStyle]="getGridHeight">
             <ng-container *ngFor="let date of timeline; let i = index">
                 <div class="planner-grid__day-band"
-                    [style.left.px]="orientation() === 'horizontal' ? berthNameWidth() + (i * timelineConfig.columnWidthPx) : null"
+                    [style.left.px]="orientation() === 'horizontal' ? berthNameWidth() + (i * timelineConfig.columnWidthPx) -0.5 : null"
                     [style.width.px]="orientation() === 'horizontal' ? timelineConfig.columnWidthPx : null"
                     [style.top.px]="orientation() === 'vertical' ? berthNameHeight() + (i * timelineConfig.columnHeightPx) : null"
                     [style.height.px]="orientation() === 'vertical' ? timelineConfig.columnHeightPx : null">
@@ -166,43 +166,64 @@
     </div>
 </div>
 <mat-menu #filterMenu="matMenu" class="planner-filter-menu">
-    <div class="planner-filter-menu__content" (click)="$event.stopPropagation()">
+  <div class="planner-filter-menu__content" (click)="$event.stopPropagation()">
 
-        <div class="planner-filter-menu__header">
-            <span>Filters</span>
-            <button mat-icon-button (click)="filterMenuTrigger.closeMenu()">
-                <mat-icon>close</mat-icon>
-            </button>
+    <div class="planner-filter-menu__header">
+      <span>Filters</span>
+      <button mat-icon-button (click)="filterMenuTrigger.closeMenu()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="filters">
+
+      <div class="left-section">
+        <div class="planner-filter-menu__section">
+          <span class="planner-filter-menu__label">View Mode</span>
+          <div class="planner-filter-options">
+            <div class="planner-filter-option"
+                 *ngFor="let mode of timelineSvc.viewModes"
+                 [class.planner-filter-option--active]="pendingViewMode === mode.value"
+                 (click)="pendingViewMode = mode.value">
+              {{ mode.label }}
+            </div>
+          </div>
         </div>
 
         <div class="planner-filter-menu__section">
-            <span class="planner-filter-menu__label">View Mode</span>
-            <div class="planner-filter-options">
-                <div class="planner-filter-option" *ngFor="let mode of timelineSvc.viewModes"
-                    [class.planner-filter-option--active]="pendingViewMode === mode.value"
-                    (click)="pendingViewMode = mode.value">
-                    {{ mode.label }}
-                </div>
+          <span class="planner-filter-menu__label">Time Slots</span>
+          <div class="planner-filter-options">
+            <div class="planner-filter-option"
+                 *ngFor="let slot of timelineSvc.dayTimeSlots"
+                 [class.planner-filter-option--active]="pendingSlotCount === slot.value"
+                 (click)="pendingSlotCount = slot.value">
+              {{ slot.label }}
             </div>
+          </div>
         </div>
+      </div>
 
-        <div class="planner-filter-menu__section">
-            <span class="planner-filter-menu__label">Time Slots</span>
-            <div class="planner-filter-options">
-                <div class="planner-filter-option" *ngFor="let slot of timelineSvc.dayTimeSlots"
-                    [class.planner-filter-option--active]="pendingSlotCount === slot.value"
-                    (click)="pendingSlotCount = slot.value">
-                    {{ slot.label }}
-                </div>
-            </div>
+      <div class="right-section">
+        <span class="planner-filter-menu__label">Vessel Status</span>
+        <div class="planner-filter-options">
+          <div class="planner-filter-option"
+               *ngFor="let status of vesselStatusList"
+               [class.planner-filter-option--active]="isStatusSelected(status.lookup_code)"
+               (click)="toggleStatusFilter(status.lookup_code)">
+            <span class="status-dot" [ngClass]="status.lookup_code"></span>
+            {{ status.lookup_value }}
+          </div>
         </div>
-
-        <div class="planner-filter-menu__footer">
-            <button mat-button (click)="onResetFilters()">Reset</button>
-            <button mat-flat-button color="primary" (click)="onApplyFilters()">Apply</button>
-        </div>
+      </div>
 
     </div>
+
+    <div class="planner-filter-menu__footer">
+      <button mat-button (click)="onResetFilters()">Reset</button>
+      <button mat-flat-button color="primary" (click)="onApplyFilters()">Apply</button>
+    </div>
+
+  </div>
 </mat-menu>
 
 <ng-template #toolTip>

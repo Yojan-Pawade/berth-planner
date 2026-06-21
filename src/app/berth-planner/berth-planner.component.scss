@@ -260,7 +260,7 @@
     z-index: $z-index-grid;
     height: 100%;
     width: 100%;
-    border: $planner-border-thin;
+    // border: $planner-border-thin;
     box-sizing: border-box;
 }
 
@@ -638,82 +638,128 @@
     }*/
 }
 
+::ng-deep .mat-mdc-menu-panel {
+  background-color: $planner-bg-surface !important;
+  max-width: 600px !important;  // ← increase to fit two columns
+  border-radius: 20px !important;
+}
 
 .planner-filter-menu__content {
-    padding: 16px;
-    min-width: 280px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  padding: 16px;
+  min-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .planner-filter-menu__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 8px;
-    border-bottom: $planner-border-solid-light;
-    font-size: 14px;
-    font-weight: 600;
-    color: $planner-text-default;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: $planner-border-solid-light;
+  font-size: 14px;
+  font-weight: 600;
+  color: $planner-text-default;
 }
 
-.planner-filter-menu__section {
+// ADD — two column layout
+.filters {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: flex-start;
+
+  .left-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .right-section {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    border-left: 1px solid #eee;
+    padding-left: 16px;
+  }
+}
+
+.planner-filter-menu__section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .planner-filter-menu__label {
-    font-size: 12px;
-    font-weight: 500;
-    color: $planner-text-muted;
-}
-
-.planner-filter-menu__footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    padding-top: 8px;
-    border-top: $planner-border-solid-light;
+  font-size: 12px;
+  font-weight: 600;
+  color: $planner-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
 .planner-filter-options {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
-    flex-wrap: wrap;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .planner-filter-option {
-    padding: 6px 14px;
-    border-radius: 6px;
-    border: 1px solid $planner-border-color;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    user-select: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    color: #444444;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid $planner-border-color;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+  color: $planner-text-muted;
+  background-color: $planner-bg-surface;
 
-    &:hover {
-        border-color: $planner-purple-primary;
-        color: $planner-purple-primary;
-    }
+  &:hover {
+    border-color: $planner-purple-primary;
+    color: $planner-purple-primary;
+  }
 
-    &--active {
-        border-color: $planner-purple-primary;
-        color: $planner-purple-primary;
-        box-shadow: 0 0 0 2px rgba(87, 49, 163, 0.2);
-        background-color: $planner-purple-light;
-    }
+  &--active {
+    border-color: $planner-purple-primary;
+    color: $planner-purple-primary;
+    box-shadow: 0 0 0 2px rgba(87, 49, 163, 0.15);
+    background-color: $planner-purple-light;
+  }
 }
 
-::ng-deep .mat-mdc-menu-panel {
-    background-color: $planner-bg-surface !important;
-    max-width: 350px !important;
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &.OPERATION_COMPLETE { background-color: $status-complete-bg; }
+  &.IN_PROGRESS        { background-color: $status-inprogress-bg; }
+  &.PLANNED            { background-color: $status-planned-bg; }
+  &.CANCELLED          { background-color: $status-cancelled-bg; }
+  &.ARRIVED            { background-color: $status-arrived-bg; }
+  &.REQUESTED          { background-color: $status-requested-bg; }
+  &.INVOICED           { background-color: #6366f1; }
+  &.DEPARTED           { background-color: #64748b; }
 }
 
+.planner-filter-menu__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: $planner-border-solid-light;
+}
 
 .planner-no-data {
     display: flex;
@@ -839,4 +885,41 @@
             }
         }
     }
+}
+
+.planner-grid {
+  scrollbar-color: #a78bda #f3eeff;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #ccc;
+
+    &:hover {
+      background: #f3eeff;
+    }
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #a78bda;
+    border-radius: 20px;
+
+    &:hover {
+      background: $planner-purple-dark;
+    }
+  }
+
+  &::-webkit-scrollbar-button {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: #f3eeff;
+  }
 }
