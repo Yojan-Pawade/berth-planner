@@ -98,6 +98,7 @@
                                 class="action-btn btn-zoom-in"
                                 (click)="berthZoomIn(berth.id)"
                                 [matTooltip]="'Zoom In berth ' + berth.berth_name"
+                                [disabled]="berth.bollard_size >= BOLLARD_MAX_SIZE"
                             >
                                 <mat-icon>add</mat-icon>
                             </button>
@@ -107,6 +108,7 @@
                                 class="action-btn btn-zoom-out"
                                 (click)="berthZoomOut(berth.id)"
                                 [matTooltip]="'Zoom Out berth ' + berth.berth_name"
+                                [disabled]="berth.bollard_size <= BOLLARD_MIN_SIZE"
                             >
                                 <mat-icon>remove</mat-icon>
                             </button>
@@ -143,9 +145,14 @@
                                 +{{vessel.hiddenCount}}
                             </div>
                             
-                            <!-- <div class="action-circle filter-badge" *ngIf="vessel.hiddenCount > 0" [matTooltip]="'Filter resources based on the resource type'">
-                                <mat-icon>tune</mat-icon>
-                            </div> -->
+                            <div class="action-circle filter-badge" 
+                                *ngIf="vessel.hiddenCount > 0 || vessel.resources?.length > 0" 
+                                (click)="onMenuOpened(vessel.id)"
+                                [matTooltip]="'Filter resources based on the resource type'"
+                                [matMenuTriggerFor]="resourceTypeMenu"
+                                [matMenuTriggerData]="{ resourcesList: vessel.allResourceTypes, vesselId: vessel.id }">
+                             <mat-icon>tune</mat-icon>
+                            </div>
                         </div>
                         <div *ngFor="let res of vessel.resources"
                            [matTooltip]="res.resource_name"
@@ -225,6 +232,23 @@
 
   </div>
 </mat-menu>
+
+
+<mat-menu #resourceTypeMenu="matMenu" class="resource-type-filter-menu" (menuClosed)="onMenuClosed()">
+  <ng-template matMenuContent let-resources="resourcesList" let-vesselId="vesselId">
+    <div class="header">Resource Type Filter</div>
+    <div class="resource-filter-container" (click)="$event.stopPropagation()">
+      <div *ngFor="let resType of resources" class="resource-item">
+        <mat-checkbox 
+          [checked]="isResourceTypeChecked(vesselId, resType.value)"
+          (change)="onResourceFilterChange($event, vesselId, resType.value)">
+          <span [matTooltip]="resType.title">{{ resType.title }}</span>
+        </mat-checkbox>
+      </div>
+    </div>
+  </ng-template>
+</mat-menu>
+
 
 <ng-template #toolTip>
   <div class="tooltip-content" [@dialogSlide]>

@@ -202,6 +202,17 @@
                     align-items: center;
                     justify-content: center;
                 }
+
+                 &[disabled] {
+                    border-color: #d1d5db;
+                    background-color: #f9fafb;
+                    opacity: 0.6;
+                    cursor: not-allowed;
+
+                    mat-icon {
+                        color: #9ca3af;
+                    }
+                }
             }
         }
     }
@@ -641,7 +652,7 @@
 ::ng-deep .mat-mdc-menu-panel {
   background-color: $planner-bg-surface !important;
   max-width: 600px !important;  // ← increase to fit two columns
-  border-radius: 20px !important;
+  border-radius: 15px !important;
 }
 
 .planner-filter-menu__content {
@@ -819,7 +830,63 @@
         margin: 0;
     }
 }
+::ng-deep .mat-mdc-menu-panel.resource-type-filter-menu {
+    max-width: none !important;
+    min-width: 200px !important;
 
+    .header {
+        font-size: 13px;
+        font-weight: 700;
+        color: #374151;
+        padding: 5px 10px;
+        border-bottom: 1px solid #e5e7eb;
+        letter-spacing: 0.2px;
+    }
+
+    .resource-filter-container {
+        display: flex;
+        flex-direction: column;
+        max-width: 200px;
+        max-height: 200px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 6px 4px;
+
+        @include custom-scrollbar();
+    }
+
+    .resource-item {
+        display: flex;
+        align-items: center;
+        padding: 2px 5px;
+        border-radius: 6px;
+        transition: background-color 0.15s ease;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #f5f3ff;
+        }
+
+        .mat-mdc-checkbox {
+            width: 100%;
+
+            .mdc-form-field {
+                width: 100%;
+            }
+
+            label {
+                width: 100%;
+                font-size: 12px;
+                color: #374151;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: block;
+                max-width: 150px;
+            }
+        }
+    }
+}
 
 ::ng-deep .tooltip-container {
     height: 100%;
@@ -891,35 +958,5 @@
   scrollbar-color: #a78bda #f3eeff;
   scrollbar-width: thin;
 
-  &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #ccc;
-
-    &:hover {
-      background: #f3eeff;
-    }
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #a78bda;
-    border-radius: 20px;
-
-    &:hover {
-      background: $planner-purple-dark;
-    }
-  }
-
-  &::-webkit-scrollbar-button {
-    width: 0;
-    height: 0;
-    display: none;
-  }
-
-  &::-webkit-scrollbar-corner {
-    background: #f3eeff;
-  }
+  @include custom-scrollbar();
 }

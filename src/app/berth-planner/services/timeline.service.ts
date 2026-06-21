@@ -117,8 +117,10 @@ export class TimeLineService {
 
     // Verticla layout Calc
     let columnHeightPx: number;
-    if (viewMode === 'ONE_DAY' || viewMode === 'TWO_DAY') {
+    if (viewMode === 'ONE_DAY') {
       columnHeightPx = containerHeight / totalDays;
+    }else if(viewMode === 'TWO_DAY'){
+      columnHeightPx = slotCount === 24 ? this.MIN_COLUMN_WIDTH_24_SLOT : containerHeight / totalDays;
     } else if (viewMode === 'ONE_MONTH' || viewMode === 'CUSTOM' || viewMode === 'ONE_WEEK' ) {
       columnHeightPx = slotCount === 24 ? this.MIN_COLUMN_WIDTH_24_SLOT
         : slotCount === 12 ? this.MIN_COLUMN_WIDTH_12_SLOT

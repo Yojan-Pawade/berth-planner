@@ -91,3 +91,32 @@ $resource-colors: (
     z-index: $z;
     background-color: $planner-bg-surface;
 }
+
+@mixin custom-scrollbar(
+    $width: 5px,
+    $thumb-color: #c4b5fd,
+    $thumb-hover-color: #a78bfa,
+    $track-color: transparent,
+    $radius: 10px
+) {
+    scrollbar-width: thin;
+    scrollbar-color: $thumb-color $track-color;
+
+    &::-webkit-scrollbar {
+        width: $width;
+        height: $width;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $track-color;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $thumb-color;
+        border-radius: $radius;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: $thumb-hover-color;
+    }
+}

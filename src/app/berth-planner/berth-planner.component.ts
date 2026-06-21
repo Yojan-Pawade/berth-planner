@@ -29,6 +29,7 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
   private resizeTimeout?: number;
   lastWidth:any;
   lastHeight :any;
+  activeMenuVesselId :string | null =null;
 
   @ViewChild('plannerBody', { static: false }) plannerBody!: ElementRef<HTMLDivElement>;
   @ViewChild(MatMenuTrigger) filterMenuTrigger!: MatMenuTrigger;
@@ -174,6 +175,36 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
   closeTooltip(event:Event){
     event.stopPropagation();
     this.dialog.closeAll();
+  }
+
+  isResourceTypeChecked(vesselId: string, resourceTypeId: string): boolean {
+    const allowedSet = this.resourceTypefilterMap.get(vesselId);
+    return allowedSet ? allowedSet.has(resourceTypeId) : false;
+  }
+
+  onResourceFilterChange(event: any, vesselId: string, resourceTypeId: string): void {
+    const allowedSet = this.resourceTypefilterMap.get(vesselId);
+    if (allowedSet) {
+      if (event.checked) {
+        allowedSet.add(resourceTypeId);
+      } else {
+        allowedSet.delete(resourceTypeId);
+      }
+    }
+  }
+
+  onMenuOpened(vesselId: string){
+    this.activeMenuVesselId = vesselId;
+  }
+
+  onMenuClosed(): void {
+    this.activeMenuVesselId = null;
+  }
+  
+  data(resources :any[]){
+    console.log('execusting');
+    console.log(resources);
+    return{}
   }
 
   ngOnDestroy(): void {

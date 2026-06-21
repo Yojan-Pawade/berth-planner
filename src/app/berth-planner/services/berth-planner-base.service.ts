@@ -9,16 +9,19 @@ import { single } from 'rxjs';
 })
 export class BerthPlannerbaseService implements OnInit {
   _orientation = signal<PlannerOrientation>('horizontal');
-  _VesselStatusFilter = single<string[]>();
   readonly orientation = this._orientation.asReadonly();
   readonly Math = Math;
-  vesselStatusList : any[] =[];
+  readonly BOLLARD_MAX_SIZE = BOLLARD_MAX_SIZE;
+  readonly BOLLARD_MIN_SIZE = BOLLARD_MIN_SIZE;
+  
+  _VesselStatusFilter = single<string[]>();
+  vesselStatusList: any[] = [];
   pendingStatusFilter: string[] = [];
   activeStatusFilter: string[] = [];
-
+  
   pendingViewMode: ViewMode = 'ONE_MONTH';
   pendingSlotCount: SlotCount = 4;
-
+  
 
   private readonly BERTH_NAME_PERCENT = 15;
   private readonly BERTH_NAME_HEIGHT_PERCENT = 12;
@@ -29,6 +32,7 @@ export class BerthPlannerbaseService implements OnInit {
   timeline: Date[] = [];
   rawBerthData: any[] = [];
   BerthMap: Map<string, any> = new Map();
+  resourceTypefilterMap: Map<string, Set<string>> = new Map();
   berthPlotingData: any[] = []
   startDateRange!: Date | null;
   endDateRange!: Date | null;
@@ -46,8 +50,8 @@ export class BerthPlannerbaseService implements OnInit {
   }
 
   isStatusSelected(code: string): boolean {
-  return this.pendingStatusFilter.includes(code);
-}
+    return this.pendingStatusFilter.includes(code);
+  }
 
   berthNameWidth = () => Math.floor(this.timelineSvc.plannerWidthPx() * this.BERTH_NAME_PERCENT / 100);
   berthNameHeight = () => Math.floor(this.timelineSvc.plannerHeightPx() * this.BERTH_NAME_HEIGHT_PERCENT / 100);
@@ -66,6 +70,7 @@ export class BerthPlannerbaseService implements OnInit {
   }
 
   async initBerthData() {
+    this.resourceTypefilterMap.clear();
     this.rawBerthData = BERTH_PLANNER_DATA;
     const isVertical = this._orientation() === 'vertical';
 
@@ -74,7 +79,6 @@ export class BerthPlannerbaseService implements OnInit {
 
     const rangeStart = this.timelineSvc.rangeStartDate();
     const rangeEnd = this.timelineSvc.rangeEndDate();
-    console.log('status', this.activeStatusFilter);
     const filteredBerthData = this.rawBerthData
       .map((berth: any) => {
         const vessels = (berth.vessels || []).filter((vessel: any) => {
@@ -96,9 +100,9 @@ export class BerthPlannerbaseService implements OnInit {
       .filter((berth: any) => berth.vessels.length > 0);
 
     this.berthPlotingData = filteredBerthData.map((berthItem: any) =>
-        this.processSingleBerth(berthItem, this.timelineConfig.bollardSize, isVertical, pxPerMinuteHorizontal, pxPerMinuteVertical)
+      this.processSingleBerth(berthItem, this.timelineConfig.bollardSize, isVertical, pxPerMinuteHorizontal, pxPerMinuteVertical)
     );
-    // console.log('final berth data', this.berthPlotingData);
+    console.log('final berth data', this.berthPlotingData);
   }
 
 
@@ -184,7 +188,7 @@ export class BerthPlannerbaseService implements OnInit {
       top_px = bollardLayout.offsetPx;
       height_px = bollardLayout.sizePx;
     }
-    return {left_px, width_px, top_px, height_px};
+    return { left_px, width_px, top_px, height_px };
   }
 
   private InitResources(
@@ -209,6 +213,8 @@ export class BerthPlannerbaseService implements OnInit {
     const sortedData = [...data].sort(
       (a, b) => new Date(a.planned_start).getTime() - new Date(b.planned_start).getTime()
     );
+
+
 
     const rowLastEndPx: number[] = [];
     const processedResources: any[] = [];
@@ -304,7 +310,7 @@ export class BerthPlannerbaseService implements OnInit {
       const endTimestamp = (actualEnd !== null && actualEnd.getTime() > plannedEnd.getTime())
         ? actualEnd : plannedEnd;
 
-      const bollardLayout = this.calculateVesselVerticalLayout(
+      const bollardLayout = this.calculateVesselLayout(
         berthItem.avail_bollards_st,
         berthItem.bollards_increment,
         vesselItem.bollards_start,
@@ -316,8 +322,34 @@ export class BerthPlannerbaseService implements OnInit {
         startTimestamp, endTimestamp, bollardLayout, pxPerMinuteHorizontal, pxPerMinuteVertical
       );
 
+      let allResourceTypes: any[] = [];
+      const seenTypes = new Set<string>();
+
+      vesselItem.resources.forEach((resource: any) => {
+        const typeId = resource.resource_type?.id || resource.resource_type_id;
+        const typeDesc = resource.resource_type?.description || resource.resource_name || 'Resource';
+
+        if (typeId && !seenTypes.has(typeId)) {
+          allResourceTypes.push({
+            title: typeDesc,
+            value: typeId
+          });
+          seenTypes.add(typeId);
+        }
+      });
+
+      if (!this.resourceTypefilterMap.has(vesselItem.id)) {
+        this.resourceTypefilterMap.set(vesselItem.id, new Set<string>(seenTypes));
+      }
+
+      const allowedResTypes = this.resourceTypefilterMap.get(vesselItem.id)!;
+      const filteredResources = vesselItem.resources.filter((resource: any) => {
+        return !allowedResTypes.has(resource.resource_type_id)
+      }
+      );
+
       const { resources: processedResources, hiddenCount } = this.InitResources(
-        vesselItem.resources,
+        filteredResources,
         pxPerMinuteHorizontal,
         pxPerMinuteVertical,
         isVertical,
@@ -342,6 +374,7 @@ export class BerthPlannerbaseService implements OnInit {
         actual_start: vesselItem.actual_start,
         actual_end: actualEnd,
         resources: processedResources,
+        allResourceTypes,
         hiddenCount
       };
     });
@@ -359,6 +392,8 @@ export class BerthPlannerbaseService implements OnInit {
       total_bollard_px: total_row_height,
     };
   }
+
+
 
   berthZoomIn(berthID: any) {
     const ind = this.berthPlotingData.findIndex((it: any) => it.id === berthID);
@@ -437,12 +472,12 @@ export class BerthPlannerbaseService implements OnInit {
     }
   }
 
-  private calculateVesselVerticalLayout(
+  private calculateVesselLayout(
     availStart: number,
     increment: number,
     vesselStart: number,
     vesselEnd: number,
-    bollardsSize : number
+    bollardsSize: number
   ) {
     const singleBollardRowHeightPx = bollardsSize;
     const offsetPx = Math.floor((vesselStart - availStart) / increment) * singleBollardRowHeightPx;
