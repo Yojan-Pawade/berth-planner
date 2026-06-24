@@ -1,7 +1,7 @@
 import { Injectable, OnInit, signal } from '@angular/core';
 import { TimeLineService } from './timeline.service';
 import { PlannerOrientation, SlotCount, TimelineConfig, ViewMode } from '../berth-planner.model';
-import { BERTH_PLANNER_DATA, BOLLARD_MAX_SIZE, BOLLARD_MIN_SIZE, BOLLARD_STEP_SIZE, EDGE_MARGIN, RESOURCE_BAR_SIZE, SLOT_SIZE, TITLE_SIZE, VESSEL_STATUS } from '../berth-planner.utils';
+import { BERTH_PLANNER_DATA, BERTH_SCALE_LABEL, BOLLARD_MAX_SIZE, BOLLARD_MIN_SIZE, BOLLARD_STEP_SIZE, EDGE_MARGIN, RESOURCE_BAR_SIZE, SLOT_SIZE, TITLE_SIZE, VESSEL_STATUS } from '../berth-planner.utils';
 import { single } from 'rxjs';
 
 @Injectable({
@@ -13,6 +13,7 @@ export class BerthPlannerbaseService implements OnInit {
   readonly Math = Math;
   readonly BOLLARD_MAX_SIZE = BOLLARD_MAX_SIZE;
   readonly BOLLARD_MIN_SIZE = BOLLARD_MIN_SIZE;
+  readonly BERTH_SCALE_LABEL = BERTH_SCALE_LABEL;
   
   _VesselStatusFilter = single<string[]>();
   vesselStatusList: any[] = [];
@@ -284,7 +285,8 @@ export class BerthPlannerbaseService implements OnInit {
         top_px: res_top_px!,
         height_px: res_height_px,
         resStart,
-        resEnd
+        resEnd,
+        resource_type : resourceItem.resource_type,
       }
 
       this.resourceMap.set(resourceObj.id , resourceObj);
@@ -402,8 +404,6 @@ export class BerthPlannerbaseService implements OnInit {
     this.berthMap.set(berthObj.id , berthObj);
     return berthObj;
   }
-
-
 
   berthZoomIn(berthID: any) {
     const ind = this.berthPlotingData.findIndex((it: any) => it.id === berthID);
@@ -527,7 +527,7 @@ export class BerthPlannerbaseService implements OnInit {
 
     this.vesselMap.set(updatedVessel.id, updatedVessel);
     this.berthMap.set(updatedBerth.id, updatedBerth);
-}
+  }
 
   private generateTimelineDays(): void {
     if (!this.startDateRange || !this.endDateRange) {
@@ -542,6 +542,12 @@ export class BerthPlannerbaseService implements OnInit {
       this.timeline.push(new Date(current));
       current.setDate(current.getDate() + 1);
     }
+  }
+
+  private showAllresources(vesselId: string, berthID: string){
+    const berth = this.berthMap.get(berthID);
+    const bollardsLength = berth.bollard_labels.length;
+    
   }
 
   private calculateVesselLayout(

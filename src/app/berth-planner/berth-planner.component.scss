@@ -1,5 +1,11 @@
 @import './beth-planner-style.utils.scss';
 
+$resource-color-1: blue;
+$resource-color-2: blue;
+$resource-color-3: blue;
+$resource-color-4: blue;
+
+
 .berth-planner {
     padding: 10px;
     box-sizing: border-box;
@@ -353,12 +359,14 @@
     }
 
 
-    &__resource {
-        position: absolute;
-        border-radius: 15px;
-        box-sizing: border-box;
-        opacity: 0.7;
-        z-index: 2;
+        &__resource {
+            position: absolute;
+            border-radius: 15px;
+            box-sizing: border-box;
+            opacity: 0.7;
+            z-index: 2;
+            overflow: hidden;
+        
 /*
          &::before,
          &::after {
@@ -439,8 +447,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 18px;
-            height: 18px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             border: 1px solid #000;
             cursor: pointer;
@@ -452,12 +460,13 @@
             }
 
             &.info-badge {
-                font-family: sans-serif;
-                font-style: italic;
-                font-size: 13px;
-                font-weight: 700;
-                color: #4b5563;
-                line-height: 2;
+
+                .vessel-icon{
+                    width: 20px; 
+                    &__vertical{
+                        transform: rotate(90deg);
+                    }
+                }
             }
 
             &.count-badge {
@@ -704,6 +713,25 @@
   gap: 8px;
 }
 
+.scale-section{
+    @include flex-row( center , center , 10px);
+    border: 1px solid #eee;
+    border-radius: 15px;
+    padding: 5px 0;
+
+    .zoom_in{
+        color: $planner-purple-primary;
+    }
+
+    .zoom_out{
+        color: $planner-text-default;
+    }
+
+    .restore{
+        color: #D71515;
+    }
+}
+
 .planner-filter-menu__label {
   font-size: 12px;
   font-weight: 600;
@@ -854,6 +882,29 @@
 
         @include custom-scrollbar();
     }
+
+        .action-btn {
+            display: flex;
+            justify-content: flex-end;
+            padding: 5px 12px;
+            gap: 15px;
+            font-size: 12px;
+            border-top: 1px solid #e5e7eb;
+
+            .apply{
+                color:$planner-purple-primary;
+                cursor: pointer;
+
+                &:hover{
+                    color: darken($planner-purple-primary, 2%); 
+                }
+            }
+
+            .cancel{
+                color: $planner-text-muted;
+                cursor: pointer;
+            }
+        }
 
     .resource-item {
         display: flex;

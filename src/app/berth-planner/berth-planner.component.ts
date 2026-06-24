@@ -29,12 +29,11 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
   private resizeTimeout?: number;
   lastWidth:any;
   lastHeight :any;
-  activeMenuVesselId :string | null =null;
-  activeBerthId :string | null = null;
-
+  activeMenuFilter : Set<string> | null = null;  
   @ViewChild('plannerBody', { static: false }) plannerBody!: ElementRef<HTMLDivElement>;
   @ViewChild(MatMenuTrigger) filterMenuTrigger!: MatMenuTrigger;
   @ViewChild('toolTip') toolTip! :TemplateRef<any>; 
+  @ViewChild('resourceFilterTrigger') resourceTypeFilter!: MatMenuTrigger;  
 
   constructor(
     timelineSvc: TimeLineService,
@@ -121,6 +120,23 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
     this.initBerthData();
   }
 
+  increaseBerthScale(event: Event){
+    event.stopPropagation();
+    const bollarSize = this.timelineSvc.defaultBollardSize();
+    this.timelineSvc.setBollardSize(bollarSize + 25);
+  }
+
+  decreaseBerthScale(event:Event){
+    event.stopPropagation();
+    const bollarSize = this.timelineSvc.defaultBollardSize();
+    this.timelineSvc.setBollardSize(bollarSize - 25);
+  }
+
+  resetBerthScale(event:Event){
+    event.stopPropagation();
+    this.timelineSvc.setBollardSize(25);
+  }
+
   get dateRangeLabel(): string {
     const start = this.timelineSvc.rangeStartDate();
     const end = this.timelineSvc.rangeEndDate();
@@ -183,33 +199,34 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
   }
 
   onResourceFilterChange(event: any, vesselId: string, resourceTypeId: string): void {
-    const allowedSet = this.resourceTypefilterMap.get(vesselId);
-    if (allowedSet) {
+
+    if (this.activeMenuFilter) {
       if (event.checked) {
-        allowedSet.add(resourceTypeId);
+        this.activeMenuFilter.add(resourceTypeId);
       } else {
-        allowedSet.delete(resourceTypeId);
+        this.activeMenuFilter.delete(resourceTypeId);
       }
     }
   }
 
   onMenuOpened(vesselId: string , berthId:string){
-    this.activeMenuVesselId = vesselId;
-    this.activeBerthId = berthId;
+    const original = this.resourceTypefilterMap.get(vesselId)!;
+    this.activeMenuFilter = new Set(original);
   }
 
-  onMenuClosed(): void {
-    this.applyResourceType(this.activeMenuVesselId! , this.activeBerthId!);
-    this.activeBerthId = null;
-    this.activeMenuVesselId= null;
+  menuClose(event:Event){
+    event.stopPropagation();
+    this.resourceTypeFilter.closeMenu();
+  }
+
+  applyFilter(event : Event, vesselId: string , berthId:string): void {
+    event.stopPropagation();
+    this.resourceTypefilterMap.set(vesselId, this.activeMenuFilter!);
+    this.applyResourceType(vesselId , berthId);
+    this.activeMenuFilter = null;
+    this.resourceTypeFilter.closeMenu();
   }
   
-  data(resources :any[]){
-    console.log('execusting');
-    console.log(resources);
-    return{}
-  }
-
   ngOnDestroy(): void {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();

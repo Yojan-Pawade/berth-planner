@@ -42,7 +42,7 @@
         <div class="planner-grid__lines" [ngStyle]="getGridHeight">
             <ng-container *ngFor="let date of timeline; let i = index">
                 <div class="planner-grid__day-band"
-                    [style.left.px]="orientation() === 'horizontal' ? berthNameWidth() + (i * timelineConfig.columnWidthPx) -0.5 : null"
+                    [style.left.px]="orientation() === 'horizontal' ? berthNameWidth() + (i * timelineConfig.columnWidthPx) - 0.5 : null"
                     [style.width.px]="orientation() === 'horizontal' ? timelineConfig.columnWidthPx : null"
                     [style.top.px]="orientation() === 'vertical' ? berthNameHeight() + (i * timelineConfig.columnHeightPx) : null"
                     [style.height.px]="orientation() === 'vertical' ? timelineConfig.columnHeightPx : null">
@@ -69,7 +69,7 @@
                         [style.height.px]="orientation() === 'vertical' ? timelineConfig.columnHeightPx : null">
 
                         <div class="planner-timeline__date">
-                            <mat-icon class="calendar-icon">calendar_today</mat-icon>{{ date | date:'dd-MMM-yyyy' }}</div>
+                            <mat-icon *ngIf="orientation() === 'vertical'" class="calendar-icon">calendar_today</mat-icon>{{ date | date:'dd-MMM-yyyy' }}</div>
                         <div class="planner-timeline__slots">
                             <div class="planner-timeline__slot"
                                 [style.width.px]="orientation() === 'horizontal' ? timelineConfig.slotWidthPx : null"
@@ -97,7 +97,7 @@
                                 mat-icon-button
                                 class="action-btn btn-zoom-in"
                                 (click)="berthZoomIn(berth.id)"
-                                [matTooltip]="'Zoom In berth ' + berth.berth_name"
+                                [matTooltip]="'Expand berth ' + berth.berth_name"
                                 [disabled]="berth.bollard_size >= BOLLARD_MAX_SIZE"
                             >
                                 <mat-icon>add</mat-icon>
@@ -107,7 +107,7 @@
                                 mat-icon-button
                                 class="action-btn btn-zoom-out"
                                 (click)="berthZoomOut(berth.id)"
-                                [matTooltip]="'Zoom Out berth ' + berth.berth_name"
+                                [matTooltip]="'Collapse berth ' + berth.berth_name"
                                 [disabled]="berth.bollard_size <= BOLLARD_MIN_SIZE"
                             >
                                 <mat-icon>remove</mat-icon>
@@ -137,7 +137,7 @@
                             <div class="action-circle info-badge" 
                             [matTooltip]="vessel.vessel_name"
                             (click)="showTooltip($event ,berth , vessel)"
-                            >i</div>
+                            ><img [ngClass]="{'vessel-icon': orientation() == 'horizontal' , 'vessel-icon__vertical' : orientation() == 'vertical'}" style="width: 20px;" src="/assets/icons/vessel-icon.svg"/></div>
                             
                             <div class="action-circle count-badge" 
                                 *ngIf="vessel.hiddenCount > 0" 
@@ -148,6 +148,7 @@
                             <div class="action-circle filter-badge" 
                                 *ngIf="vessel.allResourceTypes?.length > 0" 
                                 (click)="onMenuOpened(vessel.id , berth.id)"
+                                 #resourceFilterTrigger="matMenuTrigger"
                                 [matTooltip]="'Filter resources based on the resource type'"
                                 [matMenuTriggerFor]="resourceTypeMenu"
                                 [matMenuTriggerData]="{ resourcesList: vessel.allResourceTypes, vesselId: vessel.id , berthId: berth.id }">
@@ -155,7 +156,7 @@
                             </div>
                         </div>
                         <div *ngFor="let res of vessel.resources"
-                           [matTooltip]="res.resource_name"
+                        [matTooltip]="res.resource_name"
                             class="planner-vessel__resource"
                             [ngStyle]="{
                                 'left.px':   res.left_px,
@@ -208,6 +209,18 @@
             </div>
           </div>
         </div>
+
+        <div class="planner-filter-menu__section">
+            <span class="planner-filter-menu__label">Berth Scale</span>
+            <div class="scale-section">
+                <button mat-icon-button class="zoom_out" [disabled]=" timelineSvc.defaultBollardSize() >= BOLLARD_MIN_SIZE"
+                    (click)="decreaseBerthScale($event)"><mat-icon>zoom_out</mat-icon></button>
+                <div>{{BERTH_SCALE_LABEL[timelineSvc.defaultBollardSize()]}}</div>
+                <button mat-icon-button class="zoom_in" [disabled]=" timelineSvc.defaultBollardSize() >= BOLLARD_MAX_SIZE"
+                    (click)="increaseBerthScale($event)"><mat-icon>zoom_in</mat-icon></button>
+                <button mat-icon-button class="restore" (click)="resetBerthScale($event)"><mat-icon>restore</mat-icon></button>
+            </div>
+        </div>
       </div>
 
       <div class="right-section">
@@ -234,7 +247,7 @@
 </mat-menu>
 
 
-<mat-menu #resourceTypeMenu="matMenu" class="resource-type-filter-menu" (closed)="onMenuClosed()">
+<mat-menu #resourceTypeMenu="matMenu" class="resource-type-filter-menu">
   <ng-template matMenuContent let-resources="resourcesList" let-vesselId="vesselId" let-berthId="berthId">
     <div class="header">Resource Type Filter</div>
     <div class="resource-filter-container" (click)="$event.stopPropagation()">
@@ -245,6 +258,10 @@
           <span [matTooltip]="resType.title">{{ resType.title }}</span>
         </mat-checkbox>
       </div>
+    </div>
+    <div class="action-btn">
+        <span class="cancel" (click)="menuClose($event)">Cancel</span>
+        <span class="apply" (click)="applyFilter($event ,vesselId , berthId)">Apply</span>
     </div>
   </ng-template>
 </mat-menu>

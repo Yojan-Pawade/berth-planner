@@ -37,6 +37,7 @@ export class TimeLineService {
   private readonly _rangeEndDate = signal<Date | null>(null);
   private readonly _viewMode = signal<ViewMode>('ONE_WEEK');
   private readonly _slotCount = signal<SlotCount>(4);
+  private readonly _defaultBollardSize = signal<number>(DEFAUTL_BOLLARD_SIZE);
   
   private readonly _plannerWidthPx = signal<number>(1200);
   private readonly _plannerHeightPx = signal<number>(0);
@@ -45,6 +46,7 @@ export class TimeLineService {
   readonly rangeEndDate = this._rangeEndDate.asReadonly();
   readonly viewMode = this._viewMode.asReadonly();
   readonly slotCount = this._slotCount.asReadonly();
+  readonly defaultBollardSize = this._defaultBollardSize.asReadonly();
   
   readonly plannerWidthPx = this._plannerWidthPx.asReadonly();
   readonly plannerHeightPx = this._plannerHeightPx.asReadonly();
@@ -88,6 +90,7 @@ export class TimeLineService {
     const slotCount = this._slotCount();
     const start = this._rangeStartDate();
     const end = this._rangeEndDate();
+    const defaultBollardSize = this._defaultBollardSize();
 
     const totalDays = this._daysBetween(start, end);
     const totalColumns = totalDays * slotCount;
@@ -150,7 +153,7 @@ export class TimeLineService {
       pxPerMinute,
       pxPerMinuteVertical,
       slotLabels,
-      bollardSize: DEFAUTL_BOLLARD_SIZE,
+      bollardSize: defaultBollardSize,
       bollardStep : BOLLARD_STEP_SIZE,
       minBollard : BOLLARD_MIN_SIZE,
       maxBollard : BOLLARD_MAX_SIZE
@@ -220,6 +223,11 @@ export class TimeLineService {
 
   setSlots(slot:SlotCount){
     this._slotCount.set(slot);
+  }
+
+  setBollardSize(size:number){
+    if(size > BOLLARD_MAX_SIZE || size < BOLLARD_MIN_SIZE) return;
+    this._defaultBollardSize.set(size);
   }
 
   setPlannerWidthPx(width: number): void {

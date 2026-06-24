@@ -18,6 +18,13 @@ export const BOLLARD_MIN_SIZE = 25;
 export const BOLLARD_MAX_SIZE = 100;
 export const DEFAUTL_BOLLARD_SIZE = 25;
 
+export const BERTH_SCALE_LABEL: Record<number, string> = {
+  25: '100%',
+  50: '125%',
+  75: '150%',
+  100: '200%'
+}
+
 export const VESSEL_STATUS = [
   { lookup_code: 'OPERATION_COMPLETE', lookup_value: 'Operation Complete' },
   { lookup_code: 'IN_PROGRESS', lookup_value: 'In Progress' },
