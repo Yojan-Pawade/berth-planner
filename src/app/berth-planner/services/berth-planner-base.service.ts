@@ -544,11 +544,136 @@ export class BerthPlannerbaseService implements OnInit {
     }
   }
 
-  private showAllresources(vesselId: string, berthID: string){
-    const berth = this.berthMap.get(berthID);
-    const bollardsLength = berth.bollard_labels.length;
-    
+  calcRequiredBollardSizeForAllResources(
+    data: any[],
+    pxPerMinuteHorizontal: number,
+    pxPerMinuteVertical: number,
+    isVertical: boolean,
+    vesselLeft: number,
+    vesselTop: number,
+    vesselWidth: number,
+    vesselHeight: number
+  ): number {
+    const sortedData = [...data].sort(
+      (a, b) => new Date(a.planned_start).getTime() - new Date(b.planned_start).getTime()
+    );
+
+    const rowLastEndPx: number[] = [];
+
+    for (const resourceItem of sortedData) {
+      const resStart = new Date(resourceItem.planned_start);
+      const resEnd = new Date(resourceItem.planned_end);
+
+      let startPx: number, endPx: number;
+
+      if (!isVertical) {
+        const resTimeLayout = this.timelineSvc.calcBarLayout(resStart, resEnd, pxPerMinuteHorizontal)!;
+        let res_left_px = Math.max(0, resTimeLayout.leftPx - vesselLeft);
+        const res_width_px = Math.min(resTimeLayout.widthPx, (vesselWidth - 2) - res_left_px);
+        startPx = res_left_px;
+        endPx = res_left_px + res_width_px;
+      } else {
+        const resTimeLayout = this.timelineSvc.calcBarLayoutVertical(resStart, resEnd, pxPerMinuteVertical)!;
+        let res_top_px = Math.max(0, resTimeLayout.topPx - vesselTop);
+        const res_height_px = Math.min(resTimeLayout.heightPx, (vesselHeight - 2) - res_top_px);
+        startPx = res_top_px;
+        endPx = res_top_px + res_height_px;
+      }
+
+      // Same packing logic — find first fitting row
+      let targetRow = -1;
+      for (let row = 0; row < rowLastEndPx.length; row++) {
+        if (startPx > rowLastEndPx[row]) {
+          targetRow = row;
+          break;
+        }
+      }
+
+      if (targetRow === -1) {
+        targetRow = rowLastEndPx.length;
+        rowLastEndPx.push(0);
+      }
+
+      rowLastEndPx[targetRow] = endPx;
+    }
+
+    const rowsNeeded = rowLastEndPx.length;
+
+    // Reverse the availableSpace formula:
+    // availableSpace = bollardSize - TITLE_SIZE - EDGE_MARGIN
+    // maxRowsFit = floor(availableSpace / SLOT_SIZE) >= rowsNeeded
+    // → bollardSize >= (rowsNeeded * SLOT_SIZE) + TITLE_SIZE + EDGE_MARGIN
+    const requiredBollardSize = (rowsNeeded * SLOT_SIZE) + TITLE_SIZE + EDGE_MARGIN;
+
+    return Math.min(requiredBollardSize, BOLLARD_MAX_SIZE);
   }
+
+  autoFitBerthResources(berthId: string) {
+    const berthIndex = this.berthPlotingData.findIndex((it: any) => it.id === berthId);
+    console.log('berth id', berthIndex);
+    if (berthIndex === -1) return;
+
+    const rawBerthItem = this.rawBerthData.find((it: any) => it.berth_id === berthId);
+    if (!rawBerthItem) return;
+
+    const isVertical = this._orientation() === 'vertical';
+    const pxPerMinuteHorizontal = this.timelineConfig.pxPerMinute;
+    const pxPerMinuteVertical = this.timelineConfig.pxPerMinuteVertical;
+    const currentBerth = this.berthPlotingData[berthIndex];
+
+    let maxRequiredBollardSize = currentBerth.bollard_size;
+
+    for (const vesselItem of rawBerthItem.vessels) {
+        const bollardLayout = this.calculateVesselLayout(
+            rawBerthItem.avail_bollards_st,
+            rawBerthItem.bollards_increment,
+            vesselItem.bollards_start,
+            vesselItem.bollards_end,
+            currentBerth.bollard_size
+        );
+
+        const { left_px, width_px, top_px, height_px } = this.timelayoutCalc(
+            new Date(vesselItem.planned_start),
+            new Date(vesselItem.planned_end),
+            bollardLayout,
+            pxPerMinuteHorizontal,
+            pxPerMinuteVertical
+        );
+
+        const allowedResTypes = this.resourceTypefilterMap.get(vesselItem.id);
+        const filteredResources = allowedResTypes
+            ? vesselItem.resources.filter((r: any) => allowedResTypes.has(r.resource_type_id))
+            : vesselItem.resources;
+
+        const required = this.calcRequiredBollardSizeForAllResources(
+            filteredResources,
+            pxPerMinuteHorizontal,
+            pxPerMinuteVertical,
+            isVertical,
+            left_px,
+            top_px,
+            width_px,
+            height_px
+        );
+
+        maxRequiredBollardSize = Math.max(maxRequiredBollardSize, required);
+    }
+
+    const updatedBerth = this.processSingleBerth(
+        rawBerthItem,
+        maxRequiredBollardSize,
+        isVertical,
+        pxPerMinuteHorizontal,
+        pxPerMinuteVertical
+    );
+    console.log(maxRequiredBollardSize,'max bollard size');
+
+    this.berthPlotingData = [
+        ...this.berthPlotingData.slice(0, berthIndex),
+        updatedBerth,
+        ...this.berthPlotingData.slice(berthIndex + 1)
+    ];
+}
 
   private calculateVesselLayout(
     availStart: number,

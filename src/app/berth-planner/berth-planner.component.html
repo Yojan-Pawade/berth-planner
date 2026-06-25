@@ -141,6 +141,7 @@
                             
                             <div class="action-circle count-badge" 
                                 *ngIf="vessel.hiddenCount > 0" 
+                                (click)="autoFitBerthResources(berth.id)"
                                 [matTooltip]="'+' + vessel.hiddenCount + ' more resources hidden due to container size'">
                                 +{{vessel.hiddenCount}}
                             </div>
