@@ -125,8 +125,8 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
   }
 
   onResetFilters(): void {
-    this.pendingViewMode = 'ONE_DAY';
-    this.pendingSlotCount = 4;
+    this.pendingViewMode = 'ONE_MONTH';
+    this.pendingSlotCount = 12;
     this.pendingStatusFilter = [];
     this.pendingResourceTypeFilter = [];
     this.resetBerthScale({
