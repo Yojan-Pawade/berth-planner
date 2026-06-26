@@ -1,9 +1,5 @@
 @import './beth-planner-style.utils.scss';
 
-$resource-color-1: blue;
-$resource-color-2: blue;
-$resource-color-3: blue;
-$resource-color-4: blue;
 
 
 .berth-planner {
@@ -22,7 +18,7 @@ $resource-color-4: blue;
     z-index: $z-index-header;
 
     .title{
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 500;
     }
 
@@ -359,50 +355,28 @@ $resource-color-4: blue;
     }
 
 
-        &__resource {
-            position: absolute;
-            border-radius: 15px;
-            box-sizing: border-box;
-            opacity: 0.7;
-            z-index: 2;
-            overflow: hidden;
-        
-/*
-         &::before,
-         &::after {
-        content: '';
+    &__resource {
         position: absolute;
-        width: 0;
-        border-left: 1.5px dashed rgba(239, 68, 68, 0.7);
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.15s ease;
-        z-index: 1;
-        top: -2000px;
-        height: 4000px;
-    }
-    
-    &::hover{
-        opacity: 1;
-    }
+        border-radius: 15px;
+        box-sizing: border-box;
+        z-index: 2;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
 
-    &::before { left: 0; }
-    &::after  { right: 0; }
-
-    &:hover::before,
-    &:hover::after {
-        opacity: 1;
-    }
-*/
-        @for $i from 1 through length($resource-colors) {
-            &:nth-of-type(#{$i}) {
-                background-color: nth($resource-colors, $i);
-            }
+       &-progress {
+            position: absolute;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 0px;
+            font-size: 10px;
+            font-weight: 500;
         }
 
-        &:hover {
-            opacity: 1;
-        }
     }
 
     .planner-vessel__title {
@@ -460,11 +434,14 @@ $resource-color-4: blue;
             }
 
             &.info-badge {
+                .vessel-icon {
+                    width: 100%;
+                    height: 100%;
 
-                .vessel-icon{
-                    width: 20px; 
-                    &__vertical{
-                        transform: rotate(90deg);
+                    &__vertical {
+                        width: 100%;
+                        height: 100%;
+                        transform: rotate(-90deg);
                     }
                 }
             }
@@ -489,6 +466,23 @@ $resource-color-4: blue;
                     justify-content: center;
                 }
             }
+        }
+        
+        .vessel-name-pill {
+            flex-shrink: 0;
+            min-width: 0;
+            font-size: 9px;
+            font-weight: 600;
+            color: #374151;
+            background-color: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 20px;
+            padding: 1px 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 14px;
+            box-sizing: border-box;
         }
     }
 }
@@ -641,6 +635,26 @@ $resource-color-4: blue;
             }
         }
     }
+     .vessel-name-pill {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8px;
+        padding: 5px 3px;
+        white-space: normal;
+        overflow: hidden;
+        text-overflow: unset;
+        box-sizing: border-box;
+        .vessel-char {
+            display: block;
+            font-size: 9px;
+            font-weight: 600;
+            color: #374151;
+            line-height: 10px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+    }
 
     /*.planner-vessel__resource {
         &::before,
@@ -663,9 +677,12 @@ $resource-color-4: blue;
   max-width: 600px !important;  // ← increase to fit two columns
   border-radius: 15px !important;
 }
+::ng-deep .mat-mdc-menu-content{
+    padding:0 !important;
+}
 
 .planner-filter-menu__content {
-  padding: 16px;
+  padding: 10px;
   min-width: 520px;
   display: flex;
   flex-direction: column;

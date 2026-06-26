@@ -1,178 +1,191 @@
 <div class="berth-planner" #plannerWrapper>
-    <div class="planner-toolbar">
-        <div class="title">
-            Berth Planner
+  <div class="planner-toolbar">
+    <div class="title">
+      Berth Planner
+    </div>
+    <div class="toolbar-actions">
+      <div class="planner-toolbar__nav">
+        <button mat-icon-button (click)="onPrev()">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="planner-toolbar__label">{{ dateRangeLabel }}</span>
+        <button mat-icon-button (click)="onNext()">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+      <mat-slide-toggle [checked]="orientation() === 'vertical'"
+        (change)="setOrientation($event.checked ? 'vertical' : 'horizontal')">
+        {{ orientation() === 'vertical' ? 'Vertical Layout' : 'Horizontal Layout' }}
+      </mat-slide-toggle>
+
+      <button mat-icon-button [matMenuTriggerFor]="filterMenu">
+        <mat-icon>tune</mat-icon>
+      </button>
+    </div>
+  </div>
+
+
+
+  <div class="planner-no-data" *ngIf="berthPlotingData.length === 0">
+    <div class="planner-no-data__card">
+      <div class="planner-no-data__icon-wrapper">
+        <mat-icon class="planner-no-data__icon">anchor</mat-icon>
+      </div>
+      <h3 class="planner-no-data__title">No Planner Data Found</h3>
+      <p class="planner-no-data__description">
+        There are no scheduled berths or vessel plotting logs available for the selected date range. Try adjusting your
+        filters or navigation view window.
+      </p>
+    </div>
+  </div>
+  <div class="planner-grid" *ngIf="berthPlotingData.length > 0"
+    [ngClass]="{'planner-grid--vertical': orientation() === 'vertical'}" #plannerBody>
+
+    <div class="planner-grid__lines" [ngStyle]="getGridHeight">
+      <ng-container *ngFor="let date of timeline; let i = index">
+        <div class="planner-grid__day-band"
+          [style.left.px]="orientation() === 'horizontal' ? berthNameWidth() + (i * timelineConfig.columnWidthPx)  : null"
+          [style.width.px]="orientation() === 'horizontal' ? timelineConfig.columnWidthPx : null"
+          [style.top.px]="orientation() === 'vertical' ? berthNameHeight() + (i * timelineConfig.columnHeightPx) : null"
+          [style.height.px]="orientation() === 'vertical' ? timelineConfig.columnHeightPx : null">
+
+          <div class="planner-grid__slot-line" *ngFor="let slot of timelineConfig.slotLabels; let si = index"
+            [style.width.px]="orientation() === 'horizontal' ? timelineConfig.slotWidthPx : null"
+            [style.height.px]="orientation() === 'vertical' ? timelineConfig.slotHeightPx : null">
+          </div>
         </div>
-        <div class="toolbar-actions">
-            <div class="planner-toolbar__nav">
-                <button mat-icon-button (click)="onPrev()">
-                    <mat-icon>chevron_left</mat-icon>
-                </button>
-                <span class="planner-toolbar__label">{{ dateRangeLabel }}</span>
-                <button mat-icon-button (click)="onNext()">
-                    <mat-icon>chevron_right</mat-icon>
-                </button>
-            </div>
-            <mat-slide-toggle [checked]="orientation() === 'vertical'"
-                (change)="setOrientation($event.checked ? 'vertical' : 'horizontal')">
-                {{ orientation() === 'vertical' ? 'Vertical Layout' : 'Horizontal Layout' }}
-            </mat-slide-toggle>
-    
-            <button mat-icon-button [matMenuTriggerFor]="filterMenu">
-                <mat-icon>tune</mat-icon>
-            </button>
-        </div>
+      </ng-container>
     </div>
 
+    <div class="planner-header-row" [ngClass]="{'planner-header-row--vertical': orientation() === 'vertical'}">
 
-    
-    <div class="planner-no-data" *ngIf="berthPlotingData.length === 0">
-        <div class="planner-no-data__card">
-            <div class="planner-no-data__icon-wrapper">
-                <mat-icon class="planner-no-data__icon">anchor</mat-icon>
+      <div class="planner-corner-label" [style.width.px]="berthNameWidth()"
+        [style.height.px]="orientation() === 'vertical' ? berthNameHeight() : null">
+        {{orientation() === 'horizontal' ? 'Berth / Bollards' : 'Timline'}}
+      </div>
+
+      <div class="planner-timeline">
+        <ng-container *ngFor="let date of timeline">
+          <div class="planner-timeline__day"
+            [style.width.px]="orientation() === 'horizontal' ? timelineConfig.columnWidthPx : null"
+            [style.height.px]="orientation() === 'vertical' ? timelineConfig.columnHeightPx : null">
+
+            <div class="planner-timeline__date">
+              <mat-icon *ngIf="orientation() === 'vertical'" class="calendar-icon">calendar_today</mat-icon>{{ date |
+              date:'dd-MMM-yyyy' }}
             </div>
-            <h3 class="planner-no-data__title">No Planner Data Found</h3>
-            <p class="planner-no-data__description">
-                There are no scheduled berths or vessel plotting logs available for the selected date range. Try adjusting your filters or navigation view window.
-            </p>
-        </div>
+            <div class="planner-timeline__slots">
+              <div class="planner-timeline__slot"
+                [style.width.px]="orientation() === 'horizontal' ? timelineConfig.slotWidthPx : null"
+                [style.height.px]="orientation() === 'vertical' ? timelineConfig.slotHeightPx : null"
+                *ngFor="let time of timelineConfig.slotLabels">{{ time }}</div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
     </div>
-    <div class="planner-grid"  *ngIf="berthPlotingData.length > 0" [ngClass]="{'planner-grid--vertical': orientation() === 'vertical'}" #plannerBody>
 
-        <div class="planner-grid__lines" [ngStyle]="getGridHeight">
-            <ng-container *ngFor="let date of timeline; let i = index">
-                <div class="planner-grid__day-band"
-                    [style.left.px]="orientation() === 'horizontal' ? berthNameWidth() + (i * timelineConfig.columnWidthPx) - 0.5 : null"
-                    [style.width.px]="orientation() === 'horizontal' ? timelineConfig.columnWidthPx : null"
-                    [style.top.px]="orientation() === 'vertical' ? berthNameHeight() + (i * timelineConfig.columnHeightPx) : null"
-                    [style.height.px]="orientation() === 'vertical' ? timelineConfig.columnHeightPx : null">
+    <ng-container *ngFor="let berth of berthPlotingData">
+      <div class="planner-data-row" [style.height.px]="orientation() === 'horizontal' ? berth.total_row_height : null"
+        [style.width.px]="orientation() === 'vertical' ? berth.total_bollard_px : null">
 
-                    <div class="planner-grid__slot-line" *ngFor="let slot of timelineConfig.slotLabels; let si = index"
-                        [style.width.px]="orientation() === 'horizontal' ? timelineConfig.slotWidthPx : null"
-                        [style.height.px]="orientation() === 'vertical' ? timelineConfig.slotHeightPx : null">
-                    </div>
-                </div>
-            </ng-container>
-        </div>
+        <div class="planner-berth-axis"
+          [style.width.px]="orientation() === 'horizontal' ? berthNameWidth() : berth.total_bollard_px"
+          [style.height.px]="orientation() === 'vertical' ? berthNameHeight() : null">
+          <div class="planner-berth-axis__info">
+            <span class="planner-berth-axis__avatar"><mat-icon>anchor</mat-icon></span>
+            <span>{{ berth.berth_name }}</span>
+            <div class="zoom-controls">
+              <button mat-icon-button class="action-btn btn-zoom-in" (click)="berthZoomIn(berth.id)"
+                [matTooltip]="'Expand berth ' + berth.berth_name" [disabled]="berth.bollard_size >= BOLLARD_MAX_SIZE">
+                <mat-icon>add</mat-icon>
+              </button>
 
-        <div class="planner-header-row"  [ngClass]="{'planner-header-row--vertical': orientation() === 'vertical'}">
-
-            <div class="planner-corner-label" [style.width.px]="berthNameWidth()"
-                [style.height.px]="orientation() === 'vertical' ? berthNameHeight() : null">
-                {{orientation() === 'horizontal' ? 'Berth / Bollards' : 'Timline'}}
+              <button mat-icon-button class="action-btn btn-zoom-out" (click)="berthZoomOut(berth.id)"
+                [matTooltip]="'Collapse berth ' + berth.berth_name" [disabled]="berth.bollard_size <= BOLLARD_MIN_SIZE">
+                <mat-icon>remove</mat-icon>
+              </button>
             </div>
-
-            <div class="planner-timeline">
-                <ng-container *ngFor="let date of timeline">
-                    <div class="planner-timeline__day"
-                        [style.width.px]="orientation() === 'horizontal' ? timelineConfig.columnWidthPx : null"
-                        [style.height.px]="orientation() === 'vertical' ? timelineConfig.columnHeightPx : null">
-
-                        <div class="planner-timeline__date">
-                            <mat-icon *ngIf="orientation() === 'vertical'" class="calendar-icon">calendar_today</mat-icon>{{ date | date:'dd-MMM-yyyy' }}</div>
-                        <div class="planner-timeline__slots">
-                            <div class="planner-timeline__slot"
-                                [style.width.px]="orientation() === 'horizontal' ? timelineConfig.slotWidthPx : null"
-                                [style.height.px]="orientation() === 'vertical' ? timelineConfig.slotHeightPx : null"
-                                *ngFor="let time of timelineConfig.slotLabels">{{ time }}</div>
-                        </div>
-                    </div>
-                </ng-container>
-            </div>
-        </div>
-
-        <ng-container *ngFor="let berth of berthPlotingData">
-            <div class="planner-data-row"
-                [style.height.px]="orientation() === 'horizontal' ? berth.total_row_height : null"
-                [style.width.px]="orientation() === 'vertical' ? berth.total_bollard_px : null">
-
-                <div class="planner-berth-axis"
-                    [style.width.px]="orientation() === 'horizontal' ? berthNameWidth() : berth.total_bollard_px"
-                    [style.height.px]="orientation() === 'vertical' ? berthNameHeight() : null">
-                    <div class="planner-berth-axis__info">
-                        <span class="planner-berth-axis__avatar"><mat-icon>anchor</mat-icon></span>
-                        <span>{{ berth.berth_name }}</span>
-                        <div class="zoom-controls">
-                            <button
-                                mat-icon-button
-                                class="action-btn btn-zoom-in"
-                                (click)="berthZoomIn(berth.id)"
-                                [matTooltip]="'Expand berth ' + berth.berth_name"
-                                [disabled]="berth.bollard_size >= BOLLARD_MAX_SIZE"
-                            >
-                                <mat-icon>add</mat-icon>
-                            </button>
-
-                            <button
-                                mat-icon-button
-                                class="action-btn btn-zoom-out"
-                                (click)="berthZoomOut(berth.id)"
-                                [matTooltip]="'Collapse berth ' + berth.berth_name"
-                                [disabled]="berth.bollard_size <= BOLLARD_MIN_SIZE"
-                            >
-                                <mat-icon>remove</mat-icon>
-                            </button>
-                        </div>  
-                    </div>
-                    <div class="planner-berth-axis__bollards">
-                        <div class="planner-berth-axis__cell" *ngFor="let bollard of berth.bollard_labels" [ngStyle]="{
+          </div>
+          <div class="planner-berth-axis__bollards">
+            <div class="planner-berth-axis__cell" *ngFor="let bollard of berth.bollard_labels" [ngStyle]="{
                             'height.px': orientation() === 'horizontal' ? berth.bollard_size : 'auto',
                             'width.px': orientation() === 'vertical' ? berth.bollard_size : 'auto'
                           }">
-                            {{ bollard }}
-                        </div>
-                    </div>
-                </div>
+              {{ bollard }}
+            </div>
+          </div>
+        </div>
 
-                <div class="planner-canvas"
-                    [style.width.px]="orientation() === 'horizontal' ? timelineConfig.totalContentWidthPx : berth.total_bollard_px"
-                    [style.height.px]="orientation() === 'vertical' ? timelineConfig.totalContentHeightPx : berth.total_row_height">
-                    <div *ngFor="let vessel of berth.vessels" class="planner-vessel" [ngClass]="vessel.status.lookup_code"  [ngStyle]="{
+        <div class="planner-canvas"
+          [style.width.px]="orientation() === 'horizontal' ? timelineConfig.totalContentWidthPx : berth.total_bollard_px"
+          [style.height.px]="orientation() === 'vertical' ? timelineConfig.totalContentHeightPx : berth.total_row_height">
+          <div *ngFor="let vessel of berth.vessels" class="planner-vessel" [ngClass]="vessel.status.lookup_code"
+            [ngStyle]="{
                          'left.px':   vessel.left_px,
                          'top.px':    vessel.top_px,
                          'width.px':  vessel.width_px,
                          'height.px': vessel.height_px
                        }">
-                        <div class="planner-vessel__actions" [class.is-vertical]="orientation() === 'vertical'">
-                            <div class="action-circle info-badge" 
-                            [matTooltip]="vessel.vessel_name"
-                            (click)="showTooltip($event ,berth , vessel)"
-                            ><img [ngClass]="{'vessel-icon': orientation() == 'horizontal' , 'vessel-icon__vertical' : orientation() == 'vertical'}" style="width: 20px;" src="/assets/icons/vessel-icon.svg"/></div>
-                            
-                            <div class="action-circle count-badge" 
-                                *ngIf="vessel.hiddenCount > 0" 
-                                (click)="autoFitBerthResources(berth.id)"
-                                [matTooltip]="'+' + vessel.hiddenCount + ' more resources hidden due to container size'">
-                                +{{vessel.hiddenCount}}
-                            </div>
-                            
-                            <div class="action-circle filter-badge" 
-                                *ngIf="vessel.allResourceTypes?.length > 0" 
-                                (click)="onMenuOpened(vessel.id , berth.id)"
-                                 #resourceFilterTrigger="matMenuTrigger"
-                                [matTooltip]="'Filter resources based on the resource type'"
-                                [matMenuTriggerFor]="resourceTypeMenu"
-                                [matMenuTriggerData]="{ resourcesList: vessel.allResourceTypes, vesselId: vessel.id , berthId: berth.id }">
-                             <mat-icon>tune</mat-icon>
-                            </div>
-                        </div>
-                        <div *ngFor="let res of vessel.resources"
-                        [matTooltip]="res.resource_name"
-                            class="planner-vessel__resource"
-                            [ngStyle]="{
-                                'left.px':   res.left_px,
-                                'top.px':    res.top_px,
-                                'width.px':  res.width_px,
-                                'height.px': res.height_px
-                            }">
-                        </div>
-                    </div>
-                </div>
+            <div class="planner-vessel__actions" [class.is-vertical]="orientation() === 'vertical'">
+              <div class="action-circle info-badge"  matTooltipClass="planner-tooltip" 
+               [matTooltip]="orientation() === 'vertical' ? 'Horizontal vessel orientation' : 'Vertical vessel orientation'">
+                <img
+                  [ngClass]="{'vessel-icon': orientation() == 'horizontal' , 'vessel-icon__vertical' : orientation() == 'vertical'}"
+                  style="width: 20px;" src="/assets/icons/vessel-icon.svg" /></div>
 
+              <div class="action-circle count-badge" *ngIf="vessel.hiddenCount > 0"
+                (click)="autoFitBerthResources(berth.id)"
+                [matTooltip]="'+' + vessel.hiddenCount + ' more resources hidden due to container size'">
+                +{{vessel.hiddenCount}}
+              </div>
+
+              <div class="action-circle filter-badge" *ngIf="vessel.allResourceTypes?.length > 0"
+                (click)="onMenuOpened(vessel.id , berth.id)" #resourceFilterTrigger="matMenuTrigger"
+                [matTooltip]="'Filter resources based on the resource type'" [matMenuTriggerFor]="resourceTypeMenu"
+                [matMenuTriggerData]="{ resourcesList: vessel.allResourceTypes, vesselId: vessel.id , berthId: berth.id }">
+                <mat-icon>tune</mat-icon>
+              </div>
+              
+              <div class="vessel-name-pill" [matTooltip]="vessel.vessel_name"
+                (click)="showTooltip($event ,berth , vessel)"
+                [style.max-width.px]="orientation() === 'horizontal' ? vesselNameWidth(vessel) : null"
+                [style.max-height.px]="orientation() === 'vertical' ? vesselNameHeight(vessel) : null">
+              
+                <ng-container *ngIf="orientation() === 'horizontal'">
+                  {{ vessel.vessel_name }}
+                </ng-container>
+              
+                <ng-container *ngIf="orientation() === 'vertical'">
+                  <span class="vessel-char"  *ngFor="let char of getVesselNameChars(vessel)">
+                    {{ char }}
+                  </span>
+                </ng-container>
+              
+              </div>
+              
+              </div>
+            <div *ngFor="let res of vessel.resources" [matTooltip]="res.resource_name" class="planner-vessel__resource"
+              [ngStyle]="{
+                          'left.px':   res.left_px,
+                          'top.px':    res.top_px,
+                          'width.px':  res.width_px,
+                          'height.px': res.height_px,
+                          'background-color': res.color + '4D'
+                      }">
+                      <div class="planner-vessel__resource-progress"
+                      *ngIf="res.work_completed > 10"
+                      [style.background-color]="res.color"
+                      [style.width.%]="orientation() === 'horizontal' ? res.work_completed : 100"
+                      [style.height.%]="orientation() === 'vertical' ? res.work_completed : 100">{{res.work_completed}}%</div>
             </div>
-        </ng-container>
+          </div>
+        </div>
 
-    </div>
+      </div>
+    </ng-container>
+
+  </div>
 </div>
 <mat-menu #filterMenu="matMenu" class="planner-filter-menu">
   <div class="planner-filter-menu__content" (click)="$event.stopPropagation()">
@@ -190,10 +203,9 @@
         <div class="planner-filter-menu__section">
           <span class="planner-filter-menu__label">View Mode</span>
           <div class="planner-filter-options">
-            <div class="planner-filter-option"
-                 *ngFor="let mode of timelineSvc.viewModes"
-                 [class.planner-filter-option--active]="pendingViewMode === mode.value"
-                 (click)="pendingViewMode = mode.value">
+            <div class="planner-filter-option" *ngFor="let mode of timelineSvc.viewModes"
+              [class.planner-filter-option--active]="pendingViewMode === mode.value"
+              (click)="pendingViewMode = mode.value">
               {{ mode.label }}
             </div>
           </div>
@@ -202,37 +214,49 @@
         <div class="planner-filter-menu__section">
           <span class="planner-filter-menu__label">Time Slots</span>
           <div class="planner-filter-options">
-            <div class="planner-filter-option"
-                 *ngFor="let slot of timelineSvc.dayTimeSlots"
-                 [class.planner-filter-option--active]="pendingSlotCount === slot.value"
-                 (click)="pendingSlotCount = slot.value">
+            <div class="planner-filter-option" *ngFor="let slot of timelineSvc.dayTimeSlots"
+              [class.planner-filter-option--active]="pendingSlotCount === slot.value"
+              (click)="pendingSlotCount = slot.value">
               {{ slot.label }}
             </div>
           </div>
         </div>
 
         <div class="planner-filter-menu__section">
-            <span class="planner-filter-menu__label">Berth Scale</span>
-            <div class="scale-section">
-                <button mat-icon-button class="zoom_out" [disabled]=" timelineSvc.defaultBollardSize() >= BOLLARD_MIN_SIZE"
-                    (click)="decreaseBerthScale($event)"><mat-icon>zoom_out</mat-icon></button>
-                <div>{{BERTH_SCALE_LABEL[timelineSvc.defaultBollardSize()]}}</div>
-                <button mat-icon-button class="zoom_in" [disabled]=" timelineSvc.defaultBollardSize() >= BOLLARD_MAX_SIZE"
-                    (click)="increaseBerthScale($event)"><mat-icon>zoom_in</mat-icon></button>
-                <button mat-icon-button class="restore" (click)="resetBerthScale($event)"><mat-icon>restore</mat-icon></button>
-            </div>
+          <span class="planner-filter-menu__label">Berth Scale</span>
+          <div class="scale-section">
+            <button mat-icon-button class="zoom_out" [disabled]=" timelineSvc.defaultBollardSize() >= BOLLARD_MIN_SIZE"
+              (click)="decreaseBerthScale($event)"><mat-icon>zoom_out</mat-icon></button>
+            <div>{{BERTH_SCALE_LABEL[timelineSvc.defaultBollardSize()]}}</div>
+            <button mat-icon-button class="zoom_in" [disabled]=" timelineSvc.defaultBollardSize() >= BOLLARD_MAX_SIZE"
+              (click)="increaseBerthScale($event)"><mat-icon>zoom_in</mat-icon></button>
+            <button mat-icon-button class="restore"
+              (click)="resetBerthScale($event)"><mat-icon>restore</mat-icon></button>
+          </div>
         </div>
       </div>
 
       <div class="right-section">
-        <span class="planner-filter-menu__label">Vessel Status</span>
-        <div class="planner-filter-options">
-          <div class="planner-filter-option"
-               *ngFor="let status of vesselStatusList"
-               [class.planner-filter-option--active]="isStatusSelected(status.lookup_code)"
-               (click)="toggleStatusFilter(status.lookup_code)">
-            <span class="status-dot" [ngClass]="status.lookup_code"></span>
-            {{ status.lookup_value }}
+        <div class="planner-filter-menu__section">
+          <span class="planner-filter-menu__label">Vessel Status</span>
+          <div class="planner-filter-options">
+            <div class="planner-filter-option" *ngFor="let status of vesselStatusList"
+              [class.planner-filter-option--active]="isStatusSelected(status.lookup_code)"
+              (click)="toggleStatusFilter(status.lookup_code)">
+              <span class="status-dot" [ngClass]="status.lookup_code"></span>
+              {{ status.lookup_value }}
+            </div>
+          </div>
+        </div>
+        <div class="planner-filter-menu__section">
+          <span class="planner-filter-menu__label">Resource Type</span>
+          <div class="planner-filter-options">
+            <div class="planner-filter-option" *ngFor="let resType of resourceTypeList"
+              [class.planner-filter-option--active]="isResourceTypeGlobalSelected(resType.id)"
+              (click)="toggleResourceTypeFilter(resType.id)">
+              <span class="status-dot" [style.background-color]="RESOURCE_TYPE_COLORS[resType.code]"></span>
+              {{ resType.description }}
+            </div>
           </div>
         </div>
       </div>
@@ -253,16 +277,15 @@
     <div class="header">Resource Type Filter</div>
     <div class="resource-filter-container" (click)="$event.stopPropagation()">
       <div *ngFor="let resType of resources" class="resource-item">
-        <mat-checkbox 
-          [checked]="isResourceTypeChecked(vesselId, resType.value)"
+        <mat-checkbox [checked]="isResourceTypeChecked(vesselId, resType.value)"
           (change)="onResourceFilterChange($event, vesselId, resType.value)">
           <span [matTooltip]="resType.title">{{ resType.title }}</span>
         </mat-checkbox>
       </div>
     </div>
     <div class="action-btn">
-        <span class="cancel" (click)="menuClose($event)">Cancel</span>
-        <span class="apply" (click)="applyFilter($event ,vesselId , berthId)">Apply</span>
+      <span class="cancel" (click)="menuClose($event)">Cancel</span>
+      <span class="apply" (click)="applyFilter($event ,vesselId , berthId)">Apply</span>
     </div>
   </ng-template>
 </mat-menu>
@@ -271,37 +294,37 @@
 <ng-template #toolTip>
   <div class="tooltip-content" [@dialogSlide]>
     <mat-dialog-content>
-    <div class="close-icon"><mat-icon class="icon" (click)="closeTooltip($event)">close</mat-icon></div>
-    <div class="data-section">
+      <div class="close-icon"><mat-icon class="icon" (click)="closeTooltip($event)">close</mat-icon></div>
+      <div class="data-section">
         <div class="metadata-field">
-            <span class="field-label">Berth Name</span>
-            <span class="field-value">{{tootipData.berth_name}}</span>
+          <span class="field-label">Berth Name</span>
+          <span class="field-value">{{tootipData.berth_name}}</span>
         </div>
         <div class="metadata-field">
-            <span class="field-label">Vessel Name</span>
-            <span class="field-value">{{tootipData.vessel_name}}</span>
+          <span class="field-label">Vessel Name</span>
+          <span class="field-value">{{tootipData.vessel_name}}</span>
         </div>
         <div class="metadata-field">
-            <span class="field-label">status</span>
-            <span class="field-value">{{tootipData.status}}</span>
+          <span class="field-label">status</span>
+          <span class="field-value">{{tootipData.status}}</span>
         </div>
         <div class="metadata-field full-span">
-            <span class="field-label">Planned Start</span>
-            <span class="field-value">{{tootipData.planned_start | date: 'dd-MMM-yyyy hh:mm a'}}</span>
+          <span class="field-label">Planned Start</span>
+          <span class="field-value">{{tootipData.planned_start | date: 'dd-MMM-yyyy hh:mm a'}}</span>
         </div>
         <div class="metadata-field full-span">
-            <span class="field-label">Planned End</span>
-            <span class="field-value">{{tootipData.planned_end | date: 'dd-MMM-yyyy hh:mm a' }}</span>
+          <span class="field-label">Planned End</span>
+          <span class="field-value">{{tootipData.planned_end | date: 'dd-MMM-yyyy hh:mm a' }}</span>
         </div>
         <div class="metadata-field full-span" *ngIf="tootipData?.actual_start">
-            <span class="field-label">Planned End</span>
-            <span class="field-value">{{tootipData.actual_start | date: 'dd-MMM-yyyy hh:mm a'}}</span>
+          <span class="field-label">Planned End</span>
+          <span class="field-value">{{tootipData.actual_start | date: 'dd-MMM-yyyy hh:mm a'}}</span>
         </div>
         <div class="metadata-field full-span" *ngIf="tootipData?.actual_end">
-            <span class="field-label">Planned End</span>
-            <span class="field-value">{{tootipData.actual_end | date: 'dd-MMM-yyyy hh:mm a'}}</span>
+          <span class="field-label">Planned End</span>
+          <span class="field-value">{{tootipData.actual_end | date: 'dd-MMM-yyyy hh:mm a'}}</span>
         </div>
-    </div>
+      </div>
     </mat-dialog-content>
-</div>
+  </div>
 </ng-template>

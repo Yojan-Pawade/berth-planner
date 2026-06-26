@@ -1,28 +1,33 @@
-import { Injectable, OnInit, signal } from '@angular/core';
+import { Injectable, OnDestroy, OnInit, signal } from '@angular/core';
 import { TimeLineService } from './timeline.service';
 import { PlannerOrientation, SlotCount, TimelineConfig, ViewMode } from '../berth-planner.model';
-import { BERTH_PLANNER_DATA, BERTH_SCALE_LABEL, BOLLARD_MAX_SIZE, BOLLARD_MIN_SIZE, BOLLARD_STEP_SIZE, EDGE_MARGIN, RESOURCE_BAR_SIZE, SLOT_SIZE, TITLE_SIZE, VESSEL_STATUS } from '../berth-planner.utils';
+import { BERTH_PLANNER_DATA, BERTH_SCALE_LABEL, BOLLARD_MAX_SIZE, BOLLARD_MIN_SIZE, BOLLARD_STEP_SIZE, EDGE_MARGIN, RESOURCE_BAR_SIZE, RESOURCE_TYPE, RESOURCE_TYPE_COLORS, SLOT_SIZE, TITLE_SIZE, VESSEL_STATUS } from '../berth-planner.utils';
 import { single } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class BerthPlannerbaseService implements OnInit {
+export class BerthPlannerbaseService implements OnInit, OnDestroy {
   _orientation = signal<PlannerOrientation>('horizontal');
   readonly orientation = this._orientation.asReadonly();
   readonly Math = Math;
   readonly BOLLARD_MAX_SIZE = BOLLARD_MAX_SIZE;
   readonly BOLLARD_MIN_SIZE = BOLLARD_MIN_SIZE;
   readonly BERTH_SCALE_LABEL = BERTH_SCALE_LABEL;
-  
+  readonly RESOURCE_TYPE_COLORS = RESOURCE_TYPE_COLORS;
+
   _VesselStatusFilter = single<string[]>();
   vesselStatusList: any[] = [];
   pendingStatusFilter: string[] = [];
   activeStatusFilter: string[] = [];
-  
+
+  pendingResourceTypeFilter: string[] = [];
+  activeResourceTypeFilter: string[] = [];
+  resourceTypeList: any[] = [];
+
   pendingViewMode: ViewMode = 'ONE_MONTH';
-  pendingSlotCount: SlotCount = 4;
-  
+  pendingSlotCount: SlotCount = 12;
+
 
   private readonly BERTH_NAME_PERCENT = 15;
   private readonly BERTH_NAME_HEIGHT_PERCENT = 12;
@@ -33,8 +38,8 @@ export class BerthPlannerbaseService implements OnInit {
   timeline: Date[] = [];
   rawBerthData: any[] = [];
   berthMap: Map<string, any> = new Map();
-  resourceMap : Map<string , any> = new Map();
-  vesselMap : Map<string , any> = new Map();
+  resourceMap: Map<string, any> = new Map();
+  vesselMap: Map<string, any> = new Map();
   resourceTypefilterMap: Map<string, Set<string>> = new Map();
   berthPlotingData: any[] = []
   startDateRange!: Date | null;
@@ -45,6 +50,7 @@ export class BerthPlannerbaseService implements OnInit {
   ngOnInit(): void {
     this._init();
     this.vesselStatusList = VESSEL_STATUS;
+    this.resourceTypeList = RESOURCE_TYPE;
   }
 
   _init() {
@@ -55,6 +61,11 @@ export class BerthPlannerbaseService implements OnInit {
   isStatusSelected(code: string): boolean {
     return this.pendingStatusFilter.includes(code);
   }
+
+  isResourceTypeGlobalSelected(id: string): boolean {
+    return this.pendingResourceTypeFilter.length === 0 || this.pendingResourceTypeFilter.includes(id);
+  }
+
 
   berthNameWidth = () => Math.floor(this.timelineSvc.plannerWidthPx() * this.BERTH_NAME_PERCENT / 100);
   berthNameHeight = () => Math.floor(this.timelineSvc.plannerHeightPx() * this.BERTH_NAME_HEIGHT_PERCENT / 100);
@@ -286,10 +297,12 @@ export class BerthPlannerbaseService implements OnInit {
         height_px: res_height_px,
         resStart,
         resEnd,
-        resource_type : resourceItem.resource_type,
+        resource_type: resourceItem.resource_type,
+        color: RESOURCE_TYPE_COLORS[resourceItem.resource_type.code],
+        work_completed : resourceItem.work_completed
       }
 
-      this.resourceMap.set(resourceObj.id , resourceObj);
+      this.resourceMap.set(resourceObj.id, resourceObj);
 
       processedResources.push(resourceObj);
     }
@@ -334,28 +347,31 @@ export class BerthPlannerbaseService implements OnInit {
       const seenTypes = new Set<string>();
 
       vesselItem.resources.forEach((resource: any) => {
-        const typeId = resource.resource_type?.id || resource.resource_type_id;
+        const typeId = resource.resource_type.id;
         const typeDesc = resource.resource_type?.description || resource.resource_name || 'Resource';
 
         if (typeId && !seenTypes.has(typeId)) {
-          allResourceTypes.push({
-            title: typeDesc,
-            value: typeId
-          });
+          allResourceTypes.push({ title: typeDesc, value: typeId });
           seenTypes.add(typeId);
         }
       });
 
       if (!this.resourceTypefilterMap.has(vesselItem.id)) {
-        this.resourceTypefilterMap.set(vesselItem.id, new Set<string>(seenTypes));
+        if (this.activeResourceTypeFilter.length === 0) {
+          this.resourceTypefilterMap.set(vesselItem.id, new Set<string>(seenTypes));
+        } else {
+          const intersected = new Set<string>(
+            [...seenTypes].filter(id => this.activeResourceTypeFilter.includes(id))
+          );
+          this.resourceTypefilterMap.set(vesselItem.id, intersected);
+        }
       }
 
       const allowedResTypes = this.resourceTypefilterMap.get(vesselItem.id)!;
       const filteredResources = vesselItem.resources.filter((resource: any) => {
-        return !allowedResTypes.has(resource.resource_type_id)
+        return allowedResTypes.has(resource.resource_type.id)
       }
       );
-
       const { resources: processedResources, hiddenCount } = this.InitResources(
         filteredResources,
         pxPerMinuteHorizontal,
@@ -385,7 +401,7 @@ export class BerthPlannerbaseService implements OnInit {
         allResourceTypes,
         hiddenCount
       };
-      this.vesselMap.set(vesselObj.id , vesselObj);
+      this.vesselMap.set(vesselObj.id, vesselObj);
       return vesselObj;
     });
 
@@ -401,7 +417,7 @@ export class BerthPlannerbaseService implements OnInit {
       total_row_height,
       total_bollard_px: total_row_height,
     };
-    this.berthMap.set(berthObj.id , berthObj);
+    this.berthMap.set(berthObj.id, berthObj);
     return berthObj;
   }
 
@@ -443,7 +459,8 @@ export class BerthPlannerbaseService implements OnInit {
     const currentBerth = this.berthPlotingData[ind];
     if (currentBerth.bollard_size <= BOLLARD_MIN_SIZE) return;
 
-    const newBollardSize = currentBerth.bollard_size - BOLLARD_STEP_SIZE;
+    let newBollardSize = currentBerth.bollard_size - BOLLARD_STEP_SIZE;
+    if (newBollardSize < BOLLARD_MIN_SIZE) newBollardSize = BOLLARD_MIN_SIZE;
 
     const rawBerthItem = this.rawBerthData.find((it: any) => it.berth_id === berthID);
     if (!rawBerthItem) return;
@@ -487,42 +504,42 @@ export class BerthPlannerbaseService implements OnInit {
     const allowedResTypes = this.resourceTypefilterMap.get(vesselId)!;
     // console.log('resource toyes',allowedResTypes);
     const filteredResources = rawVesselItem.resources.filter((resource: any) => {
-        return allowedResTypes.has(resource.resource_type.id);
+      return allowedResTypes.has(resource.resource_type.id);
     });
     // console.log('filtered resources', filteredResources);
 
     const { resources: processedResources, hiddenCount } = this.InitResources(
-        filteredResources,
-        this.timelineConfig.pxPerMinute,
-        this.timelineConfig.pxPerMinuteVertical,
-        this.orientation() === 'vertical',
-        vesselObj.left_px,
-        vesselObj.top_px,
-        vesselObj.width_px,
-        vesselObj.height_px,
+      filteredResources,
+      this.timelineConfig.pxPerMinute,
+      this.timelineConfig.pxPerMinuteVertical,
+      this.orientation() === 'vertical',
+      vesselObj.left_px,
+      vesselObj.top_px,
+      vesselObj.width_px,
+      vesselObj.height_px,
     );
 
     const updatedVessel = {
-        ...vesselObj,
-        resources: processedResources,
-        hiddenCount
+      ...vesselObj,
+      resources: processedResources,
+      hiddenCount
     };
 
     const updatedVessels = [
-        ...berthObj.vessels.slice(0, vesselIndex),
-        updatedVessel,
-        ...berthObj.vessels.slice(vesselIndex + 1)
+      ...berthObj.vessels.slice(0, vesselIndex),
+      updatedVessel,
+      ...berthObj.vessels.slice(vesselIndex + 1)
     ];
 
     const updatedBerth = {
-        ...berthObj,
-        vessels: updatedVessels
+      ...berthObj,
+      vessels: updatedVessels
     };
 
     this.berthPlotingData = [
-        ...this.berthPlotingData.slice(0, berthIndex),
-        updatedBerth,
-        ...this.berthPlotingData.slice(berthIndex + 1)
+      ...this.berthPlotingData.slice(0, berthIndex),
+      updatedBerth,
+      ...this.berthPlotingData.slice(berthIndex + 1)
     ];
 
     this.vesselMap.set(updatedVessel.id, updatedVessel);
@@ -552,7 +569,10 @@ export class BerthPlannerbaseService implements OnInit {
     vesselLeft: number,
     vesselTop: number,
     vesselWidth: number,
-    vesselHeight: number
+    vesselHeight: number,
+    berthId: any,
+    bollard_st: number,
+    bollard_ed: number
   ): number {
     const sortedData = [...data].sort(
       (a, b) => new Date(a.planned_start).getTime() - new Date(b.planned_start).getTime()
@@ -580,7 +600,7 @@ export class BerthPlannerbaseService implements OnInit {
         endPx = res_top_px + res_height_px;
       }
 
-      // Same packing logic — find first fitting row
+      // find first fitting row
       let targetRow = -1;
       for (let row = 0; row < rowLastEndPx.length; row++) {
         if (startPx > rowLastEndPx[row]) {
@@ -599,18 +619,22 @@ export class BerthPlannerbaseService implements OnInit {
 
     const rowsNeeded = rowLastEndPx.length;
 
-    // Reverse the availableSpace formula:
     // availableSpace = bollardSize - TITLE_SIZE - EDGE_MARGIN
     // maxRowsFit = floor(availableSpace / SLOT_SIZE) >= rowsNeeded
-    // → bollardSize >= (rowsNeeded * SLOT_SIZE) + TITLE_SIZE + EDGE_MARGIN
-    const requiredBollardSize = (rowsNeeded * SLOT_SIZE) + TITLE_SIZE + EDGE_MARGIN;
+    // bollardSize >= (rowsNeeded * SLOT_SIZE) + TITLE_SIZE + EDGE_MARGIN
+    // Edge case check for vessel plots on how many bollards , so we can decide one bollard final size
+    const bollards = this.berthMap.get(berthId).bollard_labels;
+    const i = bollards.indexOf(String(bollard_st));
+    const j = bollards.indexOf(String(bollard_ed));
+    const requiredBollardSize = ((rowsNeeded * SLOT_SIZE) + TITLE_SIZE + EDGE_MARGIN) / (Math.abs(j - i) + 1);
 
     return Math.min(requiredBollardSize, BOLLARD_MAX_SIZE);
   }
 
   autoFitBerthResources(berthId: string) {
+    const rangeStart = this.timelineSvc.rangeStartDate();
+    const rangeEnd = this.timelineSvc.rangeEndDate();
     const berthIndex = this.berthPlotingData.findIndex((it: any) => it.id === berthId);
-    console.log('berth id', berthIndex);
     if (berthIndex === -1) return;
 
     const rawBerthItem = this.rawBerthData.find((it: any) => it.berth_id === berthId);
@@ -621,59 +645,79 @@ export class BerthPlannerbaseService implements OnInit {
     const pxPerMinuteVertical = this.timelineConfig.pxPerMinuteVertical;
     const currentBerth = this.berthPlotingData[berthIndex];
 
-    let maxRequiredBollardSize = currentBerth.bollard_size;
+    let maxRequiredBollardSize = this.timelineConfig.bollardSize;
 
-    for (const vesselItem of rawBerthItem.vessels) {
-        const bollardLayout = this.calculateVesselLayout(
-            rawBerthItem.avail_bollards_st,
-            rawBerthItem.bollards_increment,
-            vesselItem.bollards_start,
-            vesselItem.bollards_end,
-            currentBerth.bollard_size
-        );
+    const filteredVessels = (rawBerthItem.vessels || []).filter((vessel: any) => {
+      if (!rangeStart || !rangeEnd) {
+        return this.activeStatusFilter.length === 0
+          || this.activeStatusFilter.includes(vessel.status?.lookup_code);
+      }
+      const vesselStart = new Date(vessel.planned_start);
+      const vesselEnd = new Date(vessel.planned_end);
+      const inRange = vesselStart <= rangeEnd && vesselEnd >= rangeStart;
+      const statusMatch = this.activeStatusFilter.length === 0
+        || this.activeStatusFilter.includes(vessel.status?.lookup_code);
+      return inRange && statusMatch;
+    });
 
-        const { left_px, width_px, top_px, height_px } = this.timelayoutCalc(
-            new Date(vesselItem.planned_start),
-            new Date(vesselItem.planned_end),
-            bollardLayout,
-            pxPerMinuteHorizontal,
-            pxPerMinuteVertical
-        );
+    const filteredBerthItem = {
+        ...rawBerthItem,
+        vessels: filteredVessels
+    };
 
-        const allowedResTypes = this.resourceTypefilterMap.get(vesselItem.id);
-        const filteredResources = allowedResTypes
-            ? vesselItem.resources.filter((r: any) => allowedResTypes.has(r.resource_type_id))
-            : vesselItem.resources;
+    for (const vesselItem of filteredVessels) {
+      const bollardLayout = this.calculateVesselLayout(
+        rawBerthItem.avail_bollards_st,
+        rawBerthItem.bollards_increment,
+        vesselItem.bollards_start,
+        vesselItem.bollards_end,
+        currentBerth.bollard_size
+      );
 
-        const required = this.calcRequiredBollardSizeForAllResources(
-            filteredResources,
-            pxPerMinuteHorizontal,
-            pxPerMinuteVertical,
-            isVertical,
-            left_px,
-            top_px,
-            width_px,
-            height_px
-        );
+      const { left_px, width_px, top_px, height_px } = this.timelayoutCalc(
+        new Date(vesselItem.planned_start),
+        new Date(vesselItem.planned_end),
+        bollardLayout,
+        pxPerMinuteHorizontal,
+        pxPerMinuteVertical
+      );
 
-        maxRequiredBollardSize = Math.max(maxRequiredBollardSize, required);
+      const allowedResTypes = this.resourceTypefilterMap.get(vesselItem.id);
+      const filteredResources = allowedResTypes
+        ? vesselItem.resources.filter((r: any) => allowedResTypes.has(r.resource_type.id))
+        : vesselItem.resources;
+
+      const required = this.calcRequiredBollardSizeForAllResources(
+        filteredResources,
+        pxPerMinuteHorizontal,
+        pxPerMinuteVertical,
+        isVertical,
+        left_px,
+        top_px,
+        width_px,
+        height_px,
+        berthId,
+        vesselItem.bollards_start,
+        vesselItem.bollards_end,
+      );
+
+      maxRequiredBollardSize = Math.max(maxRequiredBollardSize, required);
     }
 
     const updatedBerth = this.processSingleBerth(
-        rawBerthItem,
-        maxRequiredBollardSize,
-        isVertical,
-        pxPerMinuteHorizontal,
-        pxPerMinuteVertical
+      filteredBerthItem,
+      maxRequiredBollardSize,
+      isVertical,
+      pxPerMinuteHorizontal,
+      pxPerMinuteVertical
     );
-    console.log(maxRequiredBollardSize,'max bollard size');
 
     this.berthPlotingData = [
-        ...this.berthPlotingData.slice(0, berthIndex),
-        updatedBerth,
-        ...this.berthPlotingData.slice(berthIndex + 1)
+      ...this.berthPlotingData.slice(0, berthIndex),
+      updatedBerth,
+      ...this.berthPlotingData.slice(berthIndex + 1)
     ];
-}
+  }
 
   private calculateVesselLayout(
     availStart: number,
@@ -690,6 +734,13 @@ export class BerthPlannerbaseService implements OnInit {
       offsetPx,
       sizePx
     };
+  }
+
+  ngOnDestroy() {
+    this.berthMap.clear();
+    this.resourceMap.clear();
+    this.vesselMap.clear();
+    this.resourceTypefilterMap.clear();
   }
 
 }

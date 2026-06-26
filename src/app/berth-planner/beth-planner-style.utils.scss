@@ -13,7 +13,7 @@ $planner-border-solid-light:   1px solid #eeeeee;
 // Typography Base Colors
 $planner-text-default:         #333333;
 $planner-text-muted:           #666666;
-$planner-text-timeline:        #0058be;
+$planner-text-timeline:        #222;
 $planner-text-slot:            #43474d;
 
 // Timeline grid Theme
@@ -28,6 +28,9 @@ $status-planned-bg:            #a3c3da;
 $status-cancelled-bg:          #e4092a;
 $status-arrived-bg:            #62db62;
 $status-requested-bg:          #d1d137;
+
+//button 
+$disable-btn-color : #D1D5DB;
 
 // Structural Z-Indices
 $z-index-corner:               11;

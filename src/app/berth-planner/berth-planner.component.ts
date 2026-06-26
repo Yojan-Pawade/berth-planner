@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { BerthPlannerbaseService } from './services/berth-planner-base.service';
 import { TimeLineService } from './services/timeline.service';
-import { fmt, m, y } from './berth-planner.utils';
+import { ACTION_CIRCLE_SIZE, fmt, m, y } from './berth-planner.utils';
 import { PlannerOrientation } from './berth-planner.model';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { animate, style, transition, trigger } from '@angular/animations';
@@ -64,14 +64,14 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
             clearTimeout(this.resizeTimeout);
             this.resizeTimeout = window.setTimeout(() => {
               console.log('triggered change layout');
-               this.timelineConfig = this.timelineSvc.generateTimelineConfig();
+              this.timelineConfig = this.timelineSvc.generateTimelineConfig();
               this.initBerthData();
             }, 300);
           }
         }
       });
 
-      this.resizeObserver.observe(el);
+      this.resizeObserver.observe(el, { box: 'border-box' });
 
       if (el.clientWidth > 0) {
         this.timelineSvc.setPlannerWidthPx(el.clientWidth);
@@ -90,9 +90,19 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
     }
   }
 
+  toggleResourceTypeFilter(id: string): void {
+    const idx = this.pendingResourceTypeFilter.indexOf(id);
+    if (idx === -1) {
+      this.pendingResourceTypeFilter.push(id);
+    } else {
+      this.pendingResourceTypeFilter.splice(idx, 1);
+    }
+  }
+
   onApplyFilters(): void {
     this.timelineSvc.initTimeline(this.pendingViewMode, this.pendingSlotCount);
     this.activeStatusFilter = [...this.pendingStatusFilter];
+    this.activeResourceTypeFilter = [...this.pendingResourceTypeFilter];
     this.updateLayout();
     this.initBerthData();
     this.filterMenuTrigger.closeMenu();
@@ -102,6 +112,10 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
     this.pendingViewMode = 'ONE_DAY';
     this.pendingSlotCount = 4;
     this.pendingStatusFilter = [];
+    this.pendingResourceTypeFilter = [];
+    this.resetBerthScale({
+      stopPropagation: () => { }
+    } as Event);
   }
 
   onNext() {
@@ -166,6 +180,45 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
     } 
   }
 
+  vesselNameWidth(vessel: any): number {
+    let count = 1;
+    if (vessel.hiddenCount > 0) count++;
+    if (vessel.allResourceTypes?.length > 0) count++;
+
+    const LEFT_OFFSET = 6;
+    const CIRCLE_SIZE = 22;
+    const GAP = 6;
+    const PILL_PADDING = 10;
+    const RIGHT_MARGIN = 4;
+
+    const actionsSpace = LEFT_OFFSET + (count * CIRCLE_SIZE) + (count * GAP) + PILL_PADDING + RIGHT_MARGIN;
+
+    return vessel.width_px - actionsSpace;
+  }
+
+  vesselNameHeight(vessel: any): number {
+    let count = 1;
+    if (vessel.hiddenCount > 0) count++;
+    if (vessel.allResourceTypes?.length > 0) count++;
+
+    const TOP_OFFSET = 6;
+    const CIRCLE_SIZE = 22;
+    const GAP = 6;
+    const BOTTOM_MARGIN = 4;
+
+    return vessel.height_px - (TOP_OFFSET + (count * CIRCLE_SIZE) + (count * GAP) + BOTTOM_MARGIN);
+  }
+
+  getVesselNameChars(vessel: any): string[] {
+    const chars = vessel.vessel_name.split('').map((c: string) => c === ' ' ? '\u00A0' : c);
+    const availHeight = this.vesselNameHeight(vessel);
+    const charLineHeight = 10.8;
+    const paddingVertical = 10;
+    const maxChars = Math.floor((availHeight - paddingVertical) / charLineHeight);
+    if (chars.length <= maxChars) return chars;
+    return [...chars.slice(0, maxChars - 1), '…'];
+  }
+
   showTooltip(event:Event , data:any , vesselData:any){
     event.stopPropagation();
     this.tootipData = {
@@ -199,7 +252,6 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
   }
 
   onResourceFilterChange(event: any, vesselId: string, resourceTypeId: string): void {
-
     if (this.activeMenuFilter) {
       if (event.checked) {
         this.activeMenuFilter.add(resourceTypeId);
@@ -227,7 +279,8 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
     this.resourceTypeFilter.closeMenu();
   }
   
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
+    super.ngOnDestroy();
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
