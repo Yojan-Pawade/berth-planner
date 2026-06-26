@@ -31,7 +31,7 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
   lastHeight :any;
   activeMenuFilter : Set<string> | null = null;  
   @ViewChild('plannerBody', { static: false }) plannerBody!: ElementRef<HTMLDivElement>;
-  @ViewChild(MatMenuTrigger) filterMenuTrigger!: MatMenuTrigger;
+  @ViewChild('PlannerFilter') filterMenuTrigger!: MatMenuTrigger;
   @ViewChild('toolTip') toolTip! :TemplateRef<any>; 
   @ViewChild('resourceFilterTrigger') resourceTypeFilter!: MatMenuTrigger;  
 
@@ -219,26 +219,34 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
     return [...chars.slice(0, maxChars - 1), '…'];
   }
 
-  showTooltip(event:Event , data:any , vesselData:any){
+  showTooltip(event: Event, type: 'vessel' | 'resource', berth: any, vessel: any = null, resource: any = null): void {
     event.stopPropagation();
     this.tootipData = {
-      berth_name: data.berth_name,
-      vessel_name: vesselData.vessel_name,
-      status: vesselData.status.lookup_value,
-      planned_start: new Date(vesselData.planned_start),
-      planned_end: new Date(vesselData.planned_end),
-      actual_start: vesselData.actual_start ? new Date(vesselData.actual_start) : null,
-      actual_end: vesselData.actual_end ? new Date(vesselData.planned_start) : null,
+      type: type,
+      berth_name: berth.berth_name,
+      vessel_name: vessel.vessel_name,
+      status: vessel.status.lookup_value,
+      planned_start: new Date(vessel.planned_start),
+      planned_end: new Date(vessel.planned_end),
+      actual_start: vessel.actual_start ? new Date(vessel.actual_start) : null,
+      actual_end: vessel.actual_end ? new Date(vessel.actual_end) : null,
+    };
 
+    if (type === 'resource') {
+      this.tootipData.resource_name = resource.resource_name;
+      this.tootipData.resource_type = resource.resource_type?.description;
+      this.tootipData.work_completed = resource.work_completed ?? 0;
+      this.tootipData.color = resource.color;
+      this.tootipData.resource_start = resource.planned_start ? new Date(resource.planned_start) : null;
+      this.tootipData.resource_end = resource.planned_end ? new Date(resource.planned_end) : null;
     }
-    this.dialog.open(this.toolTip ,{
-      position :{ top:'0px' , right:'0px' },
-      panelClass : 'tooltip-container',
-    }).afterClosed().subscribe((it)=>{
-      this.tootipData = null;
-    })
 
-    console.log('data',data , 'vessel',vesselData);
+    this.dialog.open(this.toolTip, {
+      position: { top: '0px', right: '0px' },
+      panelClass: 'tooltip-container',
+    }).afterClosed().subscribe(() => {
+      this.tootipData = null;
+    });
   }
 
   closeTooltip(event:Event){

@@ -19,11 +19,11 @@
       </mat-slide-toggle>
 
       <button mat-icon-button [matMenuTriggerFor]="legendMenu" matTooltip="Legend">
-  <mat-icon>info_outline</mat-icon>
-</button>
+        <mat-icon>info_outline</mat-icon>
+      </button>
 
 
-      <button mat-icon-button [matMenuTriggerFor]="filterMenu">
+      <button mat-icon-button [matMenuTriggerFor]="filterMenu" #PlannerFilter="matMenuTrigger">
         <mat-icon>tune</mat-icon>
       </button>
     </div>
@@ -153,7 +153,7 @@
               </div>
               
               <div class="vessel-name-pill" [matTooltip]="vessel.vessel_name"
-                (click)="showTooltip($event ,berth , vessel)"
+                (click)="showTooltip($event ,'vessel',berth , vessel)"
                 [style.max-width.px]="orientation() === 'horizontal' ? vesselNameWidth(vessel) : null"
                 [style.max-height.px]="orientation() === 'vertical' ? vesselNameHeight(vessel) : null">
               
@@ -173,6 +173,7 @@
             <div *ngFor="let res of vessel.resources"      
              [matTooltip]="res.resource_name + '\n' + (res.work_completed ?? 0) + '% completed'"
              [matTooltipClass]="'multiline-tooltip'"
+             (click)="showTooltip($event ,'resource', berth , vessel,res )"
              class="planner-vessel__resource"
               [ngStyle]="{
                           'left.px':   res.left_px,
@@ -332,7 +333,7 @@
   </div>
 </mat-menu>
 
-<ng-template #toolTip>
+<!-- <ng-template #toolTip>
   <div class="tooltip-content" [@dialogSlide]>
     <mat-dialog-content>
       <div class="close-icon"><mat-icon class="icon" (click)="closeTooltip($event)">close</mat-icon></div>
@@ -368,5 +369,89 @@
       </div>
     </mat-dialog-content>
   </div>
-</ng-template>
+</ng-template> -->
 
+<ng-template #toolTip>
+  <div class="tooltip-content" [@dialogSlide]>
+    <mat-dialog-content>
+      <div class="close-icon">
+        <mat-icon class="icon" (click)="closeTooltip($event)">close</mat-icon>
+      </div>
+
+      <!-- Berth -->
+      <div class="tooltip-section">
+        <span class="tooltip-section__title">Berth</span>
+        <div class="data-section">
+          <div class="metadata-field full-span">
+            <span class="field-label">Berth Name</span>
+            <span class="field-value">{{ tootipData?.berth_name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vessel -->
+      <div class="tooltip-section">
+        <span class="tooltip-section__title">Vessel</span>
+        <div class="data-section">
+          <div class="metadata-field">
+            <span class="field-label">Vessel Name</span>
+            <span class="field-value">{{ tootipData?.vessel_name }}</span>
+          </div>
+          <div class="metadata-field">
+            <span class="field-label">Status</span>
+            <span class="field-value">{{ tootipData?.status }}</span>
+          </div>
+          <div class="metadata-field full-span" *ngIf="tootipData?.planned_start">
+            <span class="field-label">Planned Start</span>
+            <span class="field-value">{{ tootipData?.planned_start | date: 'dd-MMM-yyyy hh:mm a' }}</span>
+          </div>
+          <div class="metadata-field full-span" *ngIf="tootipData?.planned_end">
+            <span class="field-label">Planned End</span>
+            <span class="field-value">{{ tootipData?.planned_end | date: 'dd-MMM-yyyy hh:mm a' }}</span>
+          </div>
+          <div class="metadata-field full-span" *ngIf="tootipData?.actual_start">
+            <span class="field-label">Actual Start</span>
+            <span class="field-value">{{ tootipData?.actual_start | date: 'dd-MMM-yyyy hh:mm a' }}</span>
+          </div>
+          <div class="metadata-field full-span" *ngIf="tootipData?.actual_end">
+            <span class="field-label">Actual End</span>
+            <span class="field-value">{{ tootipData?.actual_end | date: 'dd-MMM-yyyy hh:mm a' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resource (only for resource type) -->
+      <div class="tooltip-section" *ngIf="tootipData?.type === 'resource'">
+        <span class="tooltip-section__title">Resource</span>
+        <div class="data-section">
+          <div class="metadata-field">
+            <span class="field-label">Resource Name</span>
+            <span class="field-value">
+              {{ tootipData?.resource_name }}
+            </span>
+          </div>
+          <div class="metadata-field">
+            <span class="field-label" >Resource Type</span>
+            <span class="field-value" style="display:flex; align-items:center; gap:6px;">
+              <span style="width:10px; height:10px; border-radius:50%; flex-shrink:0;"
+                    [style.background-color]="tootipData?.color"></span>
+                    {{ tootipData?.resource_type }}</span>
+          </div>
+          <div class="metadata-field full-span">
+            <span class="field-label">Work Completed</span>
+            <span class="field-value">{{ tootipData?.work_completed }}%</span>
+          </div>
+          <div class="metadata-field full-span" *ngIf="tootipData?.planned_start">
+            <span class="field-label">Planned Start</span>
+            <span class="field-value">{{ tootipData?.planned_start | date: 'dd-MMM-yyyy hh:mm a' }}</span>
+          </div>
+          <div class="metadata-field full-span" *ngIf="tootipData?.planned_end">
+            <span class="field-label">Planned End</span>
+            <span class="field-value">{{ tootipData?.planned_end | date: 'dd-MMM-yyyy hh:mm a' }}</span>
+          </div>
+        </div>
+      </div>
+
+    </mat-dialog-content>
+  </div>
+</ng-template>
