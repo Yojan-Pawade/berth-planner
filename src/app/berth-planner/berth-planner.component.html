@@ -5,11 +5,11 @@
     </div>
     <div class="toolbar-actions">
       <div class="planner-toolbar__nav">
-        <button mat-icon-button (click)="onPrev()">
+        <button mat-icon-button (click)="onPrev()" matTooltip="Previous">
           <mat-icon>chevron_left</mat-icon>
         </button>
         <span class="planner-toolbar__label">{{ dateRangeLabel }}</span>
-        <button mat-icon-button (click)="onNext()">
+        <button mat-icon-button (click)="onNext()" matTooltip="Next">
           <mat-icon>chevron_right</mat-icon>
         </button>
       </div>
@@ -23,7 +23,7 @@
       </button>
 
 
-      <button mat-icon-button [matMenuTriggerFor]="filterMenu" #PlannerFilter="matMenuTrigger">
+      <button mat-icon-button [matMenuTriggerFor]="filterMenu" #PlannerFilter="matMenuTrigger" matTooltip="Filter">
         <mat-icon>tune</mat-icon>
       </button>
     </div>
