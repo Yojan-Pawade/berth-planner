@@ -137,6 +137,17 @@ export const RESOURCE_TYPE = [
   }
 ]
 
+export const VESSEL_STATUS_COLORS: Record<string, string> = {
+  'OPERATION_COMPLETE': '#0b9539',
+  'IN_PROGRESS':        '#dca830',
+  'PLANNED':            '#a3c3da',
+  'CANCELLED':          '#e4092a',
+  'ARRIVED':            '#62db62',
+  'REQUESTED':          '#d1d137',
+  'INVOICED':           '#6366f1',
+  'DEPARTED':           '#64748b',
+};
+
 export const RESOURCE_TYPE_COLORS: Record<string, string> = {
   'Forklift': '#F97316',
   'Machinery_&_Handling_Equipment': '#10B981',

@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy, OnInit, signal } from '@angular/core';
 import { TimeLineService } from './timeline.service';
 import { PlannerOrientation, SlotCount, TimelineConfig, ViewMode } from '../berth-planner.model';
-import { BERTH_PLANNER_DATA, BERTH_SCALE_LABEL, BOLLARD_MAX_SIZE, BOLLARD_MIN_SIZE, BOLLARD_STEP_SIZE, EDGE_MARGIN, RESOURCE_BAR_SIZE, RESOURCE_TYPE, RESOURCE_TYPE_COLORS, SLOT_SIZE, TITLE_SIZE, VESSEL_STATUS } from '../berth-planner.utils';
+import { BERTH_PLANNER_DATA, BERTH_SCALE_LABEL, BOLLARD_MAX_SIZE, BOLLARD_MIN_SIZE, BOLLARD_STEP_SIZE, EDGE_MARGIN, RESOURCE_BAR_SIZE, RESOURCE_TYPE, RESOURCE_TYPE_COLORS, SLOT_SIZE, TITLE_SIZE, VESSEL_STATUS, VESSEL_STATUS_COLORS } from '../berth-planner.utils';
 import { single } from 'rxjs';
 
 @Injectable({
@@ -15,6 +15,7 @@ export class BerthPlannerbaseService implements OnInit, OnDestroy {
   readonly BOLLARD_MIN_SIZE = BOLLARD_MIN_SIZE;
   readonly BERTH_SCALE_LABEL = BERTH_SCALE_LABEL;
   readonly RESOURCE_TYPE_COLORS = RESOURCE_TYPE_COLORS;
+  readonly VESSEL_STATUS_COLORS = VESSEL_STATUS_COLORS;
 
   _VesselStatusFilter = single<string[]>();
   vesselStatusList: any[] = [];

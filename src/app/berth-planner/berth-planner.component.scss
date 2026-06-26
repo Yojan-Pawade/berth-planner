@@ -320,7 +320,7 @@
     cursor: pointer;
     overflow: hidden;
 
-    &::before {
+    /*&::before {
         content: '';
         position: absolute;
         top: 0;
@@ -352,7 +352,7 @@
 
     &.REQUESTED::before {
         background-color: $status-requested-bg;
-    }
+    }*/
 
 
     &__resource {
@@ -408,7 +408,7 @@
         align-items: center;
         gap: 6px;
         z-index: 3;
-        top: 5px;
+        top: 3px;
         left: 6px;
 
         &.is-vertical {
@@ -653,6 +653,12 @@
             line-height: 10px;
             text-align: center;
             flex-shrink: 0;
+        }
+    }
+
+    .planner-vessel__resource{
+        &-progress{
+            top:0;
         }
     }
 
@@ -1027,4 +1033,146 @@
   scrollbar-width: thin;
 
   @include custom-scrollbar();
+}
+
+
+::ng-deep .mat-mdc-menu-panel.planner-legend-menu {
+    border-radius: 15px !important;
+    min-width: 260px !important;
+    max-width: 300px !important;
+}
+.planner-legend {
+    &__content {
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    &__header {
+        font-size: 14px;
+        font-weight: 600;
+        color: $planner-text-default;
+        padding-bottom: 8px;
+        border-bottom: $planner-border-solid-light;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    &__section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 14px;
+
+        &:first-child {
+            padding-left: 0;
+        }
+
+        &:last-child {
+            padding-right: 0;
+        }
+    }
+
+    &__label {
+        font-size: 11px;
+        font-weight: 600;
+        color: $planner-text-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    &__items {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__item-text {
+        font-size: 12px;
+        color: $planner-text-default;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__divider {
+        width: 1px;
+        align-self: stretch;
+        background-color: #eeeeee;
+        flex-shrink: 0;
+    }
+}
+
+::ng-deep .mat-mdc-menu-panel.planner-legend-menu {
+    border-radius: 15px !important;
+    min-width: 480px !important;
+    max-width: 520px !important;
+}
+
+.legend-status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &.OPERATION_COMPLETE {
+        background-color: $status-complete-bg;
+    }
+
+    &.IN_PROGRESS {
+        background-color: $status-inprogress-bg;
+    }
+
+    &.PLANNED {
+        background-color: $status-planned-bg;
+    }
+
+    &.CANCELLED {
+        background-color: $status-cancelled-bg;
+    }
+
+    &.ARRIVED {
+        background-color: $status-arrived-bg;
+    }
+
+    &.REQUESTED {
+        background-color: $status-requested-bg;
+    }
+
+    &.INVOICED {
+        background-color: #6366f1;
+    }
+
+    &.DEPARTED {
+        background-color: #64748b;
+    }
+}
+
+.legend-res-swatches {
+    display: flex;
+    gap: 3px;
+    flex-shrink: 0;
+}
+
+.swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+::ng-deep .multiline-tooltip {
+    white-space: pre-line;
 }

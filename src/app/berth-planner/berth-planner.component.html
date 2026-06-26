@@ -18,6 +18,11 @@
         {{ orientation() === 'vertical' ? 'Vertical Layout' : 'Horizontal Layout' }}
       </mat-slide-toggle>
 
+      <button mat-icon-button [matMenuTriggerFor]="legendMenu" matTooltip="Legend">
+  <mat-icon>info_outline</mat-icon>
+</button>
+
+
       <button mat-icon-button [matMenuTriggerFor]="filterMenu">
         <mat-icon>tune</mat-icon>
       </button>
@@ -165,7 +170,10 @@
               </div>
               
               </div>
-            <div *ngFor="let res of vessel.resources" [matTooltip]="res.resource_name" class="planner-vessel__resource"
+            <div *ngFor="let res of vessel.resources"      
+             [matTooltip]="res.resource_name + '\n' + (res.work_completed ?? 0) + '% completed'"
+             [matTooltipClass]="'multiline-tooltip'"
+             class="planner-vessel__resource"
               [ngStyle]="{
                           'left.px':   res.left_px,
                           'top.px':    res.top_px,
@@ -173,11 +181,11 @@
                           'height.px': res.height_px,
                           'background-color': res.color + '4D'
                       }">
-                      <div class="planner-vessel__resource-progress"
-                      *ngIf="res.work_completed > 10"
-                      [style.background-color]="res.color"
-                      [style.width.%]="orientation() === 'horizontal' ? res.work_completed : 100"
-                      [style.height.%]="orientation() === 'vertical' ? res.work_completed : 100"><span>{{res.work_completed}}%</span></div>
+                <div class="planner-vessel__resource-progress"
+                [style.background-color]="res.color"
+                [style.width.%]="orientation() === 'horizontal' ? res.work_completed : 100"
+                [style.height.%]="orientation() === 'vertical' ? res.work_completed : 100">
+                </div>
             </div>
           </div>
         </div>
@@ -290,6 +298,39 @@
   </ng-template>
 </mat-menu>
 
+<mat-menu #legendMenu="matMenu" class="planner-legend-menu">
+  <div class="planner-legend__content" (click)="$event.stopPropagation()">
+    <div class="planner-legend__header">
+      <span>Legend</span>
+    </div>
+    <div class="planner-legend__body">
+      <div class="planner-legend__section">
+        <span class="planner-legend__label">Vessel Status</span>
+        <div class="planner-legend__items">
+          <div class="planner-legend__item" *ngFor="let status of vesselStatusList">
+            <span class="legend-status-dot" [ngClass]="status.lookup_code"></span>
+            <span class="planner-legend__item-text">{{ status.lookup_value }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="planner-legend__vertical-divider"></div>
+      <div class="planner-legend__section">
+        <span class="planner-legend__label">Resource Types</span>
+        <div class="planner-legend__items">
+          <div class="planner-legend__item" *ngFor="let resType of resourceTypeList">
+            <div class="legend-res-swatches">
+              <span class="swatch swatch--fill" [style.background-color]="RESOURCE_TYPE_COLORS[resType.code]"
+                matTooltip="Progress fill"></span>
+              <span class="swatch swatch--tint" [style.background-color]="RESOURCE_TYPE_COLORS[resType.code] + '4D'"
+                matTooltip="Allocated background"></span>
+            </div>
+            <span class="planner-legend__item-text">{{ resType.description }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-menu>
 
 <ng-template #toolTip>
   <div class="tooltip-content" [@dialogSlide]>
@@ -328,3 +369,4 @@
     </mat-dialog-content>
   </div>
 </ng-template>
+
