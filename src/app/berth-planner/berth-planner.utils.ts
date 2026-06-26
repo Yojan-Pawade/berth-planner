@@ -338,8 +338,8 @@ export const BERTH_PLANNER_DATA = [
       {
         "id": "b1-v1",
         "vessel_name": "Pacific Voyager",
-        "bollards_start": 4,
-        "bollards_end": 16,
+        "bollards_start": 5,
+        "bollards_end": 13,
         "status": { "lookup_code": "IN_PROGRESS", "lookup_value": "In Progress" },
         "planned_start": "2026-06-25T08:00:00.000Z",
         "planned_end": "2026-06-27T18:00:00.000Z",
@@ -1031,8 +1031,8 @@ export const BERTH_PLANNER_DATA = [
       {
         "id": "f1-v5",
         "vessel_name": "Titan Mariner",
-        "bollards_start": 2,
-        "bollards_end": 10,
+        "bollards_start": 1,
+        "bollards_end": 9,
         "status": { "lookup_code": "IN_PROGRESS", "lookup_value": "In Progress" },
         "planned_start": "2026-06-25T12:00:00.000Z",
         "planned_end": "2026-06-27T12:00:00.000Z",

@@ -119,72 +119,6 @@ export class BerthPlannerbaseService implements OnInit, OnDestroy {
     console.log('final berth data', this.berthPlotingData);
   }
 
-
-  /*private InitResources(
-    data: any[],
-    pxPerMinuteHorizontal: number,
-    pxPerMinuteVertical: number,
-    isVertical: boolean,
-    vesselLeft: number,
-    vesselTop: number,
-    vesselWidth: number,
-    vesselHeight: number
-  ) {
-    let availableSpace: number;
-    if (isVertical) {
-      availableSpace = vesselWidth - TITLE_SIZE - EDGE_MARGIN;
-    } else {
-      availableSpace = vesselHeight - TITLE_SIZE - EDGE_MARGIN;
-    }
-
-    const maxBarsFit = Math.max(0, Math.floor((availableSpace) / SLOT_SIZE));
-    // console.log('max BAR FIRTS',maxBarsFit ,availableSpace, data , Math.floor((availableSpace) / SLOT_SIZE));
-
-    const totalResources = data.length;
-    const visibleCount = Math.min(totalResources, maxBarsFit);
-    const hiddenCount = totalResources - visibleCount;
-    const visibleResources = data.slice(0, visibleCount);
-
-    const processedResources = visibleResources.map((resourceItem: any, index: number) => {
-      const resStart = new Date(resourceItem.planned_start);
-      const resEnd = new Date(resourceItem.planned_end);
-      let res_left_px: number, res_width_px: number, res_top_px: number, res_height_px: number;
-      if (!isVertical) {
-        const resTimeLayout = this.timelineSvc.calcBarLayout(resStart, resEnd, pxPerMinuteHorizontal)!;
-        res_left_px = resTimeLayout.leftPx - vesselLeft;
-        res_width_px = resTimeLayout.widthPx;
-        res_left_px = Math.max(0, res_left_px);
-        res_width_px = Math.min(res_width_px, (vesselWidth - 1.5) - res_left_px);
-        res_height_px = RESOURCE_BAR_SIZE;
-        res_top_px = vesselHeight - EDGE_MARGIN - res_height_px - (index * SLOT_SIZE);
-      } else {
-        const resTimeLayout = this.timelineSvc.calcBarLayoutVertical(resStart, resEnd, pxPerMinuteVertical)!;
-        res_top_px = resTimeLayout.topPx - vesselTop;
-        res_height_px = resTimeLayout.heightPx;
-
-        res_top_px = Math.max(0, res_top_px);
-        res_height_px = Math.min(res_height_px, (vesselHeight - 2) - res_top_px);
-
-        res_width_px = RESOURCE_BAR_SIZE;
-        res_left_px = vesselWidth - EDGE_MARGIN - res_width_px - (index * SLOT_SIZE);
-      }
-
-      return {
-        id: resourceItem.id,
-        resource_name: resourceItem.resource_name,
-        left_px: res_left_px,
-        width_px: res_width_px,
-        top_px: res_top_px,
-        height_px: res_height_px,
-        resStart,
-        resEnd
-      };
-    });
-
-    return { resources: processedResources, hiddenCount };
-  } */
-
-
   private timelayoutCalc(startTimestamp: Date, endTimestamp: Date, bollardLayout: any, pxPerMinuteHorizontal: number = 0, pxPerMinuteVertical: number = 0) {
     let left_px: number, width_px: number, top_px: number, height_px: number
     const isVertical = this._orientation() === 'vertical';
@@ -264,7 +198,6 @@ export class BerthPlannerbaseService implements OnInit, OnDestroy {
       }
 
       let targetRow = -1;
-      // console.log('rowLastEndPx', rowLastEndPx);
       for (let row = 0; row < rowLastEndPx.length; row++) {
         if (startPx > rowLastEndPx[row]) {
           targetRow = row;
