@@ -177,7 +177,7 @@
                       *ngIf="res.work_completed > 10"
                       [style.background-color]="res.color"
                       [style.width.%]="orientation() === 'horizontal' ? res.work_completed : 100"
-                      [style.height.%]="orientation() === 'vertical' ? res.work_completed : 100">{{res.work_completed}}%</div>
+                      [style.height.%]="orientation() === 'vertical' ? res.work_completed : 100"><span>{{res.work_completed}}%</span></div>
             </div>
           </div>
         </div>

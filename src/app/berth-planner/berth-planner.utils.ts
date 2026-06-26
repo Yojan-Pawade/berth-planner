@@ -673,6 +673,83 @@ export const BERTH_PLANNER_DATA = [
           { id: 'c1-v6-r4', resource_name: 'First Aid Kit Station', planned_start: '2026-06-28T10:00:00.000Z', planned_end: '2026-06-29T10:00:00.000Z', work_completed: 0, resource_type: { id: '7beba8c6-b40a-11f0-865a-a3f914145d2b', code: 'Safety_Equipment', description: 'Safety Equipment' } },
           { id: 'c1-v6-r5', resource_name: 'Encrypted Radio Node', planned_start: '2026-06-28T12:00:00.000Z', planned_end: '2026-06-29T08:00:00.000Z', work_completed: 0, resource_type: { id: '7beba9ca-b40a-11f0-865a-6711ea1ca584', code: 'Communication_&_Electronic_Equipmentt', description: 'Communication & Electronic Equipment' } }
         ]
+      },
+      {
+        id: 'c1-v8',
+        vessel_name: 'Celestial Navigator',
+        bollards_start: 10,
+        bollards_end: 22,
+        status: { lookup_code: 'IN_PROGRESS', lookup_value: 'In Progress' },
+        planned_start: '2026-06-01T08:00:00.000Z',
+        planned_end: '2026-06-03T08:00:00.000Z',
+        actual_start: '2026-06-01T08:30:00.000Z',
+        actual_end: null,
+        resources: [
+          {
+            id: 'c1-v8-r1',
+            resource_name: 'Crane 2',
+            planned_start: '2026-06-01T08:00:00.000Z',
+            planned_end: '2026-06-03T08:00:00.000Z',
+            work_completed: 45,
+            resource_type: { id: '7beba312-b40a-11f0-865a-cf67109db96c', code: 'Crane', description: 'Crane' }
+          },
+          {
+            id: 'c1-v8-r2',
+            resource_name: 'Tugboat B',
+            planned_start: '2026-06-01T08:00:00.000Z',
+            planned_end: '2026-06-03T08:00:00.000Z',
+            work_completed: 100,
+            resource_type: { id: '7beba93e-b40a-11f0-865a-374acbdf9a9c', code: 'Machinery_&_Handling_Equipment', description: 'Machinery & Handling Equipment' }
+          },
+          {
+            id: 'c1-v8-r3',
+            resource_name: 'Loading Forklift',
+            planned_start: '2026-06-02T09:00:00.000Z',
+            planned_end: '2026-06-03T07:00:00.000Z',
+            work_completed: 20,
+            resource_type: { id: '7beba7b8-b40a-11f0-865a-0f90cba3972d', code: 'Forklift', description: 'Forklift' }
+          },
+          {
+            id: 'c1-v8-r4',
+            resource_name: 'Safety Barrier A',
+            planned_start: '2026-06-01T08:00:00.000Z',
+            planned_end: '2026-06-03T08:00:00.000Z',
+            work_completed: 60,
+            resource_type: { id: '7beba8c6-b40a-11f0-865a-a3f914145d2b', code: 'Safety_Equipment', description: 'Safety Equipment' }
+          },
+          {
+            id: 'c1-v8-r5',
+            resource_name: 'Comm Relay Alpha',
+            planned_start: '2026-06-01T08:00:00.000Z',
+            planned_end: '2026-06-03T08:00:00.000Z',
+            work_completed: 55,
+            resource_type: { id: '7beba9ca-b40a-11f0-865a-6711ea1ca584', code: 'Communication_&_Electronic_Equipmentt', description: 'Communication & Electronic Equipment' }
+          },
+          {
+            id: 'c1-v8-r6',
+            resource_name: 'Navigation Assist',
+            planned_start: '2026-06-01T08:00:00.000Z',
+            planned_end: '2026-06-01T16:00:00.000Z',
+            work_completed: 100,
+            resource_type: { id: '7beba84e-b40a-11f0-865a-37bc5813dc45', code: 'Navigation Equipment', description: 'Navigation Equipment' }
+          },
+          {
+            id: 'c1-v8-r7',
+            resource_name: 'Heavy Lift Crane',
+            planned_start: '2026-06-02T14:00:00.000Z',
+            planned_end: '2026-06-02T20:00:00.000Z',
+            work_completed: 0,
+            resource_type: { id: '7beba312-b40a-11f0-865a-cf67109db96c', code: 'Crane', description: 'Crane' }
+          },
+          {
+            id: 'c1-v8-r8',
+            resource_name: 'Ground Handling Tech',
+            planned_start: '2026-06-01T10:00:00.000Z',
+            planned_end: '2026-06-03T08:00:00.000Z',
+            work_completed: 80,
+            resource_type: { id: '7beba93e-b40a-11f0-865a-374acbdf9a9c', code: 'Machinery_&_Handling_Equipment', description: 'Machinery & Handling Equipment' }
+          }
+        ]
       }
     ]
   },
