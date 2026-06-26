@@ -64,7 +64,7 @@ export class BerthPlannerbaseService implements OnInit, OnDestroy {
   }
 
   isResourceTypeGlobalSelected(id: string): boolean {
-    return this.pendingResourceTypeFilter.length === 0 || this.pendingResourceTypeFilter.includes(id);
+    return this.pendingResourceTypeFilter.includes(id);
   }
 
 

@@ -113,10 +113,11 @@
             </div>
           </div>
           <div class="planner-berth-axis__bollards">
-            <div class="planner-berth-axis__cell" *ngFor="let bollard of berth.bollard_labels" [ngStyle]="{
-                            'height.px': orientation() === 'horizontal' ? berth.bollard_size : 'auto',
-                            'width.px': orientation() === 'vertical' ? berth.bollard_size : 'auto'
-                          }">
+            <div class="planner-berth-axis__cell" *ngFor="let bollard of berth.bollard_labels"
+             [ngStyle]="{
+                  'height.px': orientation() === 'horizontal' ? berth.bollard_size : 'auto',
+                  'width.px': orientation() === 'vertical' ? berth.bollard_size : 'auto'
+                }">
               {{ bollard }}
             </div>
           </div>
@@ -127,11 +128,11 @@
           [style.height.px]="orientation() === 'vertical' ? timelineConfig.totalContentHeightPx : berth.total_row_height">
           <div *ngFor="let vessel of berth.vessels" class="planner-vessel" [ngClass]="vessel.status.lookup_code"
             [ngStyle]="{
-                         'left.px':   vessel.left_px,
-                         'top.px':    vessel.top_px,
-                         'width.px':  vessel.width_px,
-                         'height.px': vessel.height_px
-                       }">
+                'left.px':   vessel.left_px,
+                'top.px':    vessel.top_px,
+                'width.px':  vessel.width_px,
+                'height.px': vessel.height_px
+              }">
             <div class="planner-vessel__actions" [class.is-vertical]="orientation() === 'vertical'">
               <div class="action-circle info-badge"  matTooltipClass="planner-tooltip" 
                [matTooltip]="orientation() === 'vertical' ? 'Horizontal vessel orientation' : 'Vertical vessel orientation'">
@@ -152,40 +153,38 @@
                 <mat-icon>tune</mat-icon>
               </div>
               
-              <div class="vessel-name-pill" [matTooltip]="vessel.vessel_name"
-                (click)="showTooltip($event ,'vessel',berth , vessel)"
+              <div class="vessel-name-pill" [matTooltip]="vessel.vessel_name" (click)="showTooltip($event, 'vessel', berth, vessel)"
                 [style.max-width.px]="orientation() === 'horizontal' ? vesselNameWidth(vessel) : null"
                 [style.max-height.px]="orientation() === 'vertical' ? vesselNameHeight(vessel) : null">
               
                 <ng-container *ngIf="orientation() === 'horizontal'">
+                  <span class="pill-status-dot" [ngClass]="vessel.status.lookup_code"></span>
                   {{ vessel.vessel_name }}
                 </ng-container>
               
                 <ng-container *ngIf="orientation() === 'vertical'">
-                  <span class="vessel-char"  *ngFor="let char of getVesselNameChars(vessel)">
-                    {{ char }}
-                  </span>
+                  <span class="pill-status-dot" [ngClass]="vessel.status.lookup_code"></span>
+                  <span class="vessel-char" *ngFor="let char of getVesselNameChars(vessel)">{{ char }}</span>
                 </ng-container>
-              
               </div>
-              
-              </div>
+            </div>
+
             <div *ngFor="let res of vessel.resources"      
-             [matTooltip]="res.resource_name + '\n' + (res.work_completed ?? 0) + '% completed'"
-             [matTooltipClass]="'multiline-tooltip'"
-             (click)="showTooltip($event ,'resource', berth , vessel,res )"
-             class="planner-vessel__resource"
+              [matTooltip]="res.resource_name + '\n' + (res.work_completed ?? 0) + '% completed'"
+              [matTooltipClass]="'multiline-tooltip'"
+              (click)="showTooltip($event ,'resource', berth , vessel,res )"
+              class="planner-vessel__resource"
               [ngStyle]="{
-                          'left.px':   res.left_px,
-                          'top.px':    res.top_px,
-                          'width.px':  res.width_px,
-                          'height.px': res.height_px,
-                          'background-color': res.color + '4D'
+                    'left.px':   res.left_px,
+                    'top.px':    res.top_px,
+                    'width.px':  res.width_px,
+                    'height.px': res.height_px,
+                    'background-color': res.color + '4D'
                       }">
                 <div class="planner-vessel__resource-progress"
-                [style.background-color]="res.color"
-                [style.width.%]="orientation() === 'horizontal' ? res.work_completed : 100"
-                [style.height.%]="orientation() === 'vertical' ? res.work_completed : 100">
+                  [style.background-color]="res.color"
+                  [style.width.%]="orientation() === 'horizontal' ? res.work_completed : 100"
+                  [style.height.%]="orientation() === 'vertical' ? res.work_completed : 100">
                 </div>
             </div>
           </div>
@@ -247,7 +246,13 @@
 
       <div class="right-section">
         <div class="planner-filter-menu__section">
-          <span class="planner-filter-menu__label">Vessel Status</span>
+          <div class="planner-filter-menu__section-header">
+            <span class="planner-filter-menu__label">Vessel Status</span>
+            <div class="section-header-actions">
+              <mat-icon matTooltip="Select All" (click)="selectAllStatus()">done_all</mat-icon>
+              <mat-icon matTooltip="Deselect All" (click)="deselectAllStatus()">remove_done</mat-icon>
+            </div>
+          </div>
           <div class="planner-filter-options">
             <div class="planner-filter-option" *ngFor="let status of vesselStatusList"
               [class.planner-filter-option--active]="isStatusSelected(status.lookup_code)"
@@ -258,7 +263,13 @@
           </div>
         </div>
         <div class="planner-filter-menu__section">
-          <span class="planner-filter-menu__label">Resource Type</span>
+          <div class="planner-filter-menu__section-header">
+            <span class="planner-filter-menu__label">Resource Type</span>
+            <div class="section-header-actions">
+              <mat-icon matTooltip="Select All" (click)="selectAllResourceTypes()">done_all</mat-icon>
+              <mat-icon matTooltip="Deselect All" (click)="deselectAllResourceTypes()">remove_done</mat-icon>
+            </div>
+          </div>
           <div class="planner-filter-options">
             <div class="planner-filter-option" *ngFor="let resType of resourceTypeList"
               [class.planner-filter-option--active]="isResourceTypeGlobalSelected(resType.id)"
@@ -279,7 +290,6 @@
 
   </div>
 </mat-menu>
-
 
 <mat-menu #resourceTypeMenu="matMenu" class="resource-type-filter-menu">
   <ng-template matMenuContent let-resources="resourcesList" let-vesselId="vesselId" let-berthId="berthId">
@@ -333,49 +343,11 @@
   </div>
 </mat-menu>
 
-<!-- <ng-template #toolTip>
-  <div class="tooltip-content" [@dialogSlide]>
-    <mat-dialog-content>
-      <div class="close-icon"><mat-icon class="icon" (click)="closeTooltip($event)">close</mat-icon></div>
-      <div class="data-section">
-        <div class="metadata-field">
-          <span class="field-label">Berth Name</span>
-          <span class="field-value">{{tootipData.berth_name}}</span>
-        </div>
-        <div class="metadata-field">
-          <span class="field-label">Vessel Name</span>
-          <span class="field-value">{{tootipData.vessel_name}}</span>
-        </div>
-        <div class="metadata-field">
-          <span class="field-label">status</span>
-          <span class="field-value">{{tootipData.status}}</span>
-        </div>
-        <div class="metadata-field full-span">
-          <span class="field-label">Planned Start</span>
-          <span class="field-value">{{tootipData.planned_start | date: 'dd-MMM-yyyy hh:mm a'}}</span>
-        </div>
-        <div class="metadata-field full-span">
-          <span class="field-label">Planned End</span>
-          <span class="field-value">{{tootipData.planned_end | date: 'dd-MMM-yyyy hh:mm a' }}</span>
-        </div>
-        <div class="metadata-field full-span" *ngIf="tootipData?.actual_start">
-          <span class="field-label">Planned End</span>
-          <span class="field-value">{{tootipData.actual_start | date: 'dd-MMM-yyyy hh:mm a'}}</span>
-        </div>
-        <div class="metadata-field full-span" *ngIf="tootipData?.actual_end">
-          <span class="field-label">Planned End</span>
-          <span class="field-value">{{tootipData.actual_end | date: 'dd-MMM-yyyy hh:mm a'}}</span>
-        </div>
-      </div>
-    </mat-dialog-content>
-  </div>
-</ng-template> -->
-
 <ng-template #toolTip>
   <div class="tooltip-content" [@dialogSlide]>
     <mat-dialog-content>
       <div class="close-icon">
-        <mat-icon class="icon" (click)="closeTooltip($event)">close</mat-icon>
+        <mat-icon class="icon" matTooltip="Close Tooltip" (click)="closeTooltip($event)">close</mat-icon>
       </div>
 
       <!-- Berth -->
@@ -399,7 +371,10 @@
           </div>
           <div class="metadata-field">
             <span class="field-label">Status</span>
-            <span class="field-value">{{ tootipData?.status }}</span>
+            <span class="field-value" style="display:flex; align-items:center; gap:6px;">
+              <span class="legend-status-dot" [ngClass]="tootipData?.status_code"></span>
+              {{ tootipData?.status }}
+            </span>
           </div>
           <div class="metadata-field full-span" *ngIf="tootipData?.planned_start">
             <span class="field-label">Planned Start</span>

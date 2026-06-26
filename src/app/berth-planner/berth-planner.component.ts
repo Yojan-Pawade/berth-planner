@@ -99,6 +99,22 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
     }
   }
 
+  selectAllStatus(): void {
+    this.pendingStatusFilter = this.vesselStatusList.map(s => s.lookup_code);
+  }
+
+  deselectAllStatus(): void {
+    this.pendingStatusFilter = [];
+  }
+
+  selectAllResourceTypes(): void {
+    this.pendingResourceTypeFilter = this.resourceTypeList.map(r => r.id);
+  }
+
+  deselectAllResourceTypes(): void {
+    this.pendingResourceTypeFilter = [];
+  }
+
   onApplyFilters(): void {
     this.timelineSvc.initTimeline(this.pendingViewMode, this.pendingSlotCount);
     this.activeStatusFilter = [...this.pendingStatusFilter];
@@ -226,6 +242,7 @@ export class BerthPlannerComponent extends BerthPlannerbaseService implements On
       berth_name: berth.berth_name,
       vessel_name: vessel.vessel_name,
       status: vessel.status.lookup_value,
+      status_code:   vessel.status.lookup_code,
       planned_start: new Date(vessel.planned_start),
       planned_end: new Date(vessel.planned_end),
       actual_start: vessel.actual_start ? new Date(vessel.actual_start) : null,
